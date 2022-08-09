@@ -1,0 +1,28 @@
+<div class="row">
+    
+    <div class="col-md-2 sideBar">
+        <!-- <div class="row">
+            <img class="seahorseImage" src='./../../assets/images/sea-horse.png' >
+        </div> -->
+        <div class="row">
+            
+            <div class="title">Sea Horse</div>
+            <hr>
+        </div>
+        <div class="container sideBarContainer">
+            <ul> 
+                <div class="pageTitle">Dashboards:</div>
+                <li *ngFor="let page of pages">
+                    
+                    <a class="page">{{page}}</a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+    
+    <div class="col-md-10 content">
+        <app-heatmap></app-heatmap>
+        
+    </div>
+</div>

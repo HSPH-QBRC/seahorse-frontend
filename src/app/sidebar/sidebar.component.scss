@@ -1,0 +1,62 @@
+.sideBar {
+    background-color: #f8f6f2;
+    height: 90vh;
+}
+
+.page {
+    color: #716d66;
+    text-decoration: none;
+    font-size: 12px;
+}
+.page:hover {
+    color: grey;
+    cursor: pointer;
+}
+
+ul li::marker {
+    color: #dad3c3;
+}
+
+ul li {
+    margin: 10px 25px;
+}
+
+.pageTitle {
+    margin-top: 10px;
+    color: rgba(40, 40, 40, 0.8);
+    font-size: 14px;
+    font-weight: 500;
+}
+.isActive {
+    transition: color 0.2s ease, background-color 0.2s ease;
+    background-color: #4fc9da;
+    color: #ffffff;
+    padding: 0.775rem;
+    border-radius: 0.95rem;
+    width: 100% !important;
+}
+
+.sideBarContainer {
+    width: 100%;
+}
+
+.title {
+    font-size: 36px;
+    font-weight: 800;
+    // margin: 20px 30px;
+    letter-spacing: -6px;
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+    -webkit-text-stroke: 1px rgba(40, 40, 40, 0.9);
+	-webkit-text-fill-color: tomato;
+}
+
+// .seahorseImage{
+//     width: 50px;
+// }
+
+hr {
+    border: none;
+    border-bottom: 1px dashed rgba(40, 40, 40, 0.8);
+  }
