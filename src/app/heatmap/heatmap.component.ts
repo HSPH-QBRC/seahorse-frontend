@@ -1,12 +1,13 @@
-import { Component, ComponentFactoryResolver, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import * as d3 from 'd3';
-// import d3Tip from 'd3-tip';
+import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-heatmap',
   templateUrl: './heatmap.component.html',
-  styleUrls: ['./heatmap.component.scss']
+  styleUrls: ['./heatmap.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Default
 })
 
 export class HeatmapComponent implements OnInit {
@@ -25,13 +26,10 @@ export class HeatmapComponent implements OnInit {
   }
 
   getData(limit, page) {
-    let tissue = "Pituitary";
-    let corrFront = "http://3.143.251.117:8001/gtex.json?";
-    let test = `sql=select%0D%0A++*%0D%0Afrom%0D%0A++correlations%0D%0A++join+annotations+on+correlations.Sample1+%3D+annotations.sample_id%0D%0Awhere%0D%0A++"tissue"+%3D+"${tissue}"%0D%0Aorder+by%0D%0A++"Sample1+Order"+asc%0D%0Alimit%0D%0A++${limit}`;
-    let test2 = `sql=select%0D%0A++*%0D%0Afrom%0D%0A++correlations%0D%0A++join+annotations+on+correlations.Sample1+%3D+annotations.sample_id%0D%0Awhere%0D%0A++"tissue"+%3D+"${tissue}"%0D%0Aorder+by%0D%0A++"Sample1+Order"+asc%0D%0Alimit%0D%0A++${limit}%0D%0Aoffset%0D%0A++${limit * page}`
-
-    // let annotations = 'http://3.143.251.117:8001/gtex.json?sql=select+*+from+correlations'
-    let queryURL = `${corrFront}${test2}`;
+    let tissue = "Uterus";
+    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
+    let filterUrl = `sql=select%0D%0A++*%0D%0Afrom%0D%0A++correlations%0D%0A++join+annotations+on+correlations.Sample1+%3D+annotations.sample_id%0D%0Awhere%0D%0A++"tissue"+%3D+"${tissue}"%0D%0Aorder+by%0D%0A++"Sample1+Order"+asc%0D%0Alimit%0D%0A++${limit}%0D%0Aoffset%0D%0A++${limit * page}`
+    let queryURL = `${apiUrl}${filterUrl}`;
     this.httpClient.get(queryURL).subscribe(res => {
       for (let i = 0; i < res['rows'].length; i++) {
         let currX = res['rows'][i][0]
@@ -56,14 +54,12 @@ export class HeatmapComponent implements OnInit {
         this.orderArr[currOrder] = currX;
         this.orderArr[currOrderY] = currY;
 
-        let temp = {
+        let dataObj = {
           xValue: currX,
           yValue: currY,
           value: correlationValue
         }
-        this.heatMapData.push(temp);
-
-
+        this.heatMapData.push(dataObj);
       }
       if (res["rows"].length === limit && page <= 50) {
         console.log(res["rows"].length, page)
@@ -83,16 +79,19 @@ export class HeatmapComponent implements OnInit {
       height = 1000 - margin.top - margin.bottom;
     // tool tip for individual points (if displayed)
 
-    // const pointTip = d3Tip()
-    //   .attr('class', 'd3-tip')
-    //   .offset([-10, 0])
-    //   .html((event, d) => {
-    //     // let xAxisDescription = this.isGene ? 'Gene' : 'Transcription Factor';
-    //     let tipBox = `<div><div class="category">Sample 1:</div> ${d.xValue}</div>
-    // <div><div class="category">Sample 2</div> ${d.yValue}</div>
-    // <div><div class="category">Value: </div>${d.value}</div>`
-    //     return tipBox
-    //   });
+    const pointTip = d3Tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html((event, d) => {
+        let tipBox = `<div><div class="category">Sample 1:</div> ${d.xValue}</div>
+    <div><div class="category">Sample 2</div> ${d.yValue}</div>
+    <div><div class="category">Value: </div>${d.value}</div>`
+        return tipBox
+      });
+
+    d3.select("#my_dataviz")
+      .selectAll('svg')
+      .remove();
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_dataviz")
@@ -108,6 +107,8 @@ export class HeatmapComponent implements OnInit {
     // let myVars = this.xAxisArr
     let xGroup = this.orderArr
     let yGroup = this.orderArr
+
+    svg.call(pointTip);
 
     // Build X scales and axis:
     var x = d3.scaleBand()
@@ -138,22 +139,7 @@ export class HeatmapComponent implements OnInit {
       .domain([this.min, this.max])
 
     //Read the data
-    // d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/heatmap_data.csv").then(data => {
-    // console.log(data)
     let data = this.heatMapData
-    // svg.selectAll()
-    //   .data(data, d => { return d.xValue + ':' + d.yValue; })
-    //   .enter()
-    //   .append("rect")
-    //   .attr("x", d => {
-    //     return x(d.xValue)
-    //   })
-    //   .attr("y", d => { return y(d.yValue) })
-    //   .attr("width", x.bandwidth())
-    //   .attr("height", y.bandwidth())
-    //   .style("fill", (d) => { return myColor(parseInt(d.value)) })
-    // })
-
     svg.selectAll()
       .data(data, function (d) { return `${d.xValue}:${d.yValue}` })
       .join("rect")
@@ -164,11 +150,12 @@ export class HeatmapComponent implements OnInit {
       .style("fill", function (d) {
         return myColor(d.value)
       })
-    // .on('mouseover', function (mouseEvent: any, d) {
-    //   pointTip.show(mouseEvent, d, this);
-    //   pointTip.style('left', mouseEvent.x  + 'px');
-    // })
-    // .on('mouseout', pointTip.hide);
+      .on('mouseover', function (mouseEvent: any, d) {
+        console.log("mouse over")
+        pointTip.show(mouseEvent, d, this);
+        pointTip.style('left', mouseEvent.x + 10 + 'px');
+      })
+      .on('mouseout', pointTip.hide);
 
     //used too fill in the missing ones on top or bottom half
     svg.selectAll()
@@ -181,6 +168,12 @@ export class HeatmapComponent implements OnInit {
       .style("fill", function (d) {
         return myColor(d.value)
       })
+      .on('mouseover', function (mouseEvent: any, d) {
+        console.log("mouse over")
+        pointTip.show(mouseEvent, d, this);
+        pointTip.style('left', mouseEvent.x + 10 + 'px');
+      })
+      .on('mouseout', pointTip.hide);
 
     svg.append('text')
       .classed('label', true)
@@ -198,7 +191,5 @@ export class HeatmapComponent implements OnInit {
       .attr('y', height + margin.bottom - 10)
       .style('text-anchor', 'end')
       .text('Sample 1');
-
-
   }
 }
