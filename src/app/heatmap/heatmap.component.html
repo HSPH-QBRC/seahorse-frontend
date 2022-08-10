@@ -1,1 +1,10 @@
+<br>
+<br>
+<mat-form-field appearance="outline">
+    <mat-label>Tissue</mat-label>
+    <mat-select [(value)]="tissue" (selectionChange)="onDropDownChange($event.value)">
+        <mat-option [value]="option.name" *ngFor="let option of tissueList">{{ option.name }}</mat-option>
+    </mat-select>
+</mat-form-field>
+
 <div id="my_dataviz"></div>
