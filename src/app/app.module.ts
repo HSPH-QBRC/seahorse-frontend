@@ -8,7 +8,8 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { HeatmapComponent } from './heatmap/heatmap.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatSelectModule } from '@angular/material/select'
+import { MatSelectModule } from '@angular/material/select';
+import { LegendComponent } from './legend/legend.component'
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { MatSelectModule } from '@angular/material/select'
     NavbarComponent,
     SidebarComponent,
     HeatmapComponent,
+    LegendComponent,
 
   ],
   imports: [

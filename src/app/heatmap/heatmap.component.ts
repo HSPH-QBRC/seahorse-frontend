@@ -12,14 +12,21 @@ import { catchError } from "rxjs/operators";
 })
 
 export class HeatmapComponent implements OnInit {
+  // ageTitle = "Age Range";
+  // ageMin = 0;
+  // ageMax = 10;
+  // ageColorArr = [{ "color": "royalblue", "value": this.ageMin }, { "color": "lightyellow", "value": ((this.ageMin + this.ageMax) / 2) }, { "color": "crimson", "value": this.ageMax }]
+
   xAxisArr = [];
   yAxisArr = [];
+  fullXAxisArr = [];
   heatMapData = [];
   min = 10000;
   max = 0;
   tooltipOffsetX = 10;
   orderArr = [];
-  tissue = "Breast - Mammary Tissue"
+  tissue = "";
+  annotationsDict = {}
 
   constructor(private httpClient: HttpClient) { }
 
@@ -183,7 +190,32 @@ export class HeatmapComponent implements OnInit {
   ]
 
   ngOnInit(): void {
-    // this.getData(20000, 0)
+    //Create annotations look up table too identify metadata for genes
+    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++sample_id%2C%0D%0A++tissue%2C%0D%0A++sex%2C%0D%0A++age_range%2C%0D%0A++hardy_scale_death%0D%0Afrom%0D%0A++annotations%0D%0Alimit%0D%0A++20000`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        for (let i = 0; i < res['rows'].length; i++) {
+          let gene = res['rows'][i][0];
+          let sex = res['rows'][i][2];
+          let age = res['rows'][i][3];
+          let hardyScale = res['rows'][i][4];
+          let obj = {
+            sex,
+            age,
+            hardyScale
+          }
+          this.annotationsDict[gene] = obj
+
+        }
+        // console.log(this.annotationsDict, Object.keys(this.annotationsDict).length)
+      })
   }
 
   getData(limit, page) {
@@ -200,50 +232,64 @@ export class HeatmapComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-      for (let i = 0; i < res['rows'].length; i++) {
-        let currX = res['rows'][i][0]
-        let currY = res['rows'][i][1]
-        let correlationValue = res['rows'][i][4];
+        for (let i = 0; i < res['rows'].length; i++) {
+          let currX = res['rows'][i][0]
+          let currY = res['rows'][i][1]
+          let correlationValue = res['rows'][i][4];
+          let sex = res['rows'][i][7];
+          let ageRange = res['rows'][i][8];
+          let hardyScale = res['rows'][i][9];
 
-        if (correlationValue < this.min) {
-          this.min = correlationValue;
+          if (correlationValue < this.min) {
+            this.min = correlationValue;
+          }
+          if (correlationValue > this.max) {
+            this.max = correlationValue;
+          }
+          if (!this.xAxisArr.includes(currX)) {
+            this.xAxisArr.push(currX)
+          }
+          if (!this.yAxisArr.includes(currY)) {
+            this.yAxisArr.push(currY)
+          }
+
+          let currOrder = res['rows'][i][2]
+          let currOrderY = res['rows'][i][3]
+          this.orderArr[currOrder] = currX;
+          this.orderArr[currOrderY] = currY;
+
+          let dataObj = {
+            xValue: currX,
+            yValue: currY,
+            value: correlationValue,
+            sex,
+            ageRange,
+            hardyScale
+          }
+          this.heatMapData.push(dataObj);
         }
-        if (correlationValue > this.max) {
-          this.max = correlationValue;
-        }
-        if (!this.xAxisArr.includes(currX)) {
-          this.xAxisArr.push(currX)
-        }
-        if (!this.yAxisArr.includes(currY)) {
-          this.yAxisArr.push(currY)
+        //get the full X Axis that is missing a value from the Y Axis
+        this.fullXAxisArr = [...this.xAxisArr];
+        for (let i = 0; i < this.yAxisArr.length; i++) {
+          if (!this.fullXAxisArr.includes(this.yAxisArr[i])) {
+            console.log("not found in X");
+            this.fullXAxisArr.push(this.yAxisArr[i])
+          }
         }
 
-        let currOrder = res['rows'][i][2]
-        let currOrderY = res['rows'][i][3]
-        this.orderArr[currOrder] = currX;
-        this.orderArr[currOrderY] = currY;
-
-        let dataObj = {
-          xValue: currX,
-          yValue: currY,
-          value: correlationValue
+        if (res["rows"].length === limit) {
+          console.log(limit, page)
+          this.getData(limit, page + 1)
+        } else {
+          this.createHeatMap()
         }
-        this.heatMapData.push(dataObj);
-      }
-      if (res["rows"].length === limit) {
-        console.log(limit, page)
-        this.getData(limit, page + 1)
-      } else {
-        this.createHeatMap()
-      }
-
-    })
+      })
   }
 
   createHeatMap() {
     // set the dimensions and margins of the graph
-    var margin = { top: 70, right: 50, bottom: 60, left: 60 },
-      width = 1000 - margin.left - margin.right,
+    var margin = { top: 100, right: 200, bottom: 60, left: 60 },
+      width = 1300 - margin.left - margin.right,
       height = 1000 - margin.top - margin.bottom;
     // tool tip for individual points (if displayed)
 
@@ -282,6 +328,7 @@ export class HeatmapComponent implements OnInit {
       .domain(xGroup)
       .padding(0.01);
 
+    //Label for X-Axis
     // svg.append("g")
     //   .attr("transform", "translate(0," + height + ")")
     //   .call(d3.axisBottom(x))
@@ -305,8 +352,19 @@ export class HeatmapComponent implements OnInit {
       .range(["royalblue", "lightyellow", "crimson",])
       .domain([this.min, (this.max + this.min) / 2, this.max])
 
+    var hardyScaleColor = d3.scaleLinear()
+      // @ts-ignore
+      .range(["#fff44f", "tomato"])
+      .domain([0, 5])
+
+    // var ageColor = d3.scaleBand()
+    //   // @ts-ignore
+    //   .range(["#e7feff", "Royal Blue"])
+    //   .domain(["0-9", "10-19", "20-29", "30-39", "40-49", "50-59", "60-69", "70-79", "80-89", "90-99"])
+
     //Read the data
     let data = this.heatMapData
+
     svg.selectAll()
       .data(data, function (d) { return `${d.xValue}:${d.yValue}` })
       .join("rect")
@@ -342,6 +400,58 @@ export class HeatmapComponent implements OnInit {
       })
       .on('mouseout', pointTip.hide);
 
+    let tempAnnotations = this.annotationsDict;
+    svg.selectAll()
+      .data(this.fullXAxisArr)
+      .join("rect")
+      .attr("x", function (d) {
+        return x(d)
+      })
+      .attr("y", -height * .025)
+      .attr("width", x.bandwidth())
+      .attr("height", height * .025)
+      .style("fill", function (d) {
+        return (tempAnnotations[d].sex === "M") ? "#00AB66" : "darkorchid"
+      })
+
+    let ageArr = ["0-9", "10-19", "20-29", "30-39", "40-49", "50-59", "60-69", "70-79", "80-89", "90-99"];
+    var ageScaleColor = d3.scaleBand()
+      // @ts-ignore
+      .range([0, 10])
+      .domain(ageArr)
+
+    var ageLinearColor = d3.scaleLinear()
+      // @ts-ignore
+      .range(["#e7feff", "#0000cd"])
+      .domain([0, 10])
+
+    svg.selectAll()
+      .data(this.fullXAxisArr)
+      .join("rect")
+      .attr("x", function (d) {
+        return x(d)
+      })
+      .attr("y", -(height * .025) * 2)
+      .attr("width", x.bandwidth())
+      .attr("height", height * .025)
+      .style("fill", function (d) {
+        let scaleValue = ageScaleColor(tempAnnotations[d].age)
+        return ageLinearColor(scaleValue)
+      })
+
+    svg.selectAll()
+      .data(this.fullXAxisArr)
+      .join("rect")
+      .attr("x", function (d) {
+        return x(d)
+      })
+      .attr("y", -(height * .025) * 3)
+      .attr("width", x.bandwidth())
+      .attr("height", height * .025)
+      .style("fill", function (d) {
+        return hardyScaleColor(tempAnnotations[d].hardyScale)
+      })
+
     svg.append('text')
       .classed('label', true)
       .attr('transform', 'rotate(-90)')
@@ -364,8 +474,8 @@ export class HeatmapComponent implements OnInit {
       .text('Sample 1');
 
     //gradient legend
-    var data2 = [{ "color": "royalblue", "value": this.min }, { "color": "lightyellow", "value": ((this.min + this.max) / 2) }, { "color": "crimson", "value": this.max }];
-    var extent = d3.extent(data2, d => d.value);
+    var correlationColorData = [{ "color": "royalblue", "value": this.min }, { "color": "lightyellow", "value": ((this.min + this.max) / 2) }, { "color": "crimson", "value": this.max }];
+    var extent = d3.extent(correlationColorData, d => d.value);
 
     var paddingGradient = 9;
     var widthGradient = 250;
@@ -373,35 +483,36 @@ export class HeatmapComponent implements OnInit {
     var barHeight = 8;
     var heightGradient = 100;
 
-    var xScale = d3.scaleLinear()
+    var xScaleCorr = d3.scaleLinear()
       .range([0, innerWidth - 100])
       .domain(extent);
 
-    var xTicks = data2.filter(f => f.value === this.min || f.value === this.max).map(d => d.value);
+    // var xTicks = correlationColorData.filter(f => f.value === this.min || f.value === this.max).map(d => d.value);
+    let xTicksCorr = [this.min, this.max]
 
-    var xAxisGradient = d3.axisBottom(xScale)
+    var xAxisGradient = d3.axisBottom(xScaleCorr)
       .tickSize(barHeight * 2)
-      .tickValues(xTicks);
+      .tickValues(xTicksCorr);
 
-    var svg2 = d3.select("#my_dataviz")
+    var correlationLegend = d3.select("svg")
       .append("svg")
       .attr("width", widthGradient)
       .attr("height", heightGradient)
-      .attr('x', width + 10)
+      .attr('x', width + 100)
       .attr('y', 100);
 
-    var defs = svg2.append("defs");
+    var defs = correlationLegend.append("defs");
     var linearGradient = defs
       .append("linearGradient")
       .attr("id", "myGradient");
 
     linearGradient.selectAll("stop")
-      .data(data2)
+      .data(correlationColorData)
       .enter().append("stop")
       .attr("offset", d => ((d.value - extent[0]) / (extent[1] - extent[0]) * 100) + "%")
       .attr("stop-color", d => d.color)
 
-    var g = svg2.append("g")
+    var g = correlationLegend.append("g")
       .attr("transform", `translate(${paddingGradient + 10}, 30)`)
 
     g.append("rect")
@@ -409,7 +520,7 @@ export class HeatmapComponent implements OnInit {
       .attr("height", barHeight)
       .style("fill", "url(#myGradient)");
 
-    svg2.append('text')
+    correlationLegend.append('text')
       .attr('y', 20)
       .attr('x', 17)
       .style('fill', 'rgba(0,0,0,.7)')
@@ -418,24 +529,176 @@ export class HeatmapComponent implements OnInit {
       .attr("font-weight", "bold")
       .text("Correlations");
 
-    svg.append('text')
-      .classed('label', true)
-      .style('font-size', '24px')
+    //next legend
+    // AGE gradient legend
+    let ageMin = 0
+    let ageMax = 99
+    var dataAge = [{ "color": "#e7feff", "value": ageMin }, { "color": "#0000cd", "value": ageMax }];
+    var extent2 = d3.extent(dataAge, d => d.value);
+
+    var xScale = d3.scaleLinear()
+      .range([0, innerWidth - 100])
+      .domain(extent2);
+
+    let xTicksAge = [ageMin, ageMax]
+
+    var xAxisGradient2 = d3.axisBottom(xScale)
+      .tickSize(barHeight * 2)
+      .tickValues(xTicksAge);
+
+    var ageLegend = d3.select("svg")
+      .append("svg")
+      .attr("width", widthGradient)
+      .attr("height", heightGradient)
+      .attr('x', width + 100)
+      .attr('y', 50 + 100 * 5);
+
+    var defsAge = ageLegend.append("defs");
+    var linearGradient = defsAge
+      .append("linearGradient")
+      .attr("id", "myGradientAge");
+
+    linearGradient.selectAll("stop")
+      .data(dataAge)
+      .enter().append("stop")
+      .attr("offset", d => ((d.value - extent2[0]) / (extent2[1] - extent2[0]) * 100) + "%")
+      .attr("stop-color", d => d.color)
+
+    var gAge = ageLegend.append("g")
+      .attr("transform", `translate(${paddingGradient + 10}, 30)`)
+
+    gAge.append("rect")
+      .attr("width", innerWidth - 100)
+      .attr("height", barHeight)
+      .style("fill", "url(#myGradientAge)");
+
+    ageLegend.append('text')
+      .attr('y', 20)
+      .attr('x', 17)
       .style('fill', 'rgba(0,0,0,.7)')
+      .style('font-size', '11px')
+      .attr("text-anchor", "start")
       .attr("font-weight", "bold")
-      .attr('y', -margin.left + 10)
-      .attr('x', width / 2)
-      .style('text-anchor', 'middle')
-      .text(this.tissue);
+      .text("Age Range");
+
+    //next legend
+    // HARDY gradient legend
+    // "#fff44f", "tomato"
+    let hardyMin = 0
+    let hardyMax = 5
+    var dataHardy = [{ "color": "yellow", "value": hardyMin }, { "color": "tomato", "value": hardyMax }];
+    var extentHardy = d3.extent(dataHardy, d => d.value);
+
+    var xScale = d3.scaleLinear()
+      .range([0, innerWidth - 100])
+      .domain(extentHardy);
+
+    var xTicks3 = [hardyMin, hardyMax]
+
+    var xAxisGradient3 = d3.axisBottom(xScale)
+      .tickSize(barHeight * 2)
+      .tickValues(xTicks3);
+
+    var hardyLegend = d3.select("svg")
+      .append("svg")
+      .attr("width", widthGradient)
+      .attr("height", heightGradient)
+      .attr('x', width + 100)
+      .attr('y', 50 + 100 * 4);
+
+    var defs3 = hardyLegend.append("defs");
+    var linearGradient = defs3
+      .append("linearGradient")
+      .attr("id", "myGradientHardy");
+
+    linearGradient.selectAll("stop")
+      .data(dataHardy)
+      .enter().append("stop")
+      .attr("offset", d => ((d.value - extentHardy[0]) / (extentHardy[1] - extentHardy[0]) * 100) + "%")
+      .attr("stop-color", d => d.color)
+
+    var gHardy = hardyLegend.append("g")
+      .attr("transform", `translate(${paddingGradient + 10}, 30)`)
+
+    gHardy.append("rect")
+      .attr("width", innerWidth - 100)
+      .attr("height", barHeight)
+      .style("fill", "url(#myGradientHardy)");
+
+    hardyLegend.append('text')
+      .attr('y', 20)
+      .attr('x', 17)
+      .style('fill', 'rgba(0,0,0,.7)')
+      .style('font-size', '11px')
+      .attr("text-anchor", "start")
+      .attr("font-weight", "bold")
+      .text("Hardy Scale Death");
 
     g.append("g")
       .call(xAxisGradient)
-      .select(".domain").remove();
+      .select(".domain")
+
+    gAge.append("g")
+      .call(xAxisGradient2)
+      .select(".domain")
+
+    gHardy.append("g")
+      .call(xAxisGradient3)
+      .select(".domain")
+
+    // select the svg area
+    var SvgSex = d3.select("svg")
+      .append("svg")
+      .attr('x', width + 20)
+      .attr('y', 275);
+
+    var keys = ["Male", "Female"]
+
+    // Add one dot in the legend for each name.
+    SvgSex.selectAll("mydots")
+      .data(keys)
+      .enter()
+      .append("circle")
+      .attr("cx", 100)
+      .attr("cy", function (d, i) { return 100 + i * 25 }) // 100 is where the first dot appears. 25 is the distance between dots
+      .attr("r", 7)
+      .style("fill", d => {
+        return (d === "Male") ? "#00AB66" : "darkorchid"
+      })
+
+    // Add one dot in the legend for each name.
+    SvgSex.selectAll("mylabels")
+      .data(keys)
+      .enter()
+      .append("text")
+      .attr("x", 120)
+      .attr("y", function (d, i) { return 100 + i * 25 }) // 100 is where the first dot appears. 25 is the distance between dots
+      .style("fill", "rgba(0,0,0,.7)")
+      .text(function (d) { return d })
+      .attr("text-anchor", "left")
+      .style("alignment-baseline", "middle")
+
+
+    // svg.append('text')
+    //   .classed('label', true)
+    //   .style('font-size', '24px')
+    //   .style('fill', 'rgba(0,0,0,.7)')
+    //   .attr("font-weight", "bold")
+    //   .attr('y', -margin.left + 10)
+    //   .attr('x', width / 2)
+    //   .style('text-anchor', 'middle')
+    //   .text(this.tissue);
   }
 
   onDropDownChange(value) {
     this.tissue = value;
-    console.log("value: ", value)
+    this.xAxisArr = [];
+    this.yAxisArr = [];
+    this.fullXAxisArr = [];
+    this.heatMapData = [];
+    this.min = 10000;
+    this.max = 0;
+    this.orderArr = [];
     this.getData(20000, 0)
   }
 }
