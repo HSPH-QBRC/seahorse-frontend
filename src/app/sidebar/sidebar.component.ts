@@ -16,16 +16,21 @@ import { HttpClient } from '@angular/common/http';
 })
 
 export class SidebarComponent implements OnInit {
-  pages = [
-    "default",
-    "projects",
-    "ecommerce",
-    "marketing",
-    "social",
-    "bidding",
-    "online courses",
-    "logistics",
-    "landing"
+  phenotype = [
+    "Age",
+    "Sex",
+    "Race",
+    "Height",
+    "Weight",
+    "BMI"
+  ]
+
+  tissue = [
+    "Brain",
+    "Liver",
+    "Kidney",
+    "Colon-Descending",
+    "Colon-Transverse"
   ]
 
   constructor() { }

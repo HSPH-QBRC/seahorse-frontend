@@ -1,28 +1,43 @@
 <div class="row">
-    
+
     <div class="col-md-2 sideBar">
         <!-- <div class="row">
             <img class="seahorseImage" src='./../../assets/images/sea-horse.png' >
         </div> -->
         <div class="row">
-            
             <div class="title">Sea Horse</div>
-            <hr>
+        </div>
+        <hr>
+        <div class="container sideBarContainer">
+            <ul>
+                <div class="pageTitle">Phenotype:</div>
+                <li *ngFor="let cat of phenotype">
+                    <a class="page">{{cat}}</a>
+                </li>
+            </ul>
         </div>
         <div class="container sideBarContainer">
-            <ul> 
-                <div class="pageTitle">Dashboards:</div>
-                <li *ngFor="let page of pages">
-                    
-                    <a class="page">{{page}}</a>
+            <ul>
+                <div class="pageTitle">Tissue:</div>
+                <li *ngFor="let cat of phenotype">
+                    <a class="page">{{cat}}</a>
                 </li>
             </ul>
         </div>
 
     </div>
-    
+
     <div class="col-md-10 content">
-        <app-heatmap></app-heatmap>
+        <div class="row">
+            <app-heatmap2></app-heatmap2>
+        </div>
+        <div class="row">
+            <app-boxplot></app-boxplot>
+        </div>
+        <div class="row">
+            <app-scatterplot></app-scatterplot>
+        </div>
         
+
     </div>
 </div>

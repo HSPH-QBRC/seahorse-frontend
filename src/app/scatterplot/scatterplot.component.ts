@@ -1,0 +1,120 @@
+import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import * as d3 from 'd3';
+import d3Tip from 'd3-tip';
+import { HttpClient } from '@angular/common/http';
+import { catchError } from "rxjs/operators";
+
+@Component({
+  selector: 'app-scatterplot',
+  templateUrl: './scatterplot.component.html',
+  styleUrls: ['./scatterplot.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Default
+})
+
+export class ScatterPlotComponent implements OnInit {
+
+  constructor(private httpClient: HttpClient) { }
+
+
+  ngOnInit(): void {
+    let numerical1 = 'SMMPPD';
+    let numerical2 = 'SME1ANTI'
+    this.getData(numerical1, numerical2)
+
+  }
+  scatterPlotData = [];
+  xMin = Infinity
+  xMax = -Infinity
+  yMin = Infinity
+  yMax = -Infinity
+
+
+  getData(numerical1, numerical2) {
+    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numerical1}%2C%0D%0A++${numerical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numerical1}+is+not+""%0D%0A++AND+${numerical2}+is+not+""%0D%0A`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        for (let i = 0; i < res['rows'].length; i++) {
+          if (res['rows'][i][1] < this.xMin) {
+            this.xMin = res['rows'][i][1];
+          }
+          if (res['rows'][i][1] > this.xMax) {
+            this.xMax = res['rows'][i][1];
+          }
+          if (res['rows'][i][2] < this.yMin) {
+            this.yMin = res['rows'][i][2];
+          }
+          if (res['rows'][i][2] > this.yMax) {
+            this.yMax = res['rows'][i][2];
+          }
+
+          let temp = {
+            'name': res['rows'][i][0],
+            'xValue': res['rows'][i][1],
+            'yValue': res['rows'][i][2]
+          };
+
+          this.scatterPlotData.push(temp);
+        }
+        this.createScatterPlot()
+      })
+
+  }
+
+  createScatterPlot() {
+    // set the dimensions and margins of the graph
+    var margin = { top: 10, right: 30, bottom: 100, left: 100 },
+      width = 800 - margin.left - margin.right,
+      height = 800 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_scatterplot")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+    // Add X axis
+    var x = d3.scaleLinear()
+      .domain([this.xMin, this.xMax])
+      .range([0, width]);
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x))
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .attr("transform", "rotate(-65)");
+
+
+    // Add Y axis
+    var y = d3.scaleLinear()
+      .domain([this.yMin, this.yMax])
+      .range([height, 0]);
+    svg.append("g")
+      .call(d3.axisLeft(y));
+
+    // Add dots
+    svg.append('g')
+      .selectAll("dot")
+      .data(this.scatterPlotData)
+      .enter()
+      .append("circle")
+      .attr("cx", function (d) {
+        return x(d.xValue);
+      })
+      .attr("cy", function (d) { return y(d.yValue); })
+      .attr("r", 1.5)
+      .style("fill", "#69b3a2")
+  }
+
+}

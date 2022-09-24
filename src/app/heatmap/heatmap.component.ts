@@ -190,9 +190,12 @@ export class HeatmapComponent implements OnInit {
   ]
 
   ngOnInit(): void {
+    // let categorical1 = "SMATSSCR"
+    // let categorical2 = "SME1ANTI"
     //Create annotations look up table too identify metadata for genes
     let apiUrl = "http://3.143.251.117:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++sample_id%2C%0D%0A++tissue%2C%0D%0A++sex%2C%0D%0A++age_range%2C%0D%0A++hardy_scale_death%0D%0Afrom%0D%0A++annotations%0D%0Alimit%0D%0A++20000`
+    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categorical1}%2C%0D%0A++${categorical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categorical1}+is+not+%22%22%0D%0A++AND+${categorical2}+is+not+%22%22%0D%0A`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -201,6 +204,7 @@ export class HeatmapComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        console.log("heatmap: ", res)
         for (let i = 0; i < res['rows'].length; i++) {
           let gene = res['rows'][i][0];
           let sex = res['rows'][i][2];
@@ -214,7 +218,7 @@ export class HeatmapComponent implements OnInit {
           this.annotationsDict[gene] = obj
 
         }
-        // console.log(this.annotationsDict, Object.keys(this.annotationsDict).length)
+        this.createHeatMap()
       })
   }
 
@@ -272,7 +276,6 @@ export class HeatmapComponent implements OnInit {
         this.fullXAxisArr = [...this.xAxisArr];
         for (let i = 0; i < this.yAxisArr.length; i++) {
           if (!this.fullXAxisArr.includes(this.yAxisArr[i])) {
-            console.log("not found in X");
             this.fullXAxisArr.push(this.yAxisArr[i])
           }
         }
@@ -303,12 +306,12 @@ export class HeatmapComponent implements OnInit {
         return tipBox
       });
 
-    d3.select("#my_dataviz")
+    d3.select("#my_heatmap")
       .selectAll('svg')
       .remove();
 
     // append the svg object to the body of the page
-    var svg = d3.select("#my_dataviz")
+    var svg = d3.select("#my_heatmap")
       .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
@@ -401,18 +404,21 @@ export class HeatmapComponent implements OnInit {
       .on('mouseout', pointTip.hide);
 
     let tempAnnotations = this.annotationsDict;
+    let spacer = 5
     svg.selectAll()
       .data(this.fullXAxisArr)
       .join("rect")
       .attr("x", function (d) {
         return x(d)
       })
-      .attr("y", -height * .025)
+      .attr("y", -height * .025 - spacer)
       .attr("width", x.bandwidth())
-      .attr("height", height * .025)
+      .attr("height", height * .025 - 1)
       .style("fill", function (d) {
         return (tempAnnotations[d].sex === "M") ? "#00AB66" : "darkorchid"
       })
+    console.log("fullXAxisArr: ", this.fullXAxisArr)
+    console.log("this.annotationsDict: ", this.annotationsDict)
 
     let ageArr = ["0-9", "10-19", "20-29", "30-39", "40-49", "50-59", "60-69", "70-79", "80-89", "90-99"];
     var ageScaleColor = d3.scaleBand()
@@ -422,7 +428,7 @@ export class HeatmapComponent implements OnInit {
 
     var ageLinearColor = d3.scaleLinear()
       // @ts-ignore
-      .range(["#e7feff", "#0000cd"])
+      .range(["#e7feff", "darkcyan"])
       .domain([0, 10])
 
     svg.selectAll()
@@ -431,9 +437,9 @@ export class HeatmapComponent implements OnInit {
       .attr("x", function (d) {
         return x(d)
       })
-      .attr("y", -(height * .025) * 2)
+      .attr("y", -(height * .025) * 2 - spacer)
       .attr("width", x.bandwidth())
-      .attr("height", height * .025)
+      .attr("height", height * .025 - 1)
       .style("fill", function (d) {
         let scaleValue = ageScaleColor(tempAnnotations[d].age)
         return ageLinearColor(scaleValue)
@@ -445,9 +451,9 @@ export class HeatmapComponent implements OnInit {
       .attr("x", function (d) {
         return x(d)
       })
-      .attr("y", -(height * .025) * 3)
+      .attr("y", -(height * .025) * 3 - spacer)
       .attr("width", x.bandwidth())
-      .attr("height", height * .025)
+      .attr("height", height * .025 - 1)
       .style("fill", function (d) {
         return hardyScaleColor(tempAnnotations[d].hardyScale)
       })
@@ -499,7 +505,7 @@ export class HeatmapComponent implements OnInit {
       .attr("width", widthGradient)
       .attr("height", heightGradient)
       .attr('x', width + 100)
-      .attr('y', 100);
+      .attr('y', 500);
 
     var defs = correlationLegend.append("defs");
     var linearGradient = defs
@@ -533,7 +539,7 @@ export class HeatmapComponent implements OnInit {
     // AGE gradient legend
     let ageMin = 0
     let ageMax = 99
-    var dataAge = [{ "color": "#e7feff", "value": ageMin }, { "color": "#0000cd", "value": ageMax }];
+    var dataAge = [{ "color": "#e7feff", "value": ageMin }, { "color": "darkcyan", "value": ageMax }];
     var extent2 = d3.extent(dataAge, d => d.value);
 
     var xScale = d3.scaleLinear()
@@ -551,7 +557,7 @@ export class HeatmapComponent implements OnInit {
       .attr("width", widthGradient)
       .attr("height", heightGradient)
       .attr('x', width + 100)
-      .attr('y', 50 + 100 * 5);
+      .attr('y', 200);
 
     var defsAge = ageLegend.append("defs");
     var linearGradient = defsAge
@@ -604,7 +610,7 @@ export class HeatmapComponent implements OnInit {
       .attr("width", widthGradient)
       .attr("height", heightGradient)
       .attr('x', width + 100)
-      .attr('y', 50 + 100 * 4);
+      .attr('y', 100);
 
     var defs3 = hardyLegend.append("defs");
     var linearGradient = defs3
@@ -650,7 +656,7 @@ export class HeatmapComponent implements OnInit {
     var SvgSex = d3.select("svg")
       .append("svg")
       .attr('x', width + 20)
-      .attr('y', 275);
+      .attr('y', 215);
 
     var keys = ["Male", "Female"]
 

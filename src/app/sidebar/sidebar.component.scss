@@ -1,6 +1,6 @@
 .sideBar {
     background-color: #f8f6f2;
-    height: 90vh;
+    height: 100vh;
 }
 
 .page {
@@ -45,7 +45,7 @@ ul li {
     font-weight: 800;
     // margin: 20px 30px;
     letter-spacing: -6px;
-    margin: 10px 0;
+    margin: 10px 0 0 0 ;
     display: flex;
     justify-content: center;
     -webkit-text-stroke: 1px rgba(40, 40, 40, 0.9);
@@ -58,5 +58,5 @@ ul li {
 
 hr {
     border: none;
-    border-bottom: 1px dashed rgba(40, 40, 40, 0.8);
+    border-top: 1px dashed rgba(40, 40, 40, 0.8);
   }
