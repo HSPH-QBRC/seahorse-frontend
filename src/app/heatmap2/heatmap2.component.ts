@@ -23,6 +23,7 @@ export class Heatmap2Component implements OnInit {
   tissue = "";
   annotationsDict = [];
   countDict = {};
+  maxCount = 0;
 
   constructor(private httpClient: HttpClient) { }
 
@@ -63,9 +64,25 @@ export class Heatmap2Component implements OnInit {
             this.countDict[tempString] = 0;
           } else {
             this.countDict[tempString] += 1;
+            this.maxCount = Math.max(this.maxCount, this.countDict[tempString]);
           }
-
           this.annotationsDict.push(temp)
+        }
+
+        //Used to handle the empty spaces on the heatmap
+        for (let i = 0; i < this.xAxisArr.length; i++) {
+          for (let j = 0; j < this.yAxisArr.length; j++) {
+            let tempString = this.xAxisArr[i] + '_' + this.yAxisArr[j];
+            if (this.countDict[tempString] === undefined) {
+              this.countDict[tempString] = 0;
+              let temp = {
+                "name": "",
+                "xValue": this.xAxisArr[i],
+                "yValue": this.yAxisArr[j]
+              }
+              this.annotationsDict.push(temp)
+            }
+          }
         }
         this.heatMapData = this.annotationsDict
         this.createHeatMap()
@@ -76,9 +93,19 @@ export class Heatmap2Component implements OnInit {
 
   createHeatMap() {
     // set the dimensions and margins of the graph
-    var margin = { top: 30, right: 30, bottom: 100, left: 100 },
-      width = 800 - margin.left - margin.right,
+    var margin = { top: 30, right: 200, bottom: 100, left: 100 },
+      width = 1000 - margin.left - margin.right,
       height = 800 - margin.top - margin.bottom;
+
+    const pointTip = d3Tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html((event, d) => {
+        let tipBox = `<div><div class="category">Name: </div> ${d.name.length === 0 ? "N/A" : d.name}</div>
+    <div><div class="category">X: </div> ${d.xValue}</div>
+    <div><div class="category">Y:  </div>${d.yValue}</div>`
+        return tipBox
+      });
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_heatmap2")
@@ -89,15 +116,13 @@ export class Heatmap2Component implements OnInit {
       .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
 
-    // Labels of row and columns
-    // var myGroups = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
-    // var myVars = ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10"]
+    svg.call(pointTip);
 
     // Build X scales and axis:
     var x = d3.scaleBand()
       .range([0, width])
       .domain(this.xAxisArr)
-      .padding(0.01);
+      .padding(-0.02);
     svg.append("g")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x))
@@ -111,19 +136,17 @@ export class Heatmap2Component implements OnInit {
     var y = d3.scaleBand()
       .range([height, 0])
       .domain(this.yAxisArr)
-      .padding(0.01);
+    // .padding(0.008);
     svg.append("g")
       .call(d3.axisLeft(y));
 
     // Build color scale
     var myColor = d3.scaleLinear()
       // @ts-ignore
-      .range(["blue", "red"])
-      .domain([1, 100])
+      .range(["royalblue", "crimson"])
+      .domain([0, this.maxCount])
 
-    //Read the data
-
-    let test = this.countDict
+    let countLookUp = this.countDict
 
     svg.selectAll()
       .data(this.heatMapData)
@@ -134,11 +157,74 @@ export class Heatmap2Component implements OnInit {
       .attr("width", x.bandwidth())
       .attr("height", y.bandwidth())
       .style("fill", function (d) {
-        let tempString = d.xValue + "_" + d.yValue;
-        return myColor(test[tempString])
+        let stringConcat = d.xValue + "_" + d.yValue;
+        return myColor(countLookUp[stringConcat])
       })
+      .on('mouseover', function (mouseEvent: any, d) {
+        pointTip.show(mouseEvent, d, this);
+        pointTip.style('left', mouseEvent.x + 10 + 'px');
+      })
+      .on('mouseout', pointTip.hide);
 
 
+    //Legend
+    var countColorData = [{ "color": "royalblue", "value": 0 }, { "color": "crimson", "value": this.maxCount }];
+    var extent = d3.extent(countColorData, d => d.value);
 
+    var paddingGradient = 9;
+    var widthGradient = 250;
+    var innerWidth = widthGradient - (paddingGradient * 2);
+    var barHeight = 8;
+    var heightGradient = 100;
+
+    var xScaleCorr = d3.scaleLinear()
+      .range([0, innerWidth - 100])
+      .domain(extent);
+
+    // var xTicks = countColorData.filter(f => f.value === this.min || f.value === this.max).map(d => d.value);
+    let xTicksCorr = [0, this.maxCount]
+
+    var xAxisGradient = d3.axisBottom(xScaleCorr)
+      .tickSize(barHeight * 2)
+      .tickValues(xTicksCorr);
+
+    var countLegend = d3.select("svg")
+      .append("svg")
+      .attr("width", widthGradient)
+      .attr("height", heightGradient)
+      .attr('x', width + 100)
+      .attr('y', 100);
+
+    var defs = countLegend.append("defs");
+    var linearGradient = defs
+      .append("linearGradient")
+      .attr("id", "myGradient");
+
+    linearGradient.selectAll("stop")
+      .data(countColorData)
+      .enter().append("stop")
+      .attr("offset", d => ((d.value - extent[0]) / (extent[1] - extent[0]) * 100) + "%")
+      .attr("stop-color", d => d.color)
+
+    var g = countLegend.append("g")
+      .attr("transform", `translate(${paddingGradient + 10}, 30)`)
+
+    g.append("rect")
+      .attr("width", innerWidth - 100)
+      .attr("height", barHeight)
+      .style("fill", "url(#myGradient)");
+
+    countLegend.append('text')
+      .attr('y', 20)
+      .attr('x', 17)
+      .style('fill', 'rgba(0,0,0,.7)')
+      .style('font-size', '11px')
+      .attr("text-anchor", "start")
+      .attr("font-weight", "bold")
+      .text("Count");
+
+    g.append("g")
+      .call(xAxisGradient)
+      .select(".domain")
   }
 }

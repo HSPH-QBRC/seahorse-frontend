@@ -1,5 +1,4 @@
 <div class="row">
-
     <div class="col-md-2 sideBar">
         <!-- <div class="row">
             <img class="seahorseImage" src='./../../assets/images/sea-horse.png' >
@@ -10,24 +9,23 @@
         <hr>
         <div class="container sideBarContainer">
             <ul>
-                <div class="pageTitle">Phenotype:</div>
-                <li *ngFor="let cat of phenotype">
+                <div class="pageTitle">Metadata:</div>
+                <li *ngFor="let cat of metadataArr">
                     <a class="page">{{cat}}</a>
                 </li>
             </ul>
         </div>
-        <div class="container sideBarContainer">
-            <ul>
-                <div class="pageTitle">Tissue:</div>
-                <li *ngFor="let cat of phenotype">
-                    <a class="page">{{cat}}</a>
-                </li>
-            </ul>
-        </div>
+        
 
     </div>
 
     <div class="col-md-10 content">
+        <div class="row">
+            <app-histogram></app-histogram>
+        </div>
+        <div class="row">
+            <app-barchart></app-barchart>
+        </div>
         <div class="row">
             <app-heatmap2></app-heatmap2>
         </div>

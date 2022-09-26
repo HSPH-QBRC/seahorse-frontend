@@ -53,7 +53,6 @@ export class BoxPlotComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        console.log("boxplot res: ", res)
         for (let i = 0; i < res['rows'].length; i++) {
           if (res['rows'][i][2] < this.min) {
             this.min = res['rows'][i][2];
@@ -69,7 +68,6 @@ export class BoxPlotComponent implements OnInit {
 
           this.boxPlotData.push(temp);
         }
-        console.log("boxplot: ", this.boxPlotData, this.min, this.max)
         this.createBoxPlot()
       })
   }

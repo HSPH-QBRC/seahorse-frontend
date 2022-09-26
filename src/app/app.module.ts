@@ -5,21 +5,23 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './navbar/navbar.component';
-import { SidebarComponent } from './sidebar/sidebar.component';
+import { MetadataCrossComparisonComponent } from './metadataCrossComparison/metadataCrossComparison.component';
 import { HeatmapComponent } from './heatmap/heatmap.component';
 import { Heatmap2Component } from './heatmap2/heatmap2.component';
 import { BoxPlotComponent } from './boxplot/boxplot.component';
-import { ScatterPlotComponent } from './scatterplot/scatterplot.component'
+import { ScatterPlotComponent } from './scatterplot/scatterplot.component';
+import { BarChartComponent } from './barchart/barchart.component';
+import { HistogramComponent } from './histogram/histogram.component'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSelectModule } from '@angular/material/select';
 import { LegendComponent } from './legend/legend.component';
-// import { IgvTestComponent } from './igv-test/igv-test.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { HomepageComponent } from './homepage/homepage.component'
 
 
 
@@ -27,13 +29,15 @@ import { MatButtonModule } from '@angular/material/button';
   declarations: [
     AppComponent,
     NavbarComponent,
-    SidebarComponent,
+    MetadataCrossComparisonComponent,
     HeatmapComponent,
     Heatmap2Component,
     BoxPlotComponent,
     ScatterPlotComponent,
+    BarChartComponent,
+    HistogramComponent,
     LegendComponent,
-    // IgvTestComponent,
+    HomepageComponent
   ],
   imports: [
     BrowserModule,

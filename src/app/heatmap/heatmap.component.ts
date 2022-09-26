@@ -204,7 +204,6 @@ export class HeatmapComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        console.log("heatmap: ", res)
         for (let i = 0; i < res['rows'].length; i++) {
           let gene = res['rows'][i][0];
           let sex = res['rows'][i][2];
@@ -281,7 +280,6 @@ export class HeatmapComponent implements OnInit {
         }
 
         if (res["rows"].length === limit) {
-          console.log(limit, page)
           this.getData(limit, page + 1)
         } else {
           this.createHeatMap()
@@ -417,8 +415,6 @@ export class HeatmapComponent implements OnInit {
       .style("fill", function (d) {
         return (tempAnnotations[d].sex === "M") ? "#00AB66" : "darkorchid"
       })
-    console.log("fullXAxisArr: ", this.fullXAxisArr)
-    console.log("this.annotationsDict: ", this.annotationsDict)
 
     let ageArr = ["0-9", "10-19", "20-29", "30-39", "40-49", "50-59", "60-69", "70-79", "80-89", "90-99"];
     var ageScaleColor = d3.scaleBand()
