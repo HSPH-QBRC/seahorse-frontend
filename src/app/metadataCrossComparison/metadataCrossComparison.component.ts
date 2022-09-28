@@ -36,7 +36,7 @@ export class MetadataCrossComparisonComponent implements OnInit {
     this.getListOfMetadata();
     this.getMetadataType(this.metadataId);
     this.getComparisonStats();
-    
+
   }
 
   getListOfMetadata() {
@@ -57,7 +57,6 @@ export class MetadataCrossComparisonComponent implements OnInit {
   }
 
   getMetadataType(meta) {
-    console.log("meta",meta)
     let apiUrl = "http://3.143.251.117:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++VARNAME%2C%0D%0A++TYPE%0D%0Afrom%0D%0A++metadata%0D%0Awhere%0D%0A++VARNAME+%3D+"${meta}"`
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -76,14 +75,16 @@ export class MetadataCrossComparisonComponent implements OnInit {
   }
 
   changeMetadata(name) {
-    d3.select("#plotArea")
-    .selectAll('svg')
-    .remove();
+    d3.select("#my_plotArea")
+      .selectAll('div')
+      .remove();
+
 
     this.plotTypeLookUp = {};
     this.metadataId = name;
     this.getMetadataType(this.metadataId);
     this.getComparisonStats();
+    window.scrollTo(0,0);
 
   }
 
@@ -101,7 +102,6 @@ export class MetadataCrossComparisonComponent implements OnInit {
       .subscribe(res => {
         this.dataSource = [];
         this.isLoading = false;
-        console.log("comparison stats res: ", res['rows'])
         for (let i = 0; i < res['rows'].length; i++) {
           let temp = {
             "metadata2": res['rows'][i][1],
@@ -126,29 +126,28 @@ export class MetadataCrossComparisonComponent implements OnInit {
   }
 
   onSelectMetadata2(name) {
+    d3.select("#plotArea")
+      .selectAll('svg')
+      .remove();
+
     this.displayScatterPlot = false;
     this.displayBoxPlot = false;
     this.displayHeatmap = false;
-    console.log("meta2: ", name, this.plotTypeLookUp)
     if (this.plotTypeLookUp[this.metadataId] === 'integer' || this.plotTypeLookUp[this.metadataId] === 'decimal') {
       if (this.plotTypeLookUp[name] === 'integer, encoded value' || this.plotTypeLookUp[name] === 'string') {
-        console.log("num/cat so should use boxplot")
         this.displayBoxPlot = true;
         this.metadata2Id = name;
       }
       else if (this.plotTypeLookUp[name] === 'integer' || this.plotTypeLookUp[name] === 'decimal') {
-        console.log("num/num so should use scatter")
         this.displayScatterPlot = true;
         this.metadata2Id = name;
       }
-    } else if(this.plotTypeLookUp[this.metadataId] === 'integer, encoded value' || this.plotTypeLookUp[this.metadataId] === 'string'){
+    } else if (this.plotTypeLookUp[this.metadataId] === 'integer, encoded value' || this.plotTypeLookUp[this.metadataId] === 'string') {
       if (this.plotTypeLookUp[name] === 'integer, encoded value' || this.plotTypeLookUp[name] === 'string') {
-        console.log("cat/cat so should use heatmap")
         this.displayHeatmap = true;
         this.metadata2Id = name;
       }
       else if (this.plotTypeLookUp[name] === 'integer' || this.plotTypeLookUp[name] === 'decimal') {
-        console.log("cat/num so should use boxplot")
         this.displayBoxPlot = true;
         this.metadata2Id = this.metadataId;
         this.metadataId = name;

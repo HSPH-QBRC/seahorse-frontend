@@ -17,32 +17,38 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   @Input() metadataCatId = '';
   @Input() metadataNumId = '';
   isLoading = false;
+  boxPlotData = [];
+  min = Infinity;
+  max = -Infinity;
+  xAxisArr = [];
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
-    this.isLoading = true;
-    // let numeric = 'SMATSSCR'
-    // let categorical = 'SME1ANTI'
-    let categorical = this.metadataCatId;
-    let numeric = this.metadataNumId;
-    console.log("num/cat: ", numeric, categorical)
-    this.getData(numeric, categorical);
+    // this.isLoading = true;
+    // // let numeric = 'SMATSSCR'
+    // // let categorical = 'SME1ANTI'
+    // let categorical = this.metadataCatId;
+    // let numeric = this.metadataNumId;
+    // this.getData(numeric, categorical);
 
 
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // this.isLoading = true;
-    // let numeric = this.metadataNumId;
-    // let categorical = this.metadataCatId;
-    // this.getData(numeric, categorical);
+    this.resetVariables()
+    this.isLoading = true;
+    let numeric = this.metadataNumId;
+    let categorical = this.metadataCatId;
+    this.getData(numeric, categorical);
   }
 
-  boxPlotData = [];
-  min = Infinity;
-  max = -Infinity;
-  xAxisArr= [];
+  resetVariables() {
+    this.boxPlotData = [];
+    this.min = Infinity;
+    this.max = -Infinity;
+    this.xAxisArr = [];
+  }
 
   getData(numericId, categoricalId) {
     let apiUrl = "http://3.143.251.117:8001/gtex.json?";
@@ -56,26 +62,27 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       }))
       .subscribe(res => {
         this.isLoading = false;
-        console.log("res: ",res)
         for (let i = 0; i < res['rows'].length; i++) {
-          if (res['rows'][i][2] < this.min) {
-            this.min = res['rows'][i][2];
-          }
-          if (res['rows'][i][2] > this.max) {
-            this.max = res['rows'][i][2];
-          }
-          if(!this.xAxisArr.includes(res['rows'][i][1].toString())){
-            this.xAxisArr.push(res['rows'][i][1].toString())
-          }
-          let temp = {
-            'name': res['rows'][i][0],
-            'key': res['rows'][i][1],
-            'value': res['rows'][i][2]
-          };
+          if (this.xAxisArr.length < 5 || this.xAxisArr.includes(res['rows'][i][1])) {
+            if (res['rows'][i][2] < this.min) {
+              this.min = res['rows'][i][2];
+            }
+            if (res['rows'][i][2] > this.max) {
+              this.max = res['rows'][i][2];
+            }
+            if (!this.xAxisArr.includes(res['rows'][i][1].toString())) {
+              this.xAxisArr.push(res['rows'][i][1].toString())
+            }
+            let temp = {
+              'name': res['rows'][i][0],
+              'key': res['rows'][i][1],
+              'value': res['rows'][i][2]
+            };
 
-          this.boxPlotData.push(temp);
+            this.boxPlotData.push(temp);
+          }
+
         }
-        console.log("boxplot: ",this.boxPlotData, this.xAxisArr)
         this.createBoxPlot()
       })
   }
@@ -86,6 +93,10 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     var margin = { top: 10, right: 30, bottom: 30, left: 100 },
       width = 800 - margin.left - margin.right,
       height = 800 - margin.top - margin.bottom;
+
+    d3.select("#my_boxplot")
+      .selectAll('svg')
+      .remove();
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_boxplot")

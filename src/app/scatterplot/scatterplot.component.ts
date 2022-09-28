@@ -19,7 +19,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
-    this.isLoading = false;
+    this.isLoading = true;
     let numerical1 = this.metadataId;
     let numerical2 = this.metadata2Id
     this.refreshData();
@@ -27,7 +27,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.isLoading = false;
+    this.isLoading = true;
     let numerical1 = this.metadataId;
     let numerical2 = this.metadata2Id;
     this.refreshData();
@@ -52,7 +52,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
-        this.isLoading = true;
+        this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
           if (res['rows'][i][1] < this.xMin) {
             this.xMin = res['rows'][i][1];
@@ -86,6 +86,16 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       width = 600 - margin.left - margin.right,
       height = 600 - margin.top - margin.bottom;
 
+      const pointTip = d3Tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html((event, d) => {
+        let tipBox = `<div><div class="category">Name:</div> ${d.name}</div>
+    <div><div class="category">${this.metadataId}: </div> ${d.xValue}</div>
+    <div><div class="category">${this.metadata2Id}: </div>${d.yValue}</div>`
+        return tipBox
+      });
+
     d3.select("#my_scatterplot")
       .selectAll('svg')
       .remove();
@@ -98,6 +108,8 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       .append("g")
       .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.call(pointTip);
 
     // Add X axis
     var x = d3.scaleLinear()
@@ -126,12 +138,38 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       .data(this.scatterPlotData)
       .enter()
       .append("circle")
-      .attr("cx", function (d) {
-        return x(d.xValue);
-      })
+      .attr("cx", function (d) { return x(d.xValue); })
       .attr("cy", function (d) { return y(d.yValue); })
-      .attr("r", 1.5)
+      .attr("r", 1)
       .style("fill", "#69b3a2")
+      .on('mouseover', function (mouseEvent: any, d) {
+        pointTip.show(mouseEvent, d, this);
+        pointTip.style('left', mouseEvent.x + 10 + 'px');
+      })
+      .on('mouseout', pointTip.hide);
+
+      svg.append('text')
+      .classed('label', true)
+      .attr('transform', 'rotate(-90)')
+      .attr("font-weight", "bold")
+      .attr('y', -margin.left + 10)
+      .attr('x', -height / 2)
+      .attr('dy', '.71em')
+      .style('fill', 'rgba(0,0,0,.8)')
+      .style('text-anchor', 'middle')
+      .style('font-size', '12px')
+      .text(this.metadata2Id);
+
+    svg
+      .append('text')
+      .classed('label', true)
+      .attr("font-weight", "bold")
+      .attr('x', width / 2)
+      .attr('y', height + margin.bottom - 10)
+      .style('fill', 'rgba(0,0,0,.8)')
+      .style('text-anchor', 'middle')
+      .style('font-size', '12px')
+      .text(this.metadataId);
   }
 
   refreshData() {

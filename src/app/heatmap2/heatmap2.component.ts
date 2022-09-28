@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit, Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
@@ -11,34 +11,57 @@ import { catchError } from "rxjs/operators";
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class Heatmap2Component implements OnInit {
+export class Heatmap2Component implements OnInit, OnChanges {
   @Input() metadataId = '';
   @Input() metadata2Id = '';
   xAxisArr = [];
   yAxisArr = [];
   fullXAxisArr = [];
   heatMapData = [];
-  min = 10000;
-  max = 0;
+  min = Infinity;
+  max = -Infinity;
   tooltipOffsetX = 10;
   orderArr = [];
-  tissue = "";
   annotationsDict = [];
   countDict = {};
-  maxCount = 0;
+  maxCount = 1;
   isLoading = false;
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
+
     this.isLoading = true;
-    // let categorical1 = "SMTS"
-    // let categorical2 = "SMATSSCR"
     let categorical1 = this.metadataId;
     let categorical2 = this.metadata2Id;
+    this.getData(categorical1, categorical2);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.resetVariables()
+
+    this.isLoading = true;
+    let categorical1 = this.metadataId;
+    let categorical2 = this.metadata2Id;
+    this.getData(categorical1, categorical2);
+  }
+
+  resetVariables() {
+    this.xAxisArr = [];
+    this.yAxisArr = [];
+    this.fullXAxisArr = [];
+    this.heatMapData = [];
+    this.min = Infinity;
+    this.max = -Infinity;
+    this.orderArr = [];
+    this.annotationsDict = [];
+    this.countDict = {};
+    this.maxCount = 1;
+  }
+
+  getData(categorical1, categorical2) {
     //Create annotations look up table too identify metadata for genes
     let apiUrl = "http://3.143.251.117:8001/gtex.json?";
-    // let annotationUrl = `sql=select%0D%0A++sample_id%2C%0D%0A++tissue%2C%0D%0A++sex%2C%0D%0A++age_range%2C%0D%0A++hardy_scale_death%0D%0Afrom%0D%0A++annotations%0D%0Alimit%0D%0A++20000`
     let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categorical1}%2C%0D%0A++${categorical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categorical1}+is+not+%22%22%0D%0A++AND+${categorical2}+is+not+%22%22%0D%0A`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -68,7 +91,7 @@ export class Heatmap2Component implements OnInit {
           //add counter dictionary
           let tempString = xValue + '_' + yValue;
           if (this.countDict[tempString] === undefined) {
-            this.countDict[tempString] = 0;
+            this.countDict[tempString] = 1;
           } else {
             this.countDict[tempString] += 1;
             this.maxCount = Math.max(this.maxCount, this.countDict[tempString]);
@@ -108,9 +131,11 @@ export class Heatmap2Component implements OnInit {
       .attr('class', 'd3-tip')
       .offset([-10, 0])
       .html((event, d) => {
+        let temp = d.xValue + "_" + d.yValue;
         let tipBox = `<div><div class="category">Name: </div> ${d.name.length === 0 ? "N/A" : d.name}</div>
-    <div><div class="category">X: </div> ${d.xValue}</div>
-    <div><div class="category">Y:  </div>${d.yValue}</div>`
+    <div><div class="category">${this.metadataId}: </div> ${d.xValue}</div>
+    <div><div class="category">${this.metadata2Id}:  </div>${d.yValue}</div>
+    <div><div class="category">Count:  </div>${this.countDict[temp]}</div>`
         return tipBox
       });
 
@@ -133,23 +158,27 @@ export class Heatmap2Component implements OnInit {
     var x = d3.scaleBand()
       .range([0, width])
       .domain(this.xAxisArr)
-      .padding(-0.02);
+      .padding(-0.02)
+
+    let rotateText = (this.xAxisArr[0].length > 5) ? "translate(0,0)rotate(-65)" : "translate(10,10)rotate(0)";
+    let xAxisLabels = (this.xAxisArr.length > 50) ? d3.axisBottom(x).tickFormat((d) => '').tickSize(0) : d3.axisBottom(x)
     svg.append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x))
+      .call(xAxisLabels)
       .selectAll("text")
       .style("text-anchor", "end")
       .attr("dx", "-.8em")
       .attr("dy", ".15em")
-      .attr("transform", "rotate(-65)");
+      .attr("transform", rotateText);
 
     // Build X scales and axis:
     var y = d3.scaleBand()
       .range([height, 0])
       .domain(this.yAxisArr)
-    // .padding(0.008);
+    let yAxisLabels = (this.yAxisArr.length > 25) ? d3.axisLeft(y).tickFormat((d) => '').tickSize(0) : d3.axisLeft(y);
     svg.append("g")
-      .call(d3.axisLeft(y));
+      .call(yAxisLabels)
+
 
     // Build color scale
     var myColor = d3.scaleLinear()
@@ -177,8 +206,30 @@ export class Heatmap2Component implements OnInit {
       })
       .on('mouseout', pointTip.hide);
 
+    svg.append('text')
+      .classed('label', true)
+      .attr('transform', 'rotate(-90)')
+      .attr("font-weight", "bold")
+      .attr('y', -margin.left + 10)
+      .attr('x', -height / 2)
+      .attr('dy', '.71em')
+      .style('fill', 'rgba(0,0,0,.8)')
+      .style('text-anchor', 'middle')
+      .style('font-size', '12px')
+      .text(this.metadata2Id);
 
-    //Legend
+    svg
+      .append('text')
+      .classed('label', true)
+      .attr("font-weight", "bold")
+      .attr('x', width / 2)
+      .attr('y', height + margin.bottom - 10)
+      .style('fill', 'rgba(0,0,0,.8)')
+      .style('text-anchor', 'middle')
+      .style('font-size', '12px')
+      .text(this.metadataId);
+
+    // //Legend
     var countColorData = [{ "color": "royalblue", "value": 0 }, { "color": "crimson", "value": this.maxCount }];
     var extent = d3.extent(countColorData, d => d.value);
 
@@ -199,7 +250,7 @@ export class Heatmap2Component implements OnInit {
       .tickSize(barHeight * 2)
       .tickValues(xTicksCorr);
 
-    var countLegend = d3.select("svg")
+    var countLegend = d3.select("#my_heatmap2").select("svg")
       .append("svg")
       .attr("width", widthGradient)
       .attr("height", heightGradient)

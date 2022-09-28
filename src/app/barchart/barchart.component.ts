@@ -19,13 +19,12 @@ export class BarChartComponent implements OnInit, OnChanges {
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
-    let categorical = this.metadataId
-    this.isLoading = true;
-    this.getData(categorical);
+    // let categorical = this.metadataId
+    // this.isLoading = true;
+    // this.getData(categorical);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log("change detected: ", this.metadataId)
     let categorical = this.metadataId
     this.isLoading = true;
     this.getData(categorical);
@@ -38,6 +37,7 @@ export class BarChartComponent implements OnInit, OnChanges {
   maxCount = 1;
   min = Infinity;
   max = -Infinity;
+  sumstat = [];
 
   getData(categoric) {
     let apiUrl = "http://3.143.251.117:8001/gtex.json?";
@@ -50,7 +50,7 @@ export class BarChartComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
-        this.isLoading=false;
+        this.isLoading = false;
         this.dataSize = res['rows'].length;
         for (let i = 0; i < res['rows'].length; i++) {
           let cat = res['rows'][i][1];
@@ -70,17 +70,26 @@ export class BarChartComponent implements OnInit, OnChanges {
           }
           this.countArr.push(temp)
         }
-        this.createBoxPlot()
+        this.createBarChart()
       })
   }
-  sumstat = []
 
-  createBoxPlot() {
-    console.log("creating new bar chart")
+  maxXaxisLabelLength = 0;
+
+  createBarChart() {
     // set the dimensions and margins of the graph
     var margin = { top: 30, right: 30, bottom: 150, left: 100 },
       width = 700 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
+
+    const pointTip = d3Tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html((event, d) => {
+        let tipBox = `<div><div class="category">Name: </div> ${d.name.length === 0 ? "N/A" : d.name}</div>
+    <div><div class="category">Count: </div> ${d.count}</div>`
+        return tipBox
+      });
 
     d3.select("#my_barchart")
       .selectAll('svg')
@@ -95,16 +104,22 @@ export class BarChartComponent implements OnInit, OnChanges {
       .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
 
+    svg.call(pointTip);
+
+    // let longName = false;
     // X axis
     var x = d3.scaleBand()
       .range([0, width])
       .domain(this.countArr.map(function (d) { return d.name; }))
       .padding(0.2);
+
+    let rotateText = (this.countArr.length > 5) ? "translate(-10,0)rotate(-45)" : "translate(-10,0)";
+    let xAxisLabels = (this.countArr.length > 55) ? d3.axisBottom(x).tickFormat((d) => '').tickSize(0) : d3.axisBottom(x);
     svg.append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x))
+      .call(xAxisLabels)
       .selectAll("text")
-      .attr("transform", "translate(-10,0)rotate(-45)")
+      .attr("transform", rotateText)
       .style("text-anchor", "end");
 
     // Add Y axis
@@ -124,6 +139,22 @@ export class BarChartComponent implements OnInit, OnChanges {
       .attr("width", x.bandwidth())
       .attr("height", function (d) { return height - y(d.count); })
       .attr("fill", "#69b3a2")
+      .on('mouseover', function (mouseEvent: any, d) {
+        pointTip.show(mouseEvent, d, this);
+        pointTip.style('left', mouseEvent.x + 10 + 'px');
+      })
+      .on('mouseout', pointTip.hide);
 
+    svg.append('text')
+      .classed('label', true)
+      .attr('transform', 'rotate(-90)')
+      .attr("font-weight", "bold")
+      .attr('y', -margin.left + 10)
+      .attr('x', -height / 2)
+      .attr('dy', '.71em')
+      .style('fill', 'rgba(0,0,0,.8)')
+      .style('text-anchor', 'middle')
+      .style('font-size', '12px')
+      .text('Counts');
   }
 }

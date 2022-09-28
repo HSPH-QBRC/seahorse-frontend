@@ -19,10 +19,9 @@ export class HistogramComponent implements OnInit, OnChanges {
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
-    // let numeric = 'SMRRNART'
-    let numeric = this.metadataId;
-    this.isLoading = true;
-    this.getData(numeric);
+    // let numeric = this.metadataId;
+    // this.isLoading = true;
+    // this.getData(numeric);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -48,7 +47,6 @@ export class HistogramComponent implements OnInit, OnChanges {
       }))
       .subscribe(res => {
         this.isLoading = false;
-        console.log("histogram res: ", res)
         this.dataSize = res['rows'].length;
         for (let i = 0; i < res['rows'].length; i++) {
           let num = res['rows'][i][1];
@@ -63,9 +61,18 @@ export class HistogramComponent implements OnInit, OnChanges {
 
   createBoxPlot() {
     // set the dimensions and margins of the graph
-    var margin = { top: 10, right: 30, bottom: 30, left: 40 },
+    var margin = { top: 10, right: 30, bottom: 100, left: 100 },
       width = 460 - margin.left - margin.right,
       height = 400 - margin.top - margin.bottom;
+
+    const pointTip = d3Tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html((event, d) => {
+        let tipBox = `<div><div class="category">Interval: ${d.x0} - ${d.x1}</div></div>
+    <div><div class="category">Count: </div> ${d.length}</div>`
+        return tipBox
+      });
 
     d3.select("#my_histogram")
       .selectAll('svg')
@@ -79,6 +86,8 @@ export class HistogramComponent implements OnInit, OnChanges {
       .append("g")
       .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.call(pointTip);
 
     // X axis: scale and draw:
     var x = d3.scaleLinear()
@@ -118,6 +127,33 @@ export class HistogramComponent implements OnInit, OnChanges {
       .attr("width", function (d) { return Math.abs(x(d.x1) - x(d.x0) - 1); })
       .attr("height", function (d) { return height - y(d.length); })
       .style("fill", "#69b3a2")
+      .on('mouseover', function (mouseEvent: any, d) {
+        pointTip.show(mouseEvent, d, this);
+        pointTip.style('left', mouseEvent.x + 10 + 'px');
+      })
+      .on('mouseout', pointTip.hide);
 
+    svg.append('text')
+      .classed('label', true)
+      .attr('transform', 'rotate(-90)')
+      .attr("font-weight", "bold")
+      .attr('y', -margin.left + 10)
+      .attr('x', -height / 2)
+      .attr('dy', '.71em')
+      .style('fill', 'rgba(0,0,0,.8)')
+      .style('text-anchor', 'middle')
+      .style('font-size', '12px')
+      .text('Counts');
+
+    svg
+      .append('text')
+      .classed('label', true)
+      .attr("font-weight", "bold")
+      .attr('x', width / 2)
+      .attr('y', height + margin.bottom - 10)
+      .style('fill', 'rgba(0,0,0,.8)')
+      .style('text-anchor', 'middle')
+      .style('font-size', '12px')
+      .text('Intervals');
   }
 }
