@@ -1,32 +1,109 @@
+<app-progress-spinner *ngIf="isLoading"></app-progress-spinner>
+
 <div class="row">
     <div class="col-md-2 sideBar">
-        <!-- <div class="row">
-            <img class="seahorseImage" src='./../../assets/images/sea-horse.png' >
-        </div> -->
         <div class="row">
-            <div class="title">Sea Horse</div>
+            <a routerLink="/" routerLinkActive="active" ariaCurrentWhenActive="page">
+                <div class="title">Sea Horse</div>
+            </a>
         </div>
         <hr>
         <div class="container sideBarContainer">
             <ul>
                 <div class="pageTitle">Metadata:</div>
-                <li *ngFor="let cat of metadataArr">
-                    <a class="page">{{cat}}</a>
-                </li>
+                <div *ngFor="let cat of metadataArr">
+                    <li *ngIf="!notIncludeList.includes(cat)">
+                        <a class="page" (click)="changeMetadata(cat)">{{cat}}</a>
+                    </li>
+                </div>
+
             </ul>
         </div>
-        
-
     </div>
 
     <div class="col-md-10 content">
-        <div class="row">
-            <app-histogram></app-histogram>
+        <div class="row text-center">
+            <h1>{{metadataId}}</h1>
+            <h4>({{currMetadataType}})</h4>
         </div>
-        <div class="row">
-            <app-barchart></app-barchart>
+
+
+        <div *ngIf="plotTypeLookUp[metadataId] === 'integer' || plotTypeLookUp[metadataId] === 'decimal'" class="row">
+            <app-histogram [metadataId]="metadataId"></app-histogram>
         </div>
-        <div class="row">
+        <div *ngIf="plotTypeLookUp[metadataId] === 'integer, encoded value' || plotTypeLookUp[metadataId] === 'string'"
+            class="row">
+            <app-barchart [metadataId]="metadataId"></app-barchart>
+        </div>
+
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" *ngIf="dataSource.length > 0">
+            <ng-container matColumnDef="metadata2">
+                <th mat-header-cell *matHeaderCellDef> Metadata 2 </th>
+                <td mat-cell *matCellDef="let element" (click)="onSelectMetadata2(element.metadata2)"> {{element.metadata2}} </td>
+            </ng-container>
+            <ng-container matColumnDef="test">
+                <th mat-header-cell *matHeaderCellDef> Test </th>
+                <td mat-cell *matCellDef="let element"> {{element.test}} </td>
+            </ng-container>
+            <ng-container matColumnDef="pValue">
+                <th mat-header-cell *matHeaderCellDef> P-Value </th>
+                <td mat-cell *matCellDef="let element"> {{element.pValue}} </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <div *ngIf="displayScatterPlot">
+            <app-scatterplot [metadataId]="metadataId" [metadata2Id]="metadata2Id"></app-scatterplot>
+        </div>
+        <div *ngIf="displayBoxPlot">
+            <app-boxplot [metadataCatId]="metadataId" [metadataNumId]="metadata2Id"></app-boxplot>
+        </div>
+        <div *ngIf="displayHeatmap">
+            <app-heatmap2 [metadataId]="metadataId" [metadata2Id]="metadata2Id"></app-heatmap2>
+        </div>
+
+        <!-- <div *ngFor="let item of plotTypeLookUp | keyvalue">
+            <div *ngIf="(plotTypeLookUp[metadataId] === 'integer' || plotTypeLookUp[metadataId] === 'decimal')">
+
+                <div *ngIf="item.key !== metadataId">
+                    <div *ngIf="(item.value === 'integer' || item.value ==='decimal')">
+                        <div class="row">
+                            <h4>{{item.key}}: {{metadataId}}</h4>
+                            <app-scatterplot [metadataId]="metadataId" [metadata2Id]="item.key"></app-scatterplot>
+                        </div>
+                    </div>
+                    <div *ngIf="(item.value === 'integer, encoded value' || item.value ==='string' )">
+                        <div class="row">
+                            <app-boxplot [metadataCatId]="item.key" [metadataNumId]="metadataId"></app-boxplot>
+                        </div>
+                    </div>
+                </div>
+                <h1 *ngIf="item.key === metadataId">
+                    {{item.key}}: {{metadataId}}
+                </h1>
+
+            </div>
+            <div
+                *ngIf="(plotTypeLookUp[metadataId] === 'integer, encoded value' || plotTypeLookUp[metadataId] === 'string')">
+
+                <div *ngIf="item.key !== metadataId">
+                    <div *ngIf="(item.value === 'integer' || item.value ==='decimal')">
+                        <div class="row">
+                            <app-boxplot [metadataCatId]="metadataId" [metadataNumId]="item.key"></app-boxplot>
+                        </div>
+                    </div>
+                    <div *ngIf="(item.value === 'integer, encoded value' || item.value ==='string' )">
+                        <div class="row">
+                            <h3>heatmap should be here</h3>
+                            <app-heatmap2 [metadataId]="metadataId" [metadata2Id]="item.key"></app-heatmap2>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div> -->
+
+        <!-- <div class="row">
             <app-heatmap2></app-heatmap2>
         </div>
         <div class="row">
@@ -34,8 +111,8 @@
         </div>
         <div class="row">
             <app-scatterplot></app-scatterplot>
-        </div>
-        
+        </div> -->
+
 
     </div>
 </div>

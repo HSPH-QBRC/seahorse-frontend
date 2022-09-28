@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
@@ -13,34 +13,33 @@ import * as d3Collection from 'd3-collection';
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class BoxPlotComponent implements OnInit {
-
-  // xAxisArr = [];
-  // yAxisArr = [];
-  // fullXAxisArr = [];
-  // heatMapData = [];
-  // min = 10000;
-  // max = 0;
-  // tooltipOffsetX = 10;
-  // orderArr = [];
-  // tissue = "";
-  // annotationsDict = {}
+export class BoxPlotComponent implements OnInit, OnChanges {
+  @Input() metadataCatId = '';
+  @Input() metadataNumId = '';
 
   constructor(private httpClient: HttpClient) { }
 
-
-
   ngOnInit(): void {
-    let numeric = 'SMATSSCR'
-    let categorical = 'SME1ANTI'
+    // let numeric = 'SMATSSCR'
+    // let categorical = 'SME1ANTI'
+    let categorical = this.metadataCatId;
+    let numeric = this.metadataNumId;
+    console.log("num/cat: ", numeric, categorical)
     this.getData(numeric, categorical);
 
 
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // let numeric = this.metadataNumId;
+    // let categorical = this.metadataCatId;
+    // this.getData(numeric, categorical);
+  }
+
   boxPlotData = [];
   min = Infinity;
   max = -Infinity;
+  xAxisArr= [];
 
   getData(numericId, categoricalId) {
     let apiUrl = "http://3.143.251.117:8001/gtex.json?";
@@ -53,12 +52,16 @@ export class BoxPlotComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        console.log("res: ",res)
         for (let i = 0; i < res['rows'].length; i++) {
           if (res['rows'][i][2] < this.min) {
             this.min = res['rows'][i][2];
           }
           if (res['rows'][i][2] > this.max) {
             this.max = res['rows'][i][2];
+          }
+          if(!this.xAxisArr.includes(res['rows'][i][1].toString())){
+            this.xAxisArr.push(res['rows'][i][1].toString())
           }
           let temp = {
             'name': res['rows'][i][0],
@@ -68,6 +71,7 @@ export class BoxPlotComponent implements OnInit {
 
           this.boxPlotData.push(temp);
         }
+        console.log("boxplot: ",this.boxPlotData, this.xAxisArr)
         this.createBoxPlot()
       })
   }
@@ -105,7 +109,7 @@ export class BoxPlotComponent implements OnInit {
     // Show the X scale
     var x = d3.scaleBand()
       .range([0, width])
-      .domain(["0", "1", "2", "3", ""])
+      .domain(this.xAxisArr)
       .paddingInner(1)
       .paddingOuter(.5)
     svg.append("g")
@@ -157,5 +161,11 @@ export class BoxPlotComponent implements OnInit {
       .attr("y2", function (d) { return (y(d.value.median)) })
       .attr("stroke", "black")
       .style("width", 80)
+  }
+
+  refreshData() {
+    this.boxPlotData = [];
+    this.min = Infinity;
+    this.max = -Infinity;
   }
 }

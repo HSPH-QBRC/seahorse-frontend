@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, Input } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
@@ -12,6 +12,8 @@ import { catchError } from "rxjs/operators";
 })
 
 export class Heatmap2Component implements OnInit {
+  @Input() metadataId = '';
+  @Input() metadata2Id = '';
   xAxisArr = [];
   yAxisArr = [];
   fullXAxisArr = [];
@@ -28,8 +30,10 @@ export class Heatmap2Component implements OnInit {
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
-    let categorical1 = "SMTS"
-    let categorical2 = "SMATSSCR"
+    // let categorical1 = "SMTS"
+    // let categorical2 = "SMATSSCR"
+    let categorical1 = this.metadataId;
+    let categorical2 = this.metadata2Id;
     //Create annotations look up table too identify metadata for genes
     let apiUrl = "http://3.143.251.117:8001/gtex.json?";
     // let annotationUrl = `sql=select%0D%0A++sample_id%2C%0D%0A++tissue%2C%0D%0A++sex%2C%0D%0A++age_range%2C%0D%0A++hardy_scale_death%0D%0Afrom%0D%0A++annotations%0D%0Alimit%0D%0A++20000`
@@ -106,6 +110,10 @@ export class Heatmap2Component implements OnInit {
     <div><div class="category">Y:  </div>${d.yValue}</div>`
         return tipBox
       });
+
+    d3.select("#my_heatmap2")
+      .selectAll('svg')
+      .remove();
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_heatmap2")

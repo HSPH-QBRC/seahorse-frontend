@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
@@ -11,17 +11,26 @@ import { catchError } from "rxjs/operators";
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class ScatterPlotComponent implements OnInit {
+export class ScatterPlotComponent implements OnInit, OnChanges {
+  @Input() metadataId = ''
+  @Input() metadata2Id = ''
 
   constructor(private httpClient: HttpClient) { }
 
-
   ngOnInit(): void {
-    let numerical1 = 'SMMPPD';
-    let numerical2 = 'SME1ANTI'
+    let numerical1 = this.metadataId;
+    let numerical2 = this.metadata2Id
+    this.refreshData();
     this.getData(numerical1, numerical2)
-
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    let numerical1 = this.metadataId;
+    let numerical2 = this.metadata2Id;
+    this.refreshData();
+    this.getData(numerical1, numerical2)
+  }
+
   scatterPlotData = [];
   xMin = Infinity
   xMax = -Infinity
@@ -40,6 +49,7 @@ export class ScatterPlotComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        console.log("scatter res: ", res['rows'])
         for (let i = 0; i < res['rows'].length; i++) {
           if (res['rows'][i][1] < this.xMin) {
             this.xMin = res['rows'][i][1];
@@ -70,8 +80,12 @@ export class ScatterPlotComponent implements OnInit {
   createScatterPlot() {
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 100, left: 100 },
-      width = 800 - margin.left - margin.right,
-      height = 800 - margin.top - margin.bottom;
+      width = 600 - margin.left - margin.right,
+      height = 600 - margin.top - margin.bottom;
+
+    d3.select("#my_scatterplot")
+      .selectAll('svg')
+      .remove();
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_scatterplot")
@@ -115,6 +129,14 @@ export class ScatterPlotComponent implements OnInit {
       .attr("cy", function (d) { return y(d.yValue); })
       .attr("r", 1.5)
       .style("fill", "#69b3a2")
+  }
+
+  refreshData() {
+    this.scatterPlotData = [];
+    this.xMin = Infinity
+    this.xMax = -Infinity
+    this.yMin = Infinity
+    this.yMax = -Infinity
   }
 
 }

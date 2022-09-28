@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
@@ -11,14 +11,26 @@ import { catchError } from "rxjs/operators";
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class HistogramComponent implements OnInit {
+export class HistogramComponent implements OnInit, OnChanges {
+  @Input() metadataId: string = '';
+  dataSize = 0;
+  isLoading = false;
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
-    let numeric = 'SMRRNART'
+    // let numeric = 'SMRRNART'
+    let numeric = this.metadataId;
+    this.isLoading = true;
     this.getData(numeric);
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    let numeric = this.metadataId;
+    this.isLoading = true;
+    this.getData(numeric);
+  }
+
 
   histogramData = [];
   min = 0;
@@ -35,7 +47,9 @@ export class HistogramComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        this.isLoading = false;
         console.log("histogram res: ", res)
+        this.dataSize = res['rows'].length;
         for (let i = 0; i < res['rows'].length; i++) {
           let num = res['rows'][i][1];
           this.min = Math.min(num, this.min)
@@ -52,6 +66,10 @@ export class HistogramComponent implements OnInit {
     var margin = { top: 10, right: 30, bottom: 30, left: 40 },
       width = 460 - margin.left - margin.right,
       height = 400 - margin.top - margin.bottom;
+
+    d3.select("#my_histogram")
+      .selectAll('svg')
+      .remove();
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_histogram")

@@ -45,11 +45,11 @@ ul li {
     font-weight: 800;
     // margin: 20px 30px;
     letter-spacing: -6px;
-    margin: 10px 0 0 0 ;
+    margin: 10px 0 0 0;
     display: flex;
     justify-content: center;
     -webkit-text-stroke: 1px rgba(40, 40, 40, 0.9);
-	-webkit-text-fill-color: tomato;
+    -webkit-text-fill-color: tomato;
 }
 
 // .seahorseImage{
@@ -59,4 +59,9 @@ ul li {
 hr {
     border: none;
     border-top: 1px dashed rgba(40, 40, 40, 0.8);
+}
+
+table {
+    width: 80%;
   }
+

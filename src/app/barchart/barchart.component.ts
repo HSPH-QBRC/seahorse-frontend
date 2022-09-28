@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
@@ -11,13 +11,23 @@ import { catchError } from "rxjs/operators";
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class BarChartComponent implements OnInit {
+export class BarChartComponent implements OnInit, OnChanges {
+  @Input() metadataId: string = '';
+  dataSize = 0;
+  isLoading = false;
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
-    // let numeric = 'SMATSSCR'
-    let categorical = 'SMTSD'
+    let categorical = this.metadataId
+    this.isLoading = true;
+    this.getData(categorical);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log("change detected: ", this.metadataId)
+    let categorical = this.metadataId
+    this.isLoading = true;
     this.getData(categorical);
   }
 
@@ -40,18 +50,20 @@ export class BarChartComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        this.isLoading=false;
+        this.dataSize = res['rows'].length;
         for (let i = 0; i < res['rows'].length; i++) {
           let cat = res['rows'][i][1];
-          if(!this.categoryArr.includes(cat)){
+          if (!this.categoryArr.includes(cat)) {
             this.categoryArr.push(cat);
             this.categoryCount[cat] = 1;
-          }else{
+          } else {
             this.categoryCount[cat] += 1;
             this.maxCount = Math.max(this.categoryCount[cat], this.maxCount);
           }
         }
 
-        for(let cat in this.categoryCount){
+        for (let cat in this.categoryCount) {
           let temp = {
             "name": cat,
             "count": this.categoryCount[cat]
@@ -64,10 +76,15 @@ export class BarChartComponent implements OnInit {
   sumstat = []
 
   createBoxPlot() {
+    console.log("creating new bar chart")
     // set the dimensions and margins of the graph
     var margin = { top: 30, right: 30, bottom: 150, left: 100 },
-      width = 800 - margin.left - margin.right,
-      height = 800 - margin.top - margin.bottom;
+      width = 700 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
+
+    d3.select("#my_barchart")
+      .selectAll('svg')
+      .remove();
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_barchart")
@@ -78,35 +95,35 @@ export class BarChartComponent implements OnInit {
       .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
 
-      // X axis
-      var x = d3.scaleBand()
-        .range([0, width])
-        .domain(this.countArr.map(function (d) { return d.name; }))
-        .padding(0.2);
-      svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x))
-        .selectAll("text")
-        .attr("transform", "translate(-10,0)rotate(-45)")
-        .style("text-anchor", "end");
+    // X axis
+    var x = d3.scaleBand()
+      .range([0, width])
+      .domain(this.countArr.map(function (d) { return d.name; }))
+      .padding(0.2);
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x))
+      .selectAll("text")
+      .attr("transform", "translate(-10,0)rotate(-45)")
+      .style("text-anchor", "end");
 
-      // Add Y axis
-      var y = d3.scaleLinear()
-        .domain([0, this.maxCount])
-        .range([height, 0]);
-      svg.append("g")
-        .call(d3.axisLeft(y));
+    // Add Y axis
+    var y = d3.scaleLinear()
+      .domain([0, this.maxCount])
+      .range([height, 0]);
+    svg.append("g")
+      .call(d3.axisLeft(y));
 
-      // Bars
-      svg.selectAll("mybar")
-        .data(this.countArr)
-        .enter()
-        .append("rect")
-        .attr("x", function (d) { return x(d.name); })
-        .attr("y", function (d) { return y(d.count); })
-        .attr("width", x.bandwidth())
-        .attr("height", function (d) { return height - y(d.count); })
-        .attr("fill", "#69b3a2")
+    // Bars
+    svg.selectAll("mybar")
+      .data(this.countArr)
+      .enter()
+      .append("rect")
+      .attr("x", function (d) { return x(d.name); })
+      .attr("y", function (d) { return y(d.count); })
+      .attr("width", x.bandwidth())
+      .attr("height", function (d) { return height - y(d.count); })
+      .attr("fill", "#69b3a2")
 
   }
 }
