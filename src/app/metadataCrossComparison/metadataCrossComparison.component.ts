@@ -21,7 +21,7 @@ export class MetadataCrossComparisonComponent implements OnInit {
   currMetadataType = ''
 
 
-  notIncludeList = ["SUBJID", "AGE", "SEX", "DTHHRDY"]
+  notIncludeList = ["SUBJID", "AGE", "SEX", "DTHHRDY", "SAMPID"]
   metadataArr = []
   isLoading = false;
 
@@ -76,8 +76,11 @@ export class MetadataCrossComparisonComponent implements OnInit {
   }
 
   changeMetadata(name) {
+    d3.select("#plotArea")
+    .selectAll('svg')
+    .remove();
+
     this.plotTypeLookUp = {};
-    // console.log('current meta: ', name)
     this.metadataId = name;
     this.getMetadataType(this.metadataId);
     this.getComparisonStats();

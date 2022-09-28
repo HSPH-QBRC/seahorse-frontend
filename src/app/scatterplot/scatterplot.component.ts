@@ -12,12 +12,14 @@ import { catchError } from "rxjs/operators";
 })
 
 export class ScatterPlotComponent implements OnInit, OnChanges {
-  @Input() metadataId = ''
-  @Input() metadata2Id = ''
+  @Input() metadataId = '';
+  @Input() metadata2Id = '';
+  isLoading = false;
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
+    this.isLoading = false;
     let numerical1 = this.metadataId;
     let numerical2 = this.metadata2Id
     this.refreshData();
@@ -25,6 +27,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.isLoading = false;
     let numerical1 = this.metadataId;
     let numerical2 = this.metadata2Id;
     this.refreshData();
@@ -49,7 +52,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
-        console.log("scatter res: ", res['rows'])
+        this.isLoading = true;
         for (let i = 0; i < res['rows'].length; i++) {
           if (res['rows'][i][1] < this.xMin) {
             this.xMin = res['rows'][i][1];

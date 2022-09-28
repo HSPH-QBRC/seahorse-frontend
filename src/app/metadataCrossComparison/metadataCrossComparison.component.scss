@@ -1,6 +1,6 @@
 .sideBar {
     background-color: #f8f6f2;
-    height: 100vh;
+    height: 100%;
 }
 
 .page {
@@ -64,4 +64,17 @@ hr {
 table {
     width: 80%;
   }
+
+//   .mat-column-metadata2{
+//     // color: tomato;
+// }
+
+.metaColumn{
+    color: royalblue
+}
+
+.metaColumn:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
 

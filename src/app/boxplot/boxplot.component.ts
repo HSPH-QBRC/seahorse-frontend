@@ -16,10 +16,12 @@ import * as d3Collection from 'd3-collection';
 export class BoxPlotComponent implements OnInit, OnChanges {
   @Input() metadataCatId = '';
   @Input() metadataNumId = '';
+  isLoading = false;
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
+    this.isLoading = true;
     // let numeric = 'SMATSSCR'
     // let categorical = 'SME1ANTI'
     let categorical = this.metadataCatId;
@@ -31,6 +33,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    // this.isLoading = true;
     // let numeric = this.metadataNumId;
     // let categorical = this.metadataCatId;
     // this.getData(numeric, categorical);
@@ -52,6 +55,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
+        this.isLoading = false;
         console.log("res: ",res)
         for (let i = 0; i < res['rows'].length; i++) {
           if (res['rows'][i][2] < this.min) {

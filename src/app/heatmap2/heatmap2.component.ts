@@ -26,10 +26,12 @@ export class Heatmap2Component implements OnInit {
   annotationsDict = [];
   countDict = {};
   maxCount = 0;
+  isLoading = false;
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
+    this.isLoading = true;
     // let categorical1 = "SMTS"
     // let categorical2 = "SMATSSCR"
     let categorical1 = this.metadataId;
@@ -46,6 +48,7 @@ export class Heatmap2Component implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
           let name = res['rows'][i][0];
           let xValue = res['rows'][i][1];
