@@ -28,7 +28,8 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ## Deploy on AWS S3
 
-The site is served over HTTPS from S3 via CloudFront.
+Reference: https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html
+
 ```shell
 npm run build
 cd dist/seahorse-frontend
