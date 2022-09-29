@@ -28,10 +28,10 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ## Deploy on AWS S3
 
+The site is served over HTTPS from S3 via CloudFront.
 ```shell
 npm run build
 cd dist/seahorse-frontend
 aws s3 rm s3://seahorse.tm4.org --recursive
 aws s3 sync . s3://seahorse.tm4.org
 ```
-Note: do NOT delete `s3://seahorse.aws.tm4.org`, it is required for AWS Route53 to work
