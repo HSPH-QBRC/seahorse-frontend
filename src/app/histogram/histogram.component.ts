@@ -11,18 +11,12 @@ import { catchError } from "rxjs/operators";
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class HistogramComponent implements OnInit, OnChanges {
+export class HistogramComponent implements OnChanges {
   @Input() metadataId: string = '';
   dataSize = 0;
   isLoading = false;
 
   constructor(private httpClient: HttpClient) { }
-
-  ngOnInit(): void {
-    // let numeric = this.metadataId;
-    // this.isLoading = true;
-    // this.getData(numeric);
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     let numeric = this.metadataId;
@@ -30,13 +24,13 @@ export class HistogramComponent implements OnInit, OnChanges {
     this.getData(numeric);
   }
 
-
   histogramData = [];
   min = 0;
   max = -Infinity;
+  hideHistogram = false;
 
   getData(numeric) {
-    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//3.143.251.117:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numeric}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numeric}+is+not+%22%22`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -55,15 +49,21 @@ export class HistogramComponent implements OnInit, OnChanges {
           this.histogramData.push(num)
 
         }
-        this.createBoxPlot()
+        console.log("histogram data: ", this.histogramData)
+        if (this.histogramData.length === 0) {
+          this.hideHistogram = true
+        } else {
+          this.createBoxPlot()
+        }
+
       })
   }
 
   createBoxPlot() {
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 100, left: 100 },
-      width = 460 - margin.left - margin.right,
-      height = 400 - margin.top - margin.bottom;
+      width = 800 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
 
     const pointTip = d3Tip()
       .attr('class', 'd3-tip')
@@ -89,13 +89,17 @@ export class HistogramComponent implements OnInit, OnChanges {
 
     svg.call(pointTip);
 
+    
     // X axis: scale and draw:
     var x = d3.scaleLinear()
       .domain([this.min, this.max])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
       .range([0, width]);
     svg.append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
+      .call(d3.axisBottom(x))
+      .selectAll("text")
+      .attr("transform", "translate(-10,0)rotate(-45)" )
+      .style("text-anchor", "end")
 
     // set the parameters for the histogram
     var histogram = d3.histogram()
@@ -105,7 +109,6 @@ export class HistogramComponent implements OnInit, OnChanges {
 
     // And apply this function to data to get the bins
     var bins = histogram(this.histogramData);
-
     // Y axis: scale and draw:
     var y = d3.scaleLinear()
       .range([height, 0]);

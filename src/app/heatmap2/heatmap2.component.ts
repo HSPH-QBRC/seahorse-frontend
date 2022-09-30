@@ -61,7 +61,7 @@ export class Heatmap2Component implements OnInit, OnChanges {
 
   getData(categorical1, categorical2) {
     //Create annotations look up table too identify metadata for genes
-    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//3.143.251.117:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categorical1}%2C%0D%0A++${categorical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categorical1}+is+not+%22%22%0D%0A++AND+${categorical2}+is+not+%22%22%0D%0A`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -125,7 +125,7 @@ export class Heatmap2Component implements OnInit, OnChanges {
     // set the dimensions and margins of the graph
     var margin = { top: 30, right: 200, bottom: 100, left: 100 },
       width = 1000 - margin.left - margin.right,
-      height = 800 - margin.top - margin.bottom;
+      height = 700 - margin.top - margin.bottom;
 
     const pointTip = d3Tip()
       .attr('class', 'd3-tip')
@@ -166,10 +166,11 @@ export class Heatmap2Component implements OnInit, OnChanges {
       .attr("transform", "translate(0," + height + ")")
       .call(xAxisLabels)
       .selectAll("text")
-      .style("text-anchor", "end")
-      .attr("dx", "-.8em")
-      .attr("dy", ".15em")
-      .attr("transform", rotateText);
+      .style("text-anchor", "middle")
+      .call(wrap, width / this.xAxisArr.length)
+      // .attr("dx", "-.8em")
+      // .attr("dy", ".15em")
+      // .attr("transform", rotateText);
 
     // Build X scales and axis:
     var y = d3.scaleBand()
@@ -288,5 +289,29 @@ export class Heatmap2Component implements OnInit, OnChanges {
     g.append("g")
       .call(xAxisGradient)
       .select(".domain")
+
+    function wrap(text, width) {
+      text.each(function () {
+        var text = d3.select(this),
+          words = text.text().split(/\s+/).reverse(),
+          word,
+          line = [],
+          lineNumber = 0,
+          lineHeight = 1.1, // ems
+          y = text.attr("y"),
+          dy = parseFloat(text.attr("dy")),
+          tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+        while (word = words.pop()) {
+          line.push(word);
+          tspan.text(line.join(" "));
+          if (tspan.node().getComputedTextLength() > width) {
+            line.pop();
+            tspan.text(line.join(" "));
+            line = [word];
+            tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+          }
+        }
+      });
+    }
   }
 }

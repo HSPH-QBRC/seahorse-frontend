@@ -9,8 +9,12 @@ const routes: Routes = [
     component: HomepageComponent
   },
   {
-    path: 'MetaDataCrossComparison',
+    path: 'metadatacrosscomparison',
     component: MetadataCrossComparisonComponent
+  },
+  {
+    path: '**',
+    redirectTo: '/'
   }
 ];
 

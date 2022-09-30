@@ -7,6 +7,7 @@
     color: #716d66;
     text-decoration: none;
     font-size: 12px;
+    text-transform: capitalize;
 }
 .page:hover {
     color: grey;
@@ -43,18 +44,12 @@ ul li {
 .title {
     font-size: 36px;
     font-weight: 800;
-    // margin: 20px 30px;
-    letter-spacing: -6px;
     margin: 10px 0 0 0;
     display: flex;
     justify-content: center;
     -webkit-text-stroke: 1px rgba(40, 40, 40, 0.9);
     -webkit-text-fill-color: tomato;
 }
-
-// .seahorseImage{
-//     width: 50px;
-// }
 
 hr {
     border: none;
@@ -63,18 +58,36 @@ hr {
 
 table {
     width: 80%;
-  }
-
-//   .mat-column-metadata2{
-//     // color: tomato;
-// }
-
-.metaColumn{
-    color: royalblue
 }
 
-.metaColumn:hover{
+.metaColumn {
+    color: royalblue;
+}
+
+.metaColumn:hover {
     cursor: pointer;
     text-decoration: underline;
 }
 
+.metaId{
+    font-size: 24px;
+    font-weight: 500;
+    color: rgba(40, 40, 40, 0.9);;
+}
+
+.metaDescription{
+    font-size: 16px;
+    line-height: 32px;
+    font-weight: 400;
+    color: rgba(40, 40, 40, 0.8);;
+}
+
+.metaComment{
+    font-size: 16px;
+    line-height: 32px;
+    font-weight: 400;
+    color: rgba(40, 40, 40, 0.8);;
+}
+.pageDescription{
+    margin: 90px 20px 40px;
+}

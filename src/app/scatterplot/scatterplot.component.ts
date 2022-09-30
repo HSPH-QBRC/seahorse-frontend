@@ -42,7 +42,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
 
 
   getData(numerical1, numerical2) {
-    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//3.143.251.117:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numerical1}%2C%0D%0A++${numerical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numerical1}+is+not+""%0D%0A++AND+${numerical2}+is+not+""%0D%0A`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(

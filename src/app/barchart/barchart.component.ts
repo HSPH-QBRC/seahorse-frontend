@@ -40,7 +40,7 @@ export class BarChartComponent implements OnInit, OnChanges {
   sumstat = [];
 
   getData(categoric) {
-    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//3.143.251.117:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categoric}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categoric}+is+not+""`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -70,6 +70,7 @@ export class BarChartComponent implements OnInit, OnChanges {
           }
           this.countArr.push(temp)
         }
+        console.log("bar chart data: ", this.countArr)
         this.createBarChart()
       })
   }
@@ -79,7 +80,7 @@ export class BarChartComponent implements OnInit, OnChanges {
   createBarChart() {
     // set the dimensions and margins of the graph
     var margin = { top: 30, right: 30, bottom: 150, left: 100 },
-      width = 700 - margin.left - margin.right,
+      width = 800 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
     const pointTip = d3Tip()
@@ -106,7 +107,6 @@ export class BarChartComponent implements OnInit, OnChanges {
 
     svg.call(pointTip);
 
-    // let longName = false;
     // X axis
     var x = d3.scaleBand()
       .range([0, width])
@@ -120,7 +120,8 @@ export class BarChartComponent implements OnInit, OnChanges {
       .call(xAxisLabels)
       .selectAll("text")
       .attr("transform", rotateText)
-      .style("text-anchor", "end");
+      .style("text-anchor", "end")
+      .call(wrap, margin.bottom)
 
     // Add Y axis
     var y = d3.scaleLinear()
@@ -156,5 +157,29 @@ export class BarChartComponent implements OnInit, OnChanges {
       .style('text-anchor', 'middle')
       .style('font-size', '12px')
       .text('Counts');
+
+    function wrap(text, width) {
+      text.each(function () {
+        var text = d3.select(this),
+          words = text.text().split(/\s+/).reverse(),
+          word,
+          line = [],
+          lineNumber = 0,
+          lineHeight = 1.1, // ems
+          y = text.attr("y"),
+          dy = parseFloat(text.attr("dy")),
+          tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+        while (word = words.pop()) {
+          line.push(word);
+          tspan.text(line.join(" "));
+          if (tspan.node().getComputedTextLength() > width) {
+            line.pop();
+            tspan.text(line.join(" "));
+            line = [word];
+            tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+          }
+        }
+      });
+    }
   }
 }

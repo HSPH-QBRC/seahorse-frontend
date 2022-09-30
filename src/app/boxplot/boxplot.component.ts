@@ -38,8 +38,8 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     this.resetVariables()
     this.isLoading = true;
-    let numeric = this.metadataNumId;
-    let categorical = this.metadataCatId;
+    let numeric = this.metadataCatId;
+    let categorical = this.metadataNumId;
     this.getData(numeric, categorical);
   }
 
@@ -51,7 +51,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   }
 
   getData(numericId, categoricalId) {
-    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//3.143.251.117:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numericId}%2C%0D%0A++${categoricalId}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numericId}+is+not+""%0D%0A++AND+${categoricalId}+is+not+""%0D%0A`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -63,25 +63,21 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .subscribe(res => {
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
-          if (this.xAxisArr.length < 5 || this.xAxisArr.includes(res['rows'][i][1])) {
-            if (res['rows'][i][2] < this.min) {
-              this.min = res['rows'][i][2];
-            }
-            if (res['rows'][i][2] > this.max) {
-              this.max = res['rows'][i][2];
-            }
-            if (!this.xAxisArr.includes(res['rows'][i][1].toString())) {
-              this.xAxisArr.push(res['rows'][i][1].toString())
-            }
-            let temp = {
-              'name': res['rows'][i][0],
-              'key': res['rows'][i][1],
-              'value': res['rows'][i][2]
-            };
-
-            this.boxPlotData.push(temp);
+          if (res['rows'][i][2] < this.min) {
+            this.min = res['rows'][i][2];
           }
-
+          if (res['rows'][i][2] > this.max) {
+            this.max = res['rows'][i][2];
+          }
+          if (!this.xAxisArr.includes(res['rows'][i][1].toString())) {
+            this.xAxisArr.push(res['rows'][i][1].toString())
+          }
+          let temp = {
+            'name': res['rows'][i][0],
+            'key': res['rows'][i][1],
+            'value': res['rows'][i][2]
+          };
+          this.boxPlotData.push(temp);
         }
         this.createBoxPlot()
       })
@@ -90,13 +86,26 @@ export class BoxPlotComponent implements OnInit, OnChanges {
 
   createBoxPlot() {
     // set the dimensions and margins of the graph
-    var margin = { top: 10, right: 30, bottom: 30, left: 100 },
-      width = 800 - margin.left - margin.right,
-      height = 800 - margin.top - margin.bottom;
+    var margin = { top: 10, right: 30, bottom: 100, left: 100 },
+      width = 700 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
 
     d3.select("#my_boxplot")
       .selectAll('svg')
       .remove();
+
+    const pointTip = d3Tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html((event, d) => {
+        let tipBox = `<div><div class="category">Name: </div> ${d.key}</div>
+    <div><div class="category">Max: </div> ${d.value.max.toFixed(2)}</div>
+    <div><div class="category">Q3: </div> ${d.value.q3.toFixed(2)}</div>
+    <div><div class="category">Median: </div> ${d.value.median.toFixed(2)}</div>
+    <div><div class="category">Q1: </div> ${d.value.q1.toFixed(2)}</div>
+    <div><div class="category">Min: </div> ${d.value.min.toFixed(2)}</div>`
+        return tipBox
+      });
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_boxplot")
@@ -106,6 +115,8 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .append("g")
       .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.call(pointTip);
 
     // Compute quartiles, median, inter quantile range min and max --> these info are then used to draw the box.
     this.sumstat = d3Collection.nest() // nest function allows to group the calculation per level of a factor
@@ -121,6 +132,16 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       })
       .entries(this.boxPlotData)
 
+    if (this.sumstat.length > 12) {
+      this.sumstat.sort((b, a) => b.value.median - a.value.median)
+      let slicedArr = this.sumstat.slice(0, 6).concat(this.sumstat.slice(this.sumstat.length - 6, this.sumstat.length))
+      this.sumstat = slicedArr;
+      this.xAxisArr = [];
+      for (let i = 0; i < this.sumstat.length; i++) {
+        this.xAxisArr.push(this.sumstat[i].key)
+      }
+    }
+
     // Show the X scale
     var x = d3.scaleBand()
       .range([0, width])
@@ -130,6 +151,9 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     svg.append("g")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x))
+      .selectAll("text")
+      .style("text-anchor", "middle")
+      .call(wrap, width / this.xAxisArr.length)
 
     // Show the Y scale
     var y = d3.scaleLinear()
@@ -151,7 +175,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .style("width", 40)
 
     // // rectangle for the main box
-    var boxWidth = 100
+    var boxWidth = 20
     svg
       .selectAll("boxes")
       .data(this.sumstat)
@@ -163,6 +187,11 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .attr("width", boxWidth)
       .attr("stroke", "black")
       .style("fill", "#69b3a2")
+      .on('mouseover', function (mouseEvent: any, d) {
+        pointTip.show(mouseEvent, d, this);
+        pointTip.style('left', mouseEvent.x + 10 + 'px');
+      })
+      .on('mouseout', pointTip.hide);
 
     // // Show the median
     svg
@@ -176,6 +205,53 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .attr("y2", function (d) { return (y(d.value.median)) })
       .attr("stroke", "black")
       .style("width", 80)
+
+    svg.append('text')
+      .classed('label', true)
+      .attr('transform', 'rotate(-90)')
+      .attr("font-weight", "bold")
+      .attr('y', -margin.left + 10)
+      .attr('x', -height / 2)
+      .attr('dy', '.71em')
+      .style('fill', 'rgba(0,0,0,.8)')
+      .style('text-anchor', 'middle')
+      .style('font-size', '12px')
+      .text(this.metadataNumId);
+
+    svg
+      .append('text')
+      .classed('label', true)
+      .attr("font-weight", "bold")
+      .attr('x', width / 2)
+      .attr('y', height + margin.bottom - 10)
+      .style('fill', 'rgba(0,0,0,.8)')
+      .style('text-anchor', 'middle')
+      .style('font-size', '12px')
+      .text(this.metadataCatId);
+
+    function wrap(text, width) {
+      text.each(function () {
+        var text = d3.select(this),
+          words = text.text().split(/\s+/).reverse(),
+          word,
+          line = [],
+          lineNumber = 0,
+          lineHeight = 1.1, // ems
+          y = text.attr("y"),
+          dy = parseFloat(text.attr("dy")),
+          tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+        while (word = words.pop()) {
+          line.push(word);
+          tspan.text(line.join(" "));
+          if (tspan.node().getComputedTextLength() > width) {
+            line.pop();
+            tspan.text(line.join(" "));
+            line = [word];
+            tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+          }
+        }
+      });
+    }
   }
 
   refreshData() {

@@ -13,21 +13,22 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 })
 
 export class MetadataCrossComparisonComponent implements OnInit {
-  metadataId = 'SMTSPAX';
+  metadataId = 'SMEXPEFF';
   metadata2Id = '';
   displayScatterPlot = false;
   displayBoxPlot = false;
   displayHeatmap = false;
   currMetadataType = ''
+  metadataLookUp = {};
 
 
-  notIncludeList = ["SUBJID", "AGE", "SEX", "DTHHRDY", "SAMPID"]
+  notIncludeList = ["SUBJID", "AGE", "SAMPID"]
   metadataArr = []
   isLoading = false;
 
   //For the Comparison table
   dataSource = [];
-  displayedColumns: string[] = ['metadata2', 'test', 'pValue'];
+  displayedColumns: string[] = ['metadata2', 'test', 'test_statistic', 'pValue'];
 
   constructor(private httpClient: HttpClient) { }
 
@@ -40,8 +41,9 @@ export class MetadataCrossComparisonComponent implements OnInit {
   }
 
   getListOfMetadata() {
-    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++VARNAME%0D%0Afrom%0D%0A++metadata%0D%0A`
+    let apiUrl = "//3.143.251.117:8001/gtex.json?";
+    // let annotationUrl = `sql=select%0D%0A++VARNAME%0D%0Afrom%0D%0A++metadata%0D%0A`
+    let annotationUrl = `sql=select%0D%0A++*%0D%0Afrom%0D%0A++metadata%0D%0A`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -51,7 +53,16 @@ export class MetadataCrossComparisonComponent implements OnInit {
       }))
       .subscribe(res => {
         for (let i = 0; i < res['rows'].length; i++) {
-          this.metadataArr.push(res['rows'][i][0])
+          let temp = {
+            "varname": res['rows'][i][0],
+            "vardesc": res['rows'][i][1].split(":"),
+            "vardescFull": res['rows'][i][1],
+            "type": res['rows'][i][2],
+            "comment": res['rows'][i][3]
+          }
+          this.metadataArr.push(temp)
+
+          this.metadataLookUp[res['rows'][i][0]] = temp
         }
       })
   }
@@ -79,19 +90,18 @@ export class MetadataCrossComparisonComponent implements OnInit {
       .selectAll('div')
       .remove();
 
-
     this.plotTypeLookUp = {};
     this.metadataId = name;
     this.getMetadataType(this.metadataId);
     this.getComparisonStats();
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
 
   }
 
   getComparisonStats() {
-    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
-    // let annotationUrl = `sql=select%0D%0A++METADATA1%2C%0D%0A++METADATA2%2C%0D%0A++TEST%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2m%0D%0Awhere%0D%0A++"METADATA1"+%3D+"${this.metadataId}"%0D%0A++AND+"TEST"+is+not+"None"%0D%0A++AND+%5BP-VALUE%5D+is+not+null%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D`
-    let annotationUrl = `sql=select%0D%0A++METADATA1%2C%0D%0A++METADATA2%2C%0D%0A++TEST%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2m%0D%0Awhere%0D%0A++"METADATA1"+%3D+"${this.metadataId}"%0D%0A++AND+"Test"+is+not+"None"%0D%0A++AND+%5BP-VALUE%5D+is+not+"null"%0D%0A++AND+%5BP-VALUE%5D+is+not+"nan"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D`
+    let apiUrl = "//3.143.251.117:8001/gtex.json?";// let annotationUrl = `sql=select%0D%0A++METADATA1%2C%0D%0A++METADATA2%2C%0D%0A++TEST%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2m%0D%0Awhere%0D%0A++"METADATA1"+%3D+"${this.metadataId}"%0D%0A++AND+"TEST"+is+not+"None"%0D%0A++AND+%5BP-VALUE%5D+is+not+null%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D`
+    // let annotationUrl = `sql=select%0D%0A++METADATA1%2C%0D%0A++METADATA2%2C%0D%0A++TEST%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2m%0D%0Awhere%0D%0A++"METADATA1"+%3D+"${this.metadataId}"%0D%0A++AND+"Test"+is+not+"None"%0D%0A++AND+%5BP-VALUE%5D+is+not+"null"%0D%0A++AND+%5BP-VALUE%5D+is+not+"nan"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D`
+    let annotationUrl = `sql=select%0D%0A++METADATA1%2C%0D%0A++METADATA2%2C%0D%0A++TEST%2C%0D%0A++%5BTEST+STATISTCT%5D%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2m%0D%0Awhere%0D%0A++"METADATA1"+%3D+"${this.metadataId}"%0D%0A++AND+"Test"+is+not+"None"%0D%0A++AND+%5BP-VALUE%5D+is+not+"null"%0D%0A++AND+%5BP-VALUE%5D+is+not+"nan"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -106,7 +116,8 @@ export class MetadataCrossComparisonComponent implements OnInit {
           let temp = {
             "metadata2": res['rows'][i][1],
             "test": res['rows'][i][2],
-            'pValue': res['rows'][i][3]
+            'test_statistic': res['rows'][i][3],
+            'pValue': res['rows'][i][4]
           }
           this.dataSource.push(temp)
         }
@@ -122,10 +133,11 @@ export class MetadataCrossComparisonComponent implements OnInit {
       let tempMeta2 = this.dataSource[i]['metadata2']
       this.getMetadataType(tempMeta2)
     }
-
   }
 
   onSelectMetadata2(name) {
+    window.scrollTo(0, 600)
+
     d3.select("#plotArea")
       .selectAll('svg')
       .remove();
@@ -133,6 +145,7 @@ export class MetadataCrossComparisonComponent implements OnInit {
     this.displayScatterPlot = false;
     this.displayBoxPlot = false;
     this.displayHeatmap = false;
+
     if (this.plotTypeLookUp[this.metadataId] === 'integer' || this.plotTypeLookUp[this.metadataId] === 'decimal') {
       if (this.plotTypeLookUp[name] === 'integer, encoded value' || this.plotTypeLookUp[name] === 'string') {
         this.displayBoxPlot = true;
