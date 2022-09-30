@@ -49,6 +49,10 @@ ul li {
     justify-content: center;
     -webkit-text-stroke: 1px rgba(40, 40, 40, 0.9);
     -webkit-text-fill-color: tomato;
+    
+}
+.titleLink:hover{
+    text-decoration: none;
 }
 
 hr {
@@ -76,16 +80,16 @@ table {
 }
 
 .metaDescription{
-    font-size: 16px;
+    font-size: 14px;
     line-height: 32px;
-    font-weight: 400;
+    font-weight: 300;
     color: rgba(40, 40, 40, 0.8);;
 }
 
 .metaComment{
-    font-size: 16px;
+    font-size: 14px;
     line-height: 32px;
-    font-weight: 400;
+    font-weight: 300;
     color: rgba(40, 40, 40, 0.8);;
 }
 .pageDescription{

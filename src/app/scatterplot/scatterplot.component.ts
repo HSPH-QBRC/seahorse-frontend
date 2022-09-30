@@ -83,8 +83,8 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   createScatterPlot() {
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 100, left: 100 },
-      width = 600 - margin.left - margin.right,
-      height = 600 - margin.top - margin.bottom;
+      width = 800 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
 
       const pointTip = d3Tip()
       .attr('class', 'd3-tip')

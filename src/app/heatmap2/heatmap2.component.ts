@@ -124,8 +124,8 @@ export class Heatmap2Component implements OnInit, OnChanges {
   createHeatMap() {
     // set the dimensions and margins of the graph
     var margin = { top: 30, right: 200, bottom: 100, left: 100 },
-      width = 1000 - margin.left - margin.right,
-      height = 700 - margin.top - margin.bottom;
+      width = 800 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
 
     const pointTip = d3Tip()
       .attr('class', 'd3-tip')
@@ -196,7 +196,7 @@ export class Heatmap2Component implements OnInit, OnChanges {
       .attr("x", function (d) { return x(d.xValue) })
       .attr("y", function (d) { return y(d.yValue) })
       .attr("width", x.bandwidth())
-      .attr("height", y.bandwidth())
+      .attr("height", y.bandwidth() + 1)
       .style("fill", function (d) {
         let stringConcat = d.xValue + "_" + d.yValue;
         return myColor(countLookUp[stringConcat])
@@ -235,7 +235,7 @@ export class Heatmap2Component implements OnInit, OnChanges {
     var extent = d3.extent(countColorData, d => d.value);
 
     var paddingGradient = 9;
-    var widthGradient = 250;
+    var widthGradient = 200;
     var innerWidth = widthGradient - (paddingGradient * 2);
     var barHeight = 8;
     var heightGradient = 100;

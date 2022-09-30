@@ -3,7 +3,7 @@
 <div class="row">
     <div class="col-md-3 sideBar">
         <div class="row">
-            <a routerLink="/" routerLinkActive="active" ariaCurrentWhenActive="page">
+            <a routerLink="/" routerLinkActive="active" ariaCurrentWhenActive="page" class="titleLink">
                 <div class="title">SEAHORSE</div>
             </a>
         </div>
@@ -29,49 +29,59 @@
                 {{metadataLookUp[metadataId]['comment']}}</div>
         </div>
 
+        <div class="d-flex justify-content-center">
+            <div *ngIf="plotTypeLookUp[metadataId] === 'integer' || plotTypeLookUp[metadataId] === 'decimal'"
+                class="row">
+                <app-histogram [metadataId]="metadataId"></app-histogram>
+            </div>
+            <div *ngIf="plotTypeLookUp[metadataId] === 'integer, encoded value' || plotTypeLookUp[metadataId] === 'string'"
+                class="row">
+                <app-barchart [metadataId]="metadataId"></app-barchart>
+            </div>
 
-        <div *ngIf="plotTypeLookUp[metadataId] === 'integer' || plotTypeLookUp[metadataId] === 'decimal'" class="row">
-            <app-histogram [metadataId]="metadataId"></app-histogram>
+            
         </div>
-        <div *ngIf="plotTypeLookUp[metadataId] === 'integer, encoded value' || plotTypeLookUp[metadataId] === 'string'"
-            class="row">
-            <app-barchart [metadataId]="metadataId"></app-barchart>
-        </div>
-        
-        <div id="my_plotArea">
-            <div *ngIf="displayScatterPlot">
-                <app-scatterplot [metadataId]="metadataId" [metadata2Id]="metadata2Id"></app-scatterplot>
-            </div>
-            <div *ngIf="displayBoxPlot">
-                <app-boxplot [metadataCatId]="metadata2Id" [metadataNumId]="metadataId"></app-boxplot>
-            </div>
-            <div *ngIf="displayHeatmap">
-                <app-heatmap2 [metadataId]="metadataId" [metadata2Id]="metadata2Id"></app-heatmap2>
+
+
+        <div class="d-flex justify-content-center">
+            <div id="my_plotArea">
+                <div *ngIf="displayScatterPlot">
+                    <app-scatterplot [metadataId]="metadataId" [metadata2Id]="metadata2Id"></app-scatterplot>
+                </div>
+                <div *ngIf="displayBoxPlot">
+                    <app-boxplot [metadataCatId]="metadata2Id" [metadataNumId]="metadataId"></app-boxplot>
+                </div>
+                <div *ngIf="displayHeatmap">
+                    <app-heatmap2 [metadataId]="metadataId" [metadata2Id]="metadata2Id"></app-heatmap2>
+                </div>
             </div>
         </div>
         <br>
         <br>
-        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" *ngIf="dataSource.length > 0">
-            <ng-container matColumnDef="metadata2">
-                <th mat-header-cell *matHeaderCellDef> Metadata 2 </th>
-                <td class="metaColumn" mat-cell *matCellDef="let element"
-                    (click)="onSelectMetadata2(element.metadata2)"> {{element.metadata2}}</td>
-            </ng-container>
-            <ng-container matColumnDef="test">
-                <th mat-header-cell *matHeaderCellDef> Test </th>
-                <td mat-cell *matCellDef="let element"> {{element.test}} </td>
-            </ng-container>
-            <ng-container matColumnDef="test_statistic">
-                <th mat-header-cell *matHeaderCellDef> Test Statistic </th>
-                <td mat-cell *matCellDef="let element"> {{element.test_statistic}} </td>
-            </ng-container>
-            <ng-container matColumnDef="pValue">
-                <th mat-header-cell *matHeaderCellDef> P-Value </th>
-                <td mat-cell *matCellDef="let element"> {{element.pValue}} </td>
-            </ng-container>
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
+        <div class="d-flex justify-content-center">
+            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" *ngIf="dataSource.length > 0">
+                <ng-container matColumnDef="metadata2">
+                    <th mat-header-cell *matHeaderCellDef> Metadata 2 </th>
+                    <td class="metaColumn" mat-cell *matCellDef="let element"
+                        (click)="onSelectMetadata2(element.metadata2)"> {{element.metadata2}}</td>
+                </ng-container>
+                <ng-container matColumnDef="test">
+                    <th mat-header-cell *matHeaderCellDef> Test </th>
+                    <td mat-cell *matCellDef="let element"> {{element.test}} </td>
+                </ng-container>
+                <ng-container matColumnDef="test_statistic">
+                    <th mat-header-cell *matHeaderCellDef> Test Statistic </th>
+                    <td mat-cell *matCellDef="let element"> {{element.test_statistic}} </td>
+                </ng-container>
+                <ng-container matColumnDef="pValue">
+                    <th mat-header-cell *matHeaderCellDef> P-Value </th>
+                    <td mat-cell *matCellDef="let element"> {{element.pValue}} </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            </table>
+        </div>
+
 
 
 

@@ -24,16 +24,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
 
   constructor(private httpClient: HttpClient) { }
 
-  ngOnInit(): void {
-    // this.isLoading = true;
-    // // let numeric = 'SMATSSCR'
-    // // let categorical = 'SME1ANTI'
-    // let categorical = this.metadataCatId;
-    // let numeric = this.metadataNumId;
-    // this.getData(numeric, categorical);
-
-
-  }
+  ngOnInit(): void {}
 
   ngOnChanges(changes: SimpleChanges): void {
     this.resetVariables()
@@ -87,7 +78,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   createBoxPlot() {
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 100, left: 100 },
-      width = 700 - margin.left - margin.right,
+      width = 800 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
     d3.select("#my_boxplot")
