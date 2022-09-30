@@ -25,3 +25,14 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+## Deploy on AWS S3
+
+Reference: https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html
+
+```shell
+npm run build
+cd dist/seahorse-frontend
+aws s3 rm s3://seahorse.tm4.org --recursive
+aws s3 sync . s3://seahorse.tm4.org
+```
