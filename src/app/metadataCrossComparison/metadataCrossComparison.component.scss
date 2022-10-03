@@ -47,7 +47,8 @@ ul li {
     margin: 10px 0 0 0;
     display: flex;
     justify-content: center;
-    -webkit-text-stroke: 1px rgba(40, 40, 40, 0.9);
+    -webkit-text-stroke: 1px rgba(40, 40, 40, 0.5);
+    // -webkit-text-stroke: 1px rgba(40, 40, 40, 0.9);
     -webkit-text-fill-color: tomato;
     
 }
@@ -80,9 +81,9 @@ table {
 }
 
 .metaDescription{
-    font-size: 14px;
+    font-size: 18px;
     line-height: 32px;
-    font-weight: 300;
+    font-weight: 400;
     color: rgba(40, 40, 40, 0.8);;
 }
 

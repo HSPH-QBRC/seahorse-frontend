@@ -23,8 +23,14 @@
 
     <div class="col-md-9 content">
         <div class="row pageDescription" *ngIf="metadataLookUp[metadataId]">
-            <div class="metaId">{{metadataId}}</div>
-            <div class="metaDescription">{{metadataLookUp[metadataId]['vardesc']}}</div>
+            <span class="metaId">{{metadataId}}: <span class="metaDescription" >({{metadataLookUp[metadataId]['vardesc']}})</span></span>
+            <!-- <div class="row">
+                <div class="col-md-12">
+                    <div class="metaId">{{metadataLookUp[metadataId]['vardesc']}}:<div class="metaDescription"> ({{metadataId}})</div>
+                </div>
+                </div>
+                
+            </div> -->
             <div class="metaComment" *ngIf="metadataLookUp[metadataId]['comment']">
                 {{metadataLookUp[metadataId]['comment']}}</div>
         </div>
@@ -39,7 +45,7 @@
                 <app-barchart [metadataId]="metadataId"></app-barchart>
             </div>
 
-            
+
         </div>
 
 
