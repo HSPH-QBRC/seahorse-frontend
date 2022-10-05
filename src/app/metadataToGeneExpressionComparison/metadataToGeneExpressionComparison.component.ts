@@ -14,7 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 export class MetadataToGeneExpressionComparison implements OnInit {
   searchValue = '';
-  metadataId = 'SMEXPEFF';
+  metadataId = 'SMEXNCRT';
   metadata2Id = '';
   displayScatterPlot = false;
   displayBoxPlot = false;
@@ -34,8 +34,10 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
+    this.tableFromSearch = false;
     this.isLoading = true;
     this.getListOfMetadata();
+    this.getTableSize();
     this.getMetadataType(this.metadataId);
     this.getComparisonStats();
 
@@ -91,22 +93,23 @@ export class MetadataToGeneExpressionComparison implements OnInit {
       .selectAll('div')
       .remove();
 
+    this.tableFromSearch = false;
     this.plotTypeLookUp = {};
     this.metadataId = name;
-    // this.getMetadataType(this.metadataId);
+    this.getMetadataType(this.metadataId);
     this.getComparisonStats();
     window.scrollTo(0, 0);
 
   }
+  // let metadata = "SMEXNCRT"
+  currPage = 0;
+  limit = 25;
+  tableSize = 0;
 
-  getComparisonStats() {
-    let metadata = "SMEXNCRT"
-    let currPage = 0;
-    let limit = 10;
-    
+  getTableSize() {
+    let table = 'm2g'
     let apiUrl = "//3.143.251.117:8001/gtex.json?";
-    // let annotationUrl = `sql=select%0D%0A++METADATA1%2C%0D%0A++METADATA2%2C%0D%0A++TEST%2C%0D%0A++%5BTEST+STATISTCT%5D%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2m%0D%0Awhere%0D%0A++"METADATA1"+%3D+"${this.metadataId}"%0D%0A++AND+"Test"+is+not+"None"%0D%0A++AND+%5BP-VALUE%5D+is+not+"null"%0D%0A++AND+%5BP-VALUE%5D+is+not+"nan"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D`
-    let annotationUrl = `sql=select%0D%0A++METADATA%2C%0D%0A++ENSG%2C%0D%0A++TEST%2C%0D%0A++%5BTEST+STATISTIC%5D%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2g%0D%0Awhere%0D%0A++"METADATA"+%3D+"${metadata}"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D%0D%0Alimit%0D%0A++${currPage}%2C+${limit}`
+    let annotationUrl = `sql=SELECT%0D%0A++COUNT%28*%29%0D%0AFROM%0D%0A++${table}`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -115,6 +118,24 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        console.log("table size: ", res['rows'][0][0])
+        this.tableSize = res['rows'][0][0];
+      })
+  }
+
+  getComparisonStats() {
+
+    let apiUrl = "//3.143.251.117:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++METADATA%2C%0D%0A++ENSG%2C%0D%0A++TEST%2C%0D%0A++%5BTEST+STATISTIC%5D%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2g%0D%0Awhere%0D%0A++"METADATA"+%3D+"${this.metadataId}"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D%0D%0Alimit%0D%0A++${this.currPage}%2C+${this.limit}`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        console.log("res m2g: ", res['rows'])
         this.dataSource = [];
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
@@ -132,15 +153,20 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   }
 
   plotTypeLookUp = {};
+  geneType = 'integer'
 
   // displayComparison() {
-  //   for (let i = 0; i < this.dataSource.length; i++) {
-  //     let tempMeta2 = this.dataSource[i]['gene']
-  //     this.getMetadataType(tempMeta2)
-  //   }
+  //   // for (let i = 0; i < this.dataSource.length; i++) {
+  //   //   let tempMeta2 = this.dataSource[i]['gene']
+  //   //   console.log("temp: ", tempMeta2)
+  //   //   this.getMetadataType(tempMeta2)
+  //   // }
+  //   console.log("metadata types: ",this.getMetadataType)
   // }
 
   onSelectMetadata2(name) {
+    let test = name.split(".")
+    console.log("name: ", name, test)
     window.scrollTo(0, 600)
 
     d3.select("#plotArea")
@@ -151,26 +177,97 @@ export class MetadataToGeneExpressionComparison implements OnInit {
     this.displayBoxPlot = false;
     this.displayHeatmap = false;
 
-    if (this.plotTypeLookUp[this.metadataId] === 'integer' || this.plotTypeLookUp[this.metadataId] === 'decimal') {
-      if (this.plotTypeLookUp[name] === 'integer, encoded value' || this.plotTypeLookUp[name] === 'string') {
-        this.displayBoxPlot = true;
-        this.metadata2Id = name;
-      }
-      else if (this.plotTypeLookUp[name] === 'integer' || this.plotTypeLookUp[name] === 'decimal') {
-        this.displayScatterPlot = true;
-        this.metadata2Id = name;
-      }
-    } else if (this.plotTypeLookUp[this.metadataId] === 'integer, encoded value' || this.plotTypeLookUp[this.metadataId] === 'string') {
-      if (this.plotTypeLookUp[name] === 'integer, encoded value' || this.plotTypeLookUp[name] === 'string') {
-        this.displayHeatmap = true;
-        this.metadata2Id = name;
-      }
-      else if (this.plotTypeLookUp[name] === 'integer' || this.plotTypeLookUp[name] === 'decimal') {
-        this.displayBoxPlot = true;
-        this.metadata2Id = this.metadataId;
-        this.metadataId = name;
-      }
+
+
+
+    //this is where we decide which plot to use if have the data for it. for now, will wait to see.
+    if (this.plotTypeLookUp[this.metadataId] === 'integer, encoded value' || this.plotTypeLookUp[this.metadataId] === 'string') {
+      // this.displayBoxPlot = true;
+      // this.metadata2Id = test[0];
+      console.log("meta1 = cat, meta2/gene = num")
     }
+    else if (this.plotTypeLookUp[this.metadataId] === 'integer' || this.plotTypeLookUp[this.metadataId] === 'decimal') {
+      // this.displayScatterPlot = true;
+      // this.metadata2Id = test[0];
+      console.log("meta1 = num, meta2/gene = num")
+    }
+
+
+
+  }
+
+
+  getPageDetails(details, el) {
+    console.log("next page:", details)
+    this.currPage = details.pageIndex
+    this.limit = details.pageSize
+    this.getComparisonStats();
+
+    window.scrollTo(0, 500)
+
+  }
+  tableFromSearch = false;
+
+  geneSearch() {
+    this.tableFromSearch = true
+    console.log(this.searchValue)
+    this.getEnsemblId(this.searchValue)
+  }
+
+  searchEnsemblResults = []
+  getEnsemblId(symbol) {
+    this.searchEnsemblResults = [];
+    let datasetteUrl = `sql=select%0D%0A++ENSEMBL%2C%0D%0A++SYMBOL%2C%0D%0A++ENTREZID%0D%0Afrom%0D%0A++e2s%0D%0Awhere%0D%0A++"SYMBOL"+is+"${symbol}"`;
+    let apiUrl = "//3.143.251.117:8001/gtex.json?";
+
+    let queryURL = `${apiUrl}${datasetteUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        for (let i = 0; i < res['rows'].length; i++) {
+          if (!this.searchEnsemblResults.includes(res['rows'][i][0])) {
+            this.searchEnsemblResults.push(res['rows'][i][0])
+          }
+        }
+        this.getMetadataToGeneComparisonResults();
+      })
+  }
+
+
+
+  getMetadataToGeneComparisonResults() {
+    for (let i = 0; i < this.searchEnsemblResults.length; i++) {
+      let ensg = this.searchEnsemblResults[0]
+      let datasetteUrl = `sql=select%0D%0A++METADATA%2C%0D%0A++ENSG%2C%0D%0A++TEST%2C%0D%0A++%5BTEST+STATISTIC%5D%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2g%0D%0Awhere%0D%0A++"ENSG"+like+"${ensg}%25"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D`;
+      let apiUrl = "//3.143.251.117:8001/gtex.json?";
+
+      let queryURL = `${apiUrl}${datasetteUrl}`;
+      this.httpClient.get(queryURL).pipe(
+        catchError(error => {
+          console.log("Error: ", error);
+          let message = `Error: ${error.error.error}`;
+          throw message
+        }))
+        .subscribe(res => {
+          console.log("res m2gCR: ", res['rows'])
+          this.dataSource = [];
+          this.isLoading = false;
+          for (let i = 0; i < res['rows'].length; i++) {
+            let temp = {
+              "gene": res['rows'][i][0],
+              "test": res['rows'][i][2],
+              'test_statistic': res['rows'][i][3],
+              'pValue': res['rows'][i][4]
+            }
+            this.dataSource.push(temp)
+          }
+        })
+    }
+
   }
 
 }

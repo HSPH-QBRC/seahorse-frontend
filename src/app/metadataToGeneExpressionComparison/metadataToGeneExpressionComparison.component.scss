@@ -65,14 +65,14 @@ table {
     width: 80%;
 }
 
-.metaColumn {
-    color: royalblue;
-}
+// .metaColumn {
+//     color: royalblue;
+// }
 
-.metaColumn:hover {
-    cursor: pointer;
-    text-decoration: underline;
-}
+// .metaColumn:hover {
+//     cursor: pointer;
+//     text-decoration: underline;
+// }
 
 .metaId{
     font-size: 24px;
@@ -100,4 +100,11 @@ table {
 
 .paginator{
     margin: 10px 0 50px
+}
+.searchTitle{
+    font-size: 24px;
+    font-weight: 500;
+    color: rgba(40, 40, 40, 0.9);
+    text-transform: capitalize;
+    margin: 90px 20px 40px;
 }

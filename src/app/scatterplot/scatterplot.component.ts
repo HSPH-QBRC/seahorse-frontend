@@ -54,6 +54,8 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
+        console.log("queryurl: ", queryURL)
+        console.log("SP res: ", res['rows'])
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
           if (res['rows'][i][1] < this.xMin) {
@@ -77,6 +79,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
 
           this.scatterPlotData.push(temp);
         }
+        console.log("scatterplot data: ", this.scatterPlotData)
         this.createScatterPlot()
       })
 

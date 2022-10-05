@@ -10,8 +10,8 @@
         <hr>
         <mat-form-field class="example-form-field container sideBarContainer" appearance="outline">
             <mat-label>Gene Search</mat-label>
-            <input matInput type="text" [(ngModel)]="searchValue">
-            <button *ngIf="searchValue" matSuffix mat-icon-button aria-label="Clear" (click)="searchValue=''">
+            <input matInput type="text" [(ngModel)]="searchValue" (keyup.enter)="geneSearch()">
+            <button *ngIf="searchValue" matSuffix mat-icon-button aria-label="Clear" (click)="searchValue = ''">
                 <mat-icon>close</mat-icon>
             </button>
         </mat-form-field>
@@ -29,13 +29,16 @@
     </div>
 
     <div class="col-md-9 content">
-        <div class="row pageDescription" *ngIf="metadataLookUp[metadataId]">
+        <div *ngIf="tableFromSearch" class="searchTitle text-center">{{searchValue}} </div>
+
+        <div class="row pageDescription" *ngIf="metadataLookUp[metadataId] && !tableFromSearch">
             <span class="metaId">{{metadataLookUp[metadataId]['vardescFull']}}: <span
                     class="metaDescription">({{metadataId}})</span></span>
             <div class="metaComment" *ngIf="metadataLookUp[metadataId]['comment']">
                 {{metadataLookUp[metadataId]['comment']}}</div>
         </div>
-        <div class="d-flex justify-content-center">
+
+        <div *ngIf="!tableFromSearch" class="d-flex justify-content-center">
             <div *ngIf="plotTypeLookUp[metadataId] === 'integer' || plotTypeLookUp[metadataId] === 'decimal'"
                 class="row">
                 <app-histogram [metadataId]="metadataId"></app-histogram>
@@ -65,11 +68,13 @@
         </div>
         <br>
         <br>
-        <div class="d-flex justify-content-center">
+        <div #target1 class="d-flex justify-content-center">
             <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" *ngIf="dataSource.length > 0">
                 <ng-container matColumnDef="metadata2">
-                    <th mat-header-cell *matHeaderCellDef> Gene </th>
-                    <td class="metaColumn" mat-cell *matCellDef="let element" (click)="onSelectMetadata2(element.gene)">
+                    <th mat-header-cell *matHeaderCellDef> {{tableFromSearch ? 'Metadata': 'Gene'}} </th>
+                    <!-- <td class="metaColumn" mat-cell *matCellDef="let element" (click)="onSelectMetadata2(element.gene)">
+                        {{element.gene}}</td> -->
+                    <td class="metaColumn" mat-cell *matCellDef="let element">
                         {{element.gene}}</td>
                 </ng-container>
                 <ng-container matColumnDef="test">
@@ -89,8 +94,9 @@
             </table>
 
         </div>
-        <div class="d-flex justify-content-center paginator">
-            <mat-paginator [length]="100" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+        <div class="d-flex justify-content-center paginator" *ngIf="tableFromSearch === false">
+            <mat-paginator [length]="tableSize" [pageSize]="25" [pageSizeOptions]="[5, 10, 25, 100]"
+                aria-label="Select page" (page)="getPageDetails($event, target1)">
             </mat-paginator>
         </div>
 
