@@ -8,6 +8,13 @@
             </a>
         </div>
         <hr>
+        <mat-form-field class="example-form-field container sideBarContainer" appearance="outline">
+            <mat-label>Gene Search</mat-label>
+            <input matInput type="text" [(ngModel)]="searchValue">
+            <button *ngIf="searchValue" matSuffix mat-icon-button aria-label="Clear" (click)="searchValue=''">
+                <mat-icon>close</mat-icon>
+            </button>
+        </mat-form-field>
         <div class="container sideBarContainer" *ngIf="metadataArr.length > 0">
             <ul>
                 <div class="pageTitle">Metadata:</div>
@@ -61,9 +68,9 @@
         <div class="d-flex justify-content-center">
             <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" *ngIf="dataSource.length > 0">
                 <ng-container matColumnDef="metadata2">
-                    <th mat-header-cell *matHeaderCellDef> Metadata 2 </th>
-                    <td class="metaColumn" mat-cell *matCellDef="let element"
-                        (click)="onSelectMetadata2(element.metadata2)"> {{element.vardesc}}</td>
+                    <th mat-header-cell *matHeaderCellDef> Gene </th>
+                    <td class="metaColumn" mat-cell *matCellDef="let element" (click)="onSelectMetadata2(element.gene)">
+                        {{element.gene}}</td>
                 </ng-container>
                 <ng-container matColumnDef="test">
                     <th mat-header-cell *matHeaderCellDef> Test </th>
@@ -80,6 +87,12 @@
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
             </table>
+
         </div>
+        <div class="d-flex justify-content-center paginator">
+            <mat-paginator [length]="100" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+            </mat-paginator>
+        </div>
+
     </div>
 </div>

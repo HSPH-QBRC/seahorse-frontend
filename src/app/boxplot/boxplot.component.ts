@@ -16,6 +16,8 @@ import * as d3Collection from 'd3-collection';
 export class BoxPlotComponent implements OnInit, OnChanges {
   @Input() metadataCatId = '';
   @Input() metadataNumId = '';
+  @Input() metadataLookUp = {};
+
   isLoading = false;
   boxPlotData = [];
   min = Infinity;
@@ -24,7 +26,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
 
   constructor(private httpClient: HttpClient) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.resetVariables()
@@ -98,6 +100,22 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         return tipBox
       });
 
+    const yAxisTip = d3Tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html((event) => {
+        let tipBox = `<div><div class="category">Y Axis: ${this.metadataLookUp[this.metadataNumId].vardescFull}</div> </div>`
+        return tipBox
+      });
+
+    const xAxisTip = d3Tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html((event) => {
+        let tipBox = `<div><div class="category">X Axis: ${this.metadataLookUp[this.metadataCatId].vardescFull}</div> </div>`
+        return tipBox
+      });
+
     // append the svg object to the body of the page
     var svg = d3.select("#my_boxplot")
       .append("svg")
@@ -108,6 +126,8 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         "translate(" + margin.left + "," + margin.top + ")");
 
     svg.call(pointTip);
+    svg.call(yAxisTip);
+    svg.call(xAxisTip);
 
     // Compute quartiles, median, inter quantile range min and max --> these info are then used to draw the box.
     this.sumstat = d3Collection.nest() // nest function allows to group the calculation per level of a factor
@@ -197,28 +217,99 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .attr("stroke", "black")
       .style("width", 80)
 
-    svg.append('text')
-      .classed('label', true)
-      .attr('transform', 'rotate(-90)')
-      .attr("font-weight", "bold")
-      .attr('y', -margin.left + 10)
-      .attr('x', -height / 2)
-      .attr('dy', '.71em')
-      .style('fill', 'rgba(0,0,0,.8)')
-      .style('text-anchor', 'middle')
-      .style('font-size', '12px')
-      .text(this.metadataNumId);
+    if (this.metadataLookUp[this.metadataNumId].vardesc[0].length > 50) {
+      svg.append('text')
+        .classed('label', true)
+        .attr('transform', 'rotate(-90)')
+        .attr("font-weight", "bold")
+        .attr('y', -margin.left + 10)
+        .attr('x', -height / 2)
+        .attr('dy', '.71em')
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '8px')
+        .text(this.metadataNumId)
+        .text(this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 50) + "...")
+        .on('mouseover', function (mouseEvent: any) {
+          yAxisTip.show(mouseEvent, this);
+          yAxisTip.style('left', mouseEvent.x + 10 + 'px');
+          d3.select(this).style("cursor", "pointer");
+        })
+        .on('mouseout', function (mouseEvent: any) {
+          d3.select(this).style("cursor", "default");
+        })
+        .on('mouseout', yAxisTip.hide);
+    } else {
+      svg.append('text')
+        .classed('label', true)
+        .attr('transform', 'rotate(-90)')
+        .attr("font-weight", "bold")
+        .attr('y', -margin.left + 10)
+        .attr('x', -height / 2)
+        .attr('dy', '.71em')
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '12px')
+        // .text(this.metadataNumId)
+        .text(this.metadataLookUp[this.metadataNumId].vardesc[0])
 
-    svg
-      .append('text')
-      .classed('label', true)
-      .attr("font-weight", "bold")
-      .attr('x', width / 2)
-      .attr('y', height + margin.bottom - 10)
-      .style('fill', 'rgba(0,0,0,.8)')
-      .style('text-anchor', 'middle')
-      .style('font-size', '12px')
-      .text(this.metadataCatId);
+    }
+
+    // svg.append('text')
+    //   .classed('label', true)
+    //   .attr('transform', 'rotate(-90)')
+    //   .attr("font-weight", "bold")
+    //   .attr('y', -margin.left + 10)
+    //   .attr('x', -height / 2)
+    //   .attr('dy', '.71em')
+    //   .style('fill', 'rgba(0,0,0,.8)')
+    //   .style('text-anchor', 'middle')
+    //   .style('font-size', '12px')
+    //   .text(this.metadataNumId);
+
+    if (this.metadataLookUp[this.metadataCatId].vardesc[0].length > 50) {
+      svg
+        .append('text')
+        .classed('label', true)
+        .attr("font-weight", "bold")
+        .attr('x', width / 2)
+        .attr('y', height + margin.bottom - 10)
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '8px')
+        // .text(this.metadataCatId)
+        .text(this.metadataLookUp[this.metadataCatId].vardesc[0].slice(0, 50) + "...")
+        .on('mouseover', function (mouseEvent: any) {
+          xAxisTip.show(mouseEvent, this);
+          xAxisTip.style('left', mouseEvent.x + 10 + 'px');
+          d3.select(this).style("cursor", "pointer");
+        })
+        .on('mouseout', function (mouseEvent: any) {
+          d3.select(this).style("cursor", "default");
+        })
+        .on('mouseout', xAxisTip.hide);
+    } else {
+      svg
+        .append('text')
+        .classed('label', true)
+        .attr("font-weight", "bold")
+        .attr('x', width / 2)
+        .attr('y', height + margin.bottom - 10)
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .text(this.metadataLookUp[this.metadataCatId].vardesc[0]);
+    }
+    // svg
+    //   .append('text')
+    //   .classed('label', true)
+    //   .attr("font-weight", "bold")
+    //   .attr('x', width / 2)
+    //   .attr('y', height + margin.bottom - 10)
+    //   .style('fill', 'rgba(0,0,0,.8)')
+    //   .style('text-anchor', 'middle')
+    //   .style('font-size', '12px')
+    //   .text(this.metadataCatId);
 
     function wrap(text, width) {
       text.each(function () {

@@ -6,6 +6,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { MetadataCrossComparisonComponent } from './metadataCrossComparison/metadataCrossComparison.component';
+import { GeneExpressionComparisonComponent } from './geneExpressionComparison/geneExpressionComparison.component';
+import { MetadataToGeneExpressionComparison } from './metadataToGeneExpressionComparison/metadataToGeneExpressionComparison.component';
 import { HeatmapComponent } from './heatmap/heatmap.component';
 import { Heatmap2Component } from './heatmap2/heatmap2.component';
 import { BoxPlotComponent } from './boxplot/boxplot.component';
@@ -24,7 +26,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { HomepageComponent } from './homepage/homepage.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProgressSpinnerComponent } from './progress-spinner/progress-spinner.component';
-import {MatTableModule} from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 
 
@@ -42,7 +45,8 @@ import {MatTableModule} from '@angular/material/table';
     LegendComponent,
     HomepageComponent,
     ProgressSpinnerComponent,
-    
+    GeneExpressionComparisonComponent,
+    MetadataToGeneExpressionComparison
   ],
   imports: [
     BrowserModule,
@@ -57,8 +61,9 @@ import {MatTableModule} from '@angular/material/table';
     MatInputModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatTableModule
-    
+    MatTableModule,
+    MatPaginatorModule
+
   ],
   providers: [],
   bootstrap: [AppComponent]

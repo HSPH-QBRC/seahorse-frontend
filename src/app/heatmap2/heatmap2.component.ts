@@ -14,6 +14,8 @@ import { catchError } from "rxjs/operators";
 export class Heatmap2Component implements OnInit, OnChanges {
   @Input() metadataId = '';
   @Input() metadata2Id = '';
+  @Input() metadataLookUp = {};
+
   xAxisArr = [];
   yAxisArr = [];
   fullXAxisArr = [];
@@ -30,6 +32,7 @@ export class Heatmap2Component implements OnInit, OnChanges {
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
+    console.log("look up from heatmap: ", this.metadataLookUp)
 
     this.isLoading = true;
     let categorical1 = this.metadataId;
@@ -133,9 +136,25 @@ export class Heatmap2Component implements OnInit, OnChanges {
       .html((event, d) => {
         let temp = d.xValue + "_" + d.yValue;
         let tipBox = `<div><div class="category">Name: </div> ${d.name.length === 0 ? "N/A" : d.name}</div>
-    <div><div class="category">${this.metadataId}: </div> ${d.xValue}</div>
-    <div><div class="category">${this.metadata2Id}:  </div>${d.yValue}</div>
+    <div><div class="category">X Value: </div> ${d.xValue}</div>
+    <div><div class="category">Y Value:  </div>${d.yValue}</div>
     <div><div class="category">Count:  </div>${this.countDict[temp]}</div>`
+        return tipBox
+      });
+
+    const yAxisTip = d3Tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html((event) => {
+        let tipBox = `<div><div class="category">Y Axis: ${this.metadataLookUp[this.metadata2Id].vardescFull}</div> </div>`
+        return tipBox
+      });
+
+    const xAxisTip = d3Tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html((event) => {
+        let tipBox = `<div><div class="category">X Axis: ${this.metadataLookUp[this.metadataId].vardescFull}</div> </div>`
         return tipBox
       });
 
@@ -153,6 +172,8 @@ export class Heatmap2Component implements OnInit, OnChanges {
         "translate(" + margin.left + "," + margin.top + ")");
 
     svg.call(pointTip);
+    svg.call(yAxisTip);
+    svg.call(xAxisTip);
 
     // Build X scales and axis:
     var x = d3.scaleBand()
@@ -168,9 +189,9 @@ export class Heatmap2Component implements OnInit, OnChanges {
       .selectAll("text")
       .style("text-anchor", "middle")
       .call(wrap, width / this.xAxisArr.length)
-      // .attr("dx", "-.8em")
-      // .attr("dy", ".15em")
-      // .attr("transform", rotateText);
+    // .attr("dx", "-.8em")
+    // .attr("dy", ".15em")
+    // .attr("transform", rotateText);
 
     // Build X scales and axis:
     var y = d3.scaleBand()
@@ -207,28 +228,78 @@ export class Heatmap2Component implements OnInit, OnChanges {
       })
       .on('mouseout', pointTip.hide);
 
-    svg.append('text')
-      .classed('label', true)
-      .attr('transform', 'rotate(-90)')
-      .attr("font-weight", "bold")
-      .attr('y', -margin.left + 10)
-      .attr('x', -height / 2)
-      .attr('dy', '.71em')
-      .style('fill', 'rgba(0,0,0,.8)')
-      .style('text-anchor', 'middle')
-      .style('font-size', '12px')
-      .text(this.metadata2Id);
 
-    svg
-      .append('text')
-      .classed('label', true)
-      .attr("font-weight", "bold")
-      .attr('x', width / 2)
-      .attr('y', height + margin.bottom - 10)
-      .style('fill', 'rgba(0,0,0,.8)')
-      .style('text-anchor', 'middle')
-      .style('font-size', '12px')
-      .text(this.metadataId);
+    if (this.metadataLookUp[this.metadata2Id].vardesc[0].length > 50) {
+      svg.append('text')
+        .classed('label', true)
+        .attr('transform', 'rotate(-90)')
+        .attr("font-weight", "bold")
+        .attr('y', -margin.left + 10)
+        .attr('x', -height / 2)
+        .attr('dy', '.71em')
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '8px')
+        .text(this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50) + "...")
+        .on('mouseover', function (mouseEvent: any) {
+          yAxisTip.show(mouseEvent, this);
+          yAxisTip.style('left', mouseEvent.x + 10 + 'px');
+          d3.select(this).style("cursor", "pointer");
+        })
+        .on('mouseout', function (mouseEvent: any) {
+          d3.select(this).style("cursor", "default");
+        })
+        .on('mouseout', yAxisTip.hide);
+    } else {
+      svg.append('text')
+        .classed('label', true)
+        .attr('transform', 'rotate(-90)')
+        .attr("font-weight", "bold")
+        .attr('y', -margin.left + 10)
+        .attr('x', -height / 2)
+        .attr('dy', '.71em')
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .text(this.metadataLookUp[this.metadata2Id].vardesc[0])
+
+    }
+
+    if (this.metadataLookUp[this.metadataId].vardesc[0].length > 50) {
+      svg
+        .append('text')
+        .classed('label', true)
+        .attr("font-weight", "bold")
+        .attr('x', width / 2)
+        .attr('y', height + margin.bottom - 10)
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '8px')
+        .text(this.metadataLookUp[this.metadataId].vardesc[0].slice(0, 50) + "...")
+        .on('mouseover', function (mouseEvent: any) {
+          xAxisTip.show(mouseEvent, this);
+          xAxisTip.style('left', mouseEvent.x + 10 + 'px');
+          d3.select(this).style("cursor", "pointer");
+        })
+        .on('mouseout', function (mouseEvent: any) {
+          d3.select(this).style("cursor", "default");
+        })
+        .on('mouseout', xAxisTip.hide);
+    } else {
+      svg
+        .append('text')
+        .classed('label', true)
+        .attr("font-weight", "bold")
+        .attr('x', width / 2)
+        .attr('y', height + margin.bottom - 10)
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .text(this.metadataLookUp[this.metadataId].vardesc[0].slice(0, 50))
+
+    }
+
+
 
     // //Legend
     var countColorData = [{ "color": "royalblue", "value": 0 }, { "color": "crimson", "value": this.maxCount }];

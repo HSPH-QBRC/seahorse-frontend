@@ -44,12 +44,10 @@ export class HistogramComponent implements OnChanges {
         this.dataSize = res['rows'].length;
         for (let i = 0; i < res['rows'].length; i++) {
           let num = res['rows'][i][1];
-          this.min = Math.min(num, this.min)
-          this.max = Math.max(num, this.max)
-          this.histogramData.push(num)
-
+          this.min = Math.min(num, this.min);
+          this.max = Math.max(num, this.max);
+          this.histogramData.push(num);
         }
-        console.log("histogram data: ", this.histogramData)
         if (this.histogramData.length === 0) {
           this.hideHistogram = true
         } else {
@@ -88,7 +86,6 @@ export class HistogramComponent implements OnChanges {
         "translate(" + margin.left + "," + margin.top + ")");
 
     svg.call(pointTip);
-
     
     // X axis: scale and draw:
     var x = d3.scaleLinear()

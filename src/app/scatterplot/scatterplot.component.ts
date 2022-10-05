@@ -14,6 +14,8 @@ import { catchError } from "rxjs/operators";
 export class ScatterPlotComponent implements OnInit, OnChanges {
   @Input() metadataId = '';
   @Input() metadata2Id = '';
+  @Input() metadataLookUp = {};
+
   isLoading = false;
 
   constructor(private httpClient: HttpClient) { }
@@ -86,13 +88,29 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       width = 800 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
-      const pointTip = d3Tip()
+    const pointTip = d3Tip()
       .attr('class', 'd3-tip')
       .offset([-10, 0])
       .html((event, d) => {
         let tipBox = `<div><div class="category">Name:</div> ${d.name}</div>
-    <div><div class="category">${this.metadataId}: </div> ${d.xValue}</div>
-    <div><div class="category">${this.metadata2Id}: </div>${d.yValue}</div>`
+    <div><div class="category">X Value: </div> ${d.xValue}</div>
+    <div><div class="category">Y Value: </div>${d.yValue}</div>`
+        return tipBox
+      });
+
+    const yAxisTip = d3Tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html((event) => {
+        let tipBox = `<div><div class="category">Y Axis: ${this.metadataLookUp[this.metadata2Id].vardescFull}</div> </div>`
+        return tipBox
+      });
+
+    const xAxisTip = d3Tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html((event) => {
+        let tipBox = `<div><div class="category">X Axis: ${this.metadataLookUp[this.metadataId].vardescFull}</div> </div>`
         return tipBox
       });
 
@@ -110,6 +128,8 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         "translate(" + margin.left + "," + margin.top + ")");
 
     svg.call(pointTip);
+    svg.call(yAxisTip);
+    svg.call(xAxisTip);
 
     // Add X axis
     var x = d3.scaleLinear()
@@ -148,29 +168,79 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       })
       .on('mouseout', pointTip.hide);
 
+    if (this.metadataLookUp[this.metadata2Id].vardesc[0].length > 50) {
       svg.append('text')
-      .classed('label', true)
-      .attr('transform', 'rotate(-90)')
-      .attr("font-weight", "bold")
-      .attr('y', -margin.left + 10)
-      .attr('x', -height / 2)
-      .attr('dy', '.71em')
-      .style('fill', 'rgba(0,0,0,.8)')
-      .style('text-anchor', 'middle')
-      .style('font-size', '12px')
-      .text(this.metadata2Id);
+        .classed('label', true)
+        .attr('transform', 'rotate(-90)')
+        .attr("font-weight", "bold")
+        .attr('y', -margin.left + 10)
+        .attr('x', -height / 2)
+        .attr('dy', '.71em')
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '8px')
+        .text(this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50) + "...")
+        .on('mouseover', function (mouseEvent: any) {
+          yAxisTip.show(mouseEvent, this);
+          yAxisTip.style('left', mouseEvent.x + 10 + 'px');
+          d3.select(this).style("cursor", "pointer");
+        })
+        .on('mouseout', function (mouseEvent: any) {
+          d3.select(this).style("cursor", "default");
+        })
+        .on('mouseout', yAxisTip.hide);
+    } else {
+      svg.append('text')
+        .classed('label', true)
+        .attr('transform', 'rotate(-90)')
+        .attr("font-weight", "bold")
+        .attr('y', -margin.left + 10)
+        .attr('x', -height / 2)
+        .attr('dy', '.71em')
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .text(this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50));
+    }
 
-    svg
-      .append('text')
-      .classed('label', true)
-      .attr("font-weight", "bold")
-      .attr('x', width / 2)
-      .attr('y', height + margin.bottom - 10)
-      .style('fill', 'rgba(0,0,0,.8)')
-      .style('text-anchor', 'middle')
-      .style('font-size', '12px')
-      .text(this.metadataId);
+    if (this.metadataLookUp[this.metadataId].vardesc[0].length > 50) {
+      svg
+        .append('text')
+        .classed('label', true)
+        .attr("font-weight", "bold")
+        .attr('x', width / 2)
+        .attr('y', height + margin.bottom - 10)
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '8px')
+        // .text(this.metadataId);
+        .text(this.metadataLookUp[this.metadataId].vardesc[0].slice(0, 50) + "...")
+        .on('mouseover', function (mouseEvent: any) {
+          xAxisTip.show(mouseEvent, this);
+          xAxisTip.style('left', mouseEvent.x + 10 + 'px');
+          d3.select(this).style("cursor", "pointer");
+        })
+        .on('mouseout', function (mouseEvent: any) {
+          d3.select(this).style("cursor", "default");
+        })
+        .on('mouseout', xAxisTip.hide);
+    } else {
+      svg
+        .append('text')
+        .classed('label', true)
+        .attr("font-weight", "bold")
+        .attr('x', width / 2)
+        .attr('y', height + margin.bottom - 10)
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .text(this.metadataLookUp[this.metadataId].vardesc[0].slice(0, 50));
+    }
   }
+
+
+
+
 
   refreshData() {
     this.scatterPlotData = [];
