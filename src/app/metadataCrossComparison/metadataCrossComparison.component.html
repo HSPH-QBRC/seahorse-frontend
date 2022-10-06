@@ -44,7 +44,7 @@
             <div id="my_plotArea">
                 <div *ngIf="displayScatterPlot">
                     <app-scatterplot [metadataId]="metadataId" [metadata2Id]="metadata2Id"
-                        [metadataLookUp]="metadataLookUp"></app-scatterplot>
+                        [metadataLookUp]="metadataLookUp" [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
                 </div>
                 <div *ngIf="displayBoxPlot">
                     <app-boxplot [metadataCatId]="metadata2Id" [metadataNumId]="metadataId"

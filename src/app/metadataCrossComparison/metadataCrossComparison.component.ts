@@ -20,6 +20,7 @@ export class MetadataCrossComparisonComponent implements OnInit {
   notIncludeList = ["SUBJID", "AGE", "SAMPID"]
   metadataArr = []
   isLoading = false;
+  typeOfLookUp = 'mcc'
 
   //For the Comparison table
   dataSource = [];
@@ -36,7 +37,7 @@ export class MetadataCrossComparisonComponent implements OnInit {
   }
 
   getListOfMetadata() {
-    let apiUrl = "//3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++*%0D%0Afrom%0D%0A++metadata%0D%0A`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -64,7 +65,7 @@ export class MetadataCrossComparisonComponent implements OnInit {
   }
 
   getMetadataType(meta) {
-    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++VARNAME%2C%0D%0A++TYPE%0D%0Afrom%0D%0A++metadata%0D%0Awhere%0D%0A++VARNAME+%3D+"${meta}"`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -95,7 +96,7 @@ export class MetadataCrossComparisonComponent implements OnInit {
   }
 
   getComparisonStats() {
-    let apiUrl = "//3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++METADATA1%2C%0D%0A++METADATA2%2C%0D%0A++TEST%2C%0D%0A++%5BTEST+STATISTCT%5D%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2m%0D%0Awhere%0D%0A++"METADATA1"+%3D+"${this.metadataId}"%0D%0A++AND+"Test"+is+not+"None"%0D%0A++AND+%5BP-VALUE%5D+is+not+"null"%0D%0A++AND+%5BP-VALUE%5D+is+not+"nan"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -105,6 +106,7 @@ export class MetadataCrossComparisonComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        console.log("getComp res: ", res['rows'], this.metadataId)
         this.dataSource = [];
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {

@@ -54,7 +54,7 @@
             <div id="my_plotArea">
                 <div *ngIf="displayScatterPlot">
                     <app-scatterplot [metadataId]="metadataId" [metadata2Id]="metadata2Id"
-                        [metadataLookUp]="metadataLookUp"></app-scatterplot>
+                        [metadataLookUp]="metadataLookUp" [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
                 </div>
                 <div *ngIf="displayBoxPlot">
                     <app-boxplot [metadataCatId]="metadata2Id" [metadataNumId]="metadataId"
@@ -72,11 +72,13 @@
             <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" *ngIf="dataSource.length > 0">
                 <ng-container matColumnDef="metadata2">
                     <th mat-header-cell *matHeaderCellDef> {{tableFromSearch ? 'Metadata': 'Gene'}} </th>
-                    <!-- <td class="metaColumn" mat-cell *matCellDef="let element" (click)="onSelectMetadata2(element.gene)">
-                        {{element.gene}}</td> -->
-                    <td class="metaColumn" mat-cell *matCellDef="let element">
+                    <td class="metaColumn" mat-cell *matCellDef="let element" (click)="onSelectMetadata2(element.gene)">
                         {{element.gene}}</td>
                 </ng-container>
+                <!-- <ng-container matColumnDef="symbol">
+                    <th mat-header-cell *matHeaderCellDef> Symbol </th>
+                    <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
+                </ng-container> -->
                 <ng-container matColumnDef="test">
                     <th mat-header-cell *matHeaderCellDef> Test </th>
                     <td mat-cell *matCellDef="let element"> {{element.test}} </td>

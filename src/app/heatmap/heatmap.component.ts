@@ -193,7 +193,7 @@ export class HeatmapComponent implements OnInit {
     // let categorical1 = "SMATSSCR"
     // let categorical2 = "SME1ANTI"
     //Create annotations look up table too identify metadata for genes
-    let apiUrl = "//3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++sample_id%2C%0D%0A++tissue%2C%0D%0A++sex%2C%0D%0A++age_range%2C%0D%0A++hardy_scale_death%0D%0Afrom%0D%0A++annotations%0D%0Alimit%0D%0A++20000`
     // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categorical1}%2C%0D%0A++${categorical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categorical1}+is+not+%22%22%0D%0A++AND+${categorical2}+is+not+%22%22%0D%0A`
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -223,7 +223,7 @@ export class HeatmapComponent implements OnInit {
 
   getData(limit, page) {
     let tissue = this.tissue;
-    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let filterUrl = `sql=select%0D%0A++*%0D%0Afrom%0D%0A++correlations%0D%0A++join+annotations+on+correlations.Sample1+%3D+annotations.sample_id%0D%0Awhere%0D%0A++"tissue"+%3D+"${tissue}"%0D%0Aorder+by%0D%0A++"Sample1+Order"+asc%0D%0Alimit%0D%0A++${limit}%0D%0Aoffset%0D%0A++${limit * page}`;
     let queryURL = `${apiUrl}${filterUrl}`;
 

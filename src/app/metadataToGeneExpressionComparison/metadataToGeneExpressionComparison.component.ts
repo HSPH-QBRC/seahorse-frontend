@@ -26,6 +26,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   notIncludeList = ["SUBJID", "AGE", "SAMPID"]
   metadataArr = []
   isLoading = false;
+  typeOfLookUp = 'm2g'
 
   //For the Comparison table
   dataSource = [];
@@ -44,9 +45,8 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   }
 
   getListOfMetadata() {
-    let apiUrl = "//3.143.251.117:8001/gtex.json?";
-    // let annotationUrl = `sql=select%0D%0A++VARNAME%0D%0Afrom%0D%0A++metadata%0D%0A`
-    let annotationUrl = `sql=select%0D%0A++*%0D%0Afrom%0D%0A++metadata%0D%0A`
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++*%0D%0Afrom%0D%0A++metadata%0D%0A`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -71,7 +71,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   }
 
   getMetadataType(meta) {
-    let apiUrl = "http://3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++VARNAME%2C%0D%0A++TYPE%0D%0Afrom%0D%0A++metadata%0D%0Awhere%0D%0A++VARNAME+%3D+"${meta}"`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -108,7 +108,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
 
   getTableSize() {
     let table = 'm2g'
-    let apiUrl = "//3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=SELECT%0D%0A++COUNT%28*%29%0D%0AFROM%0D%0A++${table}`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -124,8 +124,8 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   }
 
   getComparisonStats() {
-
-    let apiUrl = "//3.143.251.117:8001/gtex.json?";
+    console.log("GC ID: ",this.metadataId)
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++METADATA%2C%0D%0A++ENSG%2C%0D%0A++TEST%2C%0D%0A++%5BTEST+STATISTIC%5D%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2g%0D%0Awhere%0D%0A++"METADATA"+%3D+"${this.metadataId}"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D%0D%0Alimit%0D%0A++${this.currPage}%2C+${this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -135,7 +135,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        console.log("res m2g: ", res['rows'])
+        console.log("res m2g: ", res['rows'], this.metadataId)
         this.dataSource = [];
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
@@ -147,6 +147,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
           }
           this.dataSource.push(temp)
         }
+        console.log("datasource: ", this.dataSource)
         // this.displayComparison()
       })
 
@@ -155,14 +156,14 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   plotTypeLookUp = {};
   geneType = 'integer'
 
-  // displayComparison() {
-  //   // for (let i = 0; i < this.dataSource.length; i++) {
-  //   //   let tempMeta2 = this.dataSource[i]['gene']
-  //   //   console.log("temp: ", tempMeta2)
-  //   //   this.getMetadataType(tempMeta2)
-  //   // }
-  //   console.log("metadata types: ",this.getMetadataType)
-  // }
+  displayComparison() {
+    for (let i = 0; i < this.dataSource.length; i++) {
+      let tempMeta2 = this.dataSource[i]['gene']
+      console.log("temp: ", tempMeta2)
+      this.getMetadataType(tempMeta2)
+    }
+    console.log("metadata types: ", this.getMetadataType)
+  }
 
   onSelectMetadata2(name) {
     let test = name.split(".")
@@ -218,7 +219,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   getEnsemblId(symbol) {
     this.searchEnsemblResults = [];
     let datasetteUrl = `sql=select%0D%0A++ENSEMBL%2C%0D%0A++SYMBOL%2C%0D%0A++ENTREZID%0D%0Afrom%0D%0A++e2s%0D%0Awhere%0D%0A++"SYMBOL"+is+"${symbol}"`;
-    let apiUrl = "//3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
 
     let queryURL = `${apiUrl}${datasetteUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -240,33 +241,35 @@ export class MetadataToGeneExpressionComparison implements OnInit {
 
 
   getMetadataToGeneComparisonResults() {
-    for (let i = 0; i < this.searchEnsemblResults.length; i++) {
-      let ensg = this.searchEnsemblResults[0]
-      let datasetteUrl = `sql=select%0D%0A++METADATA%2C%0D%0A++ENSG%2C%0D%0A++TEST%2C%0D%0A++%5BTEST+STATISTIC%5D%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2g%0D%0Awhere%0D%0A++"ENSG"+like+"${ensg}%25"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D`;
-      let apiUrl = "//3.143.251.117:8001/gtex.json?";
+    // for (let i = 0; i < this.searchEnsemblResults.length; i++) {
+    let ensg = this.searchEnsemblResults[0]
+    // console.log("ensg: ", ensg)
+    let datasetteUrl = `sql=select%0D%0A++METADATA%2C%0D%0A++ENSG%2C%0D%0A++TEST%2C%0D%0A++%5BTEST+STATISTIC%5D%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2g%0D%0Awhere%0D%0A++"ENSG"+like+"${ensg}%25"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D`;
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
 
-      let queryURL = `${apiUrl}${datasetteUrl}`;
-      this.httpClient.get(queryURL).pipe(
-        catchError(error => {
-          console.log("Error: ", error);
-          let message = `Error: ${error.error.error}`;
-          throw message
-        }))
-        .subscribe(res => {
-          console.log("res m2gCR: ", res['rows'])
-          this.dataSource = [];
-          this.isLoading = false;
-          for (let i = 0; i < res['rows'].length; i++) {
-            let temp = {
-              "gene": res['rows'][i][0],
-              "test": res['rows'][i][2],
-              'test_statistic': res['rows'][i][3],
-              'pValue': res['rows'][i][4]
-            }
-            this.dataSource.push(temp)
+    let queryURL = `${apiUrl}${datasetteUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        console.log("NEW res m2gCR: ", res['rows'])
+        this.dataSource = [];
+        this.isLoading = false;
+        for (let i = 0; i < res['rows'].length; i++) {
+          let temp = {
+            "gene": res['rows'][i][0],
+            // "symbol": res['rows'][i][1],
+            "test": res['rows'][i][2],
+            'test_statistic': res['rows'][i][3],
+            'pValue': res['rows'][i][4]
           }
-        })
-    }
+          this.dataSource.push(temp)
+        }
+      })
+    // }
 
   }
 

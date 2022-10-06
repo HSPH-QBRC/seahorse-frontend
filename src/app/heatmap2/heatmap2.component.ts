@@ -64,7 +64,7 @@ export class Heatmap2Component implements OnInit, OnChanges {
 
   getData(categorical1, categorical2) {
     //Create annotations look up table too identify metadata for genes
-    let apiUrl = "//3.143.251.117:8001/gtex.json?";
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categorical1}%2C%0D%0A++${categorical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categorical1}+is+not+%22%22%0D%0A++AND+${categorical2}+is+not+%22%22%0D%0A`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(

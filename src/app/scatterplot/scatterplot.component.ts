@@ -15,6 +15,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   @Input() metadataId = '';
   @Input() metadata2Id = '';
   @Input() metadataLookUp = {};
+  @Input() typeOfLookUp = 'mcc'
 
   isLoading = false;
 
@@ -25,7 +26,12 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     let numerical1 = this.metadataId;
     let numerical2 = this.metadata2Id
     this.refreshData();
-    this.getData(numerical1, numerical2)
+    if (this.typeOfLookUp === 'mcc') {
+      this.getDataMCC(numerical1, numerical2)
+    }else if(this.typeOfLookUp === 'm2g'){
+      
+    }
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -33,7 +39,11 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     let numerical1 = this.metadataId;
     let numerical2 = this.metadata2Id;
     this.refreshData();
-    this.getData(numerical1, numerical2)
+    if (this.typeOfLookUp === 'mcc') {
+      this.getDataMCC(numerical1, numerical2)
+    }else{
+      console.log("do something diff")
+    }
   }
 
   scatterPlotData = [];
@@ -43,8 +53,8 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   yMax = -Infinity
 
 
-  getData(numerical1, numerical2) {
-    let apiUrl = "//3.143.251.117:8001/gtex.json?";
+  getDataMCC(numerical1, numerical2) {
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numerical1}%2C%0D%0A++${numerical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numerical1}+is+not+""%0D%0A++AND+${numerical2}+is+not+""%0D%0A`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -54,8 +64,6 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
-        console.log("queryurl: ", queryURL)
-        console.log("SP res: ", res['rows'])
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
           if (res['rows'][i][1] < this.xMin) {
@@ -253,4 +261,43 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     this.yMax = -Infinity
   }
 
+  getDataM2G(numerical1, numerical2) {
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numerical1}%2C%0D%0A++${numerical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numerical1}+is+not+""%0D%0A++AND+${numerical2}+is+not+""%0D%0A`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        this.isLoading = false;
+        for (let i = 0; i < res['rows'].length; i++) {
+          if (res['rows'][i][1] < this.xMin) {
+            this.xMin = res['rows'][i][1];
+          }
+          if (res['rows'][i][1] > this.xMax) {
+            this.xMax = res['rows'][i][1];
+          }
+          if (res['rows'][i][2] < this.yMin) {
+            this.yMin = res['rows'][i][2];
+          }
+          if (res['rows'][i][2] > this.yMax) {
+            this.yMax = res['rows'][i][2];
+          }
+
+          let temp = {
+            'name': res['rows'][i][0],
+            'xValue': res['rows'][i][1],
+            'yValue': res['rows'][i][2]
+          };
+
+          this.scatterPlotData.push(temp);
+        }
+        console.log("scatterplot data: ", this.scatterPlotData)
+        this.createScatterPlot()
+      })
+
+  }
 }
