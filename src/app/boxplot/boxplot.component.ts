@@ -17,12 +17,14 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   @Input() metadataCatId = '';
   @Input() metadataNumId = '';
   @Input() metadataLookUp = {};
+  @Input() typeOfLookUp = 'mcc'
 
   isLoading = false;
   boxPlotData = [];
   min = Infinity;
   max = -Infinity;
   xAxisArr = [];
+
 
   constructor(private httpClient: HttpClient) { }
 
@@ -33,7 +35,12 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     this.isLoading = true;
     let numeric = this.metadataCatId;
     let categorical = this.metadataNumId;
-    this.getData(numeric, categorical);
+    if (this.typeOfLookUp === 'mcc') {
+      this.getDataMCC(numeric, categorical);
+    } else if (this.typeOfLookUp === 'm2g') {
+      this.getDataM2G(numeric, categorical);
+    }
+
   }
 
   resetVariables() {
@@ -43,7 +50,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     this.xAxisArr = [];
   }
 
-  getData(numericId, categoricalId) {
+  getDataMCC(numericId, categoricalId) {
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numericId}%2C%0D%0A++${categoricalId}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numericId}+is+not+""%0D%0A++AND+${categoricalId}+is+not+""%0D%0A`
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -72,6 +79,44 @@ export class BoxPlotComponent implements OnInit, OnChanges {
           };
           this.boxPlotData.push(temp);
         }
+        this.createBoxPlot()
+      })
+  }
+
+  getDataM2G(numericId, categoricalId) {
+    console.log("num/cat: ", numericId, categoricalId)
+    let limit = '1000'
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${categoricalId}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+like+"${numericId}%"%0D%0A++AND+"${categoricalId}"+is+not+""%0D%0A++AND+"GENE_EXPRESSION"+is+not+""%0D%0Alimit%0D%0A++${limit}`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        this.isLoading = false;
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        console.log("boxplot: ", res['rows'])
+        this.isLoading = false;
+        for (let i = 0; i < res['rows'].length; i++) {
+          if (res['rows'][i][2] < this.min) {
+            this.min = res['rows'][i][2];
+          }
+          if (res['rows'][i][2] > this.max) {
+            this.max = res['rows'][i][2];
+          }
+          if (!this.xAxisArr.includes(res['rows'][i][1].toString())) {
+            this.xAxisArr.push(res['rows'][i][1].toString())
+          }
+          let temp = {
+            'name': res['rows'][i][0],
+            'key': res['rows'][i][1],
+            'value': res['rows'][i][2]
+          };
+          this.boxPlotData.push(temp);
+        }
+        console.log("min/max: ", this.min, this.max)
         this.createBoxPlot()
       })
   }
@@ -129,6 +174,9 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     svg.call(yAxisTip);
     svg.call(xAxisTip);
 
+    let tempMin = this.min
+    let tempMax = this.max
+
     // Compute quartiles, median, inter quantile range min and max --> these info are then used to draw the box.
     this.sumstat = d3Collection.nest() // nest function allows to group the calculation per level of a factor
       .key(function (d) { return d.key; })
@@ -139,9 +187,15 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         let interQuantileRange = q3 - q1
         let min = q1 - 1.5 * interQuantileRange
         let max = q3 + 1.5 * interQuantileRange
+        
+        tempMin = Math.min(min, tempMin)
+        tempMax = Math.max(max, tempMax)
         return ({ q1: q1, median: median, q3: q3, interQuantileRange: interQuantileRange, min: min, max: max })
       })
       .entries(this.boxPlotData)
+
+    this.min = tempMin > 0 ? tempMin * .8 : tempMin * 1.2
+    console.log("updated min: ", this.min)
 
     if (this.sumstat.length > 12) {
       this.sumstat.sort((b, a) => b.value.median - a.value.median)
@@ -166,6 +220,8 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .style("text-anchor", "middle")
       .call(wrap, width / this.xAxisArr.length)
 
+
+    console.log("sumstat: ", this.sumstat, this.min)
     // Show the Y scale
     var y = d3.scaleLinear()
       .domain([this.min, this.max])
@@ -217,7 +273,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .attr("stroke", "black")
       .style("width", 80)
 
-    if (this.metadataLookUp[this.metadataNumId].vardesc[0].length > 50) {
+    if (this.typeOfLookUp === 'mcc' && this.metadataLookUp[this.metadataNumId].vardesc[0].length > 50) {
       svg.append('text')
         .classed('label', true)
         .attr('transform', 'rotate(-90)')
@@ -267,7 +323,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     //   .style('font-size', '12px')
     //   .text(this.metadataNumId);
 
-    if (this.metadataLookUp[this.metadataCatId].vardesc[0].length > 50) {
+    if (this.typeOfLookUp === 'mcc' && this.metadataLookUp[this.metadataCatId].vardesc[0].length > 50) {
       svg
         .append('text')
         .classed('label', true)
@@ -298,7 +354,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         .style('font-size', '12px')
-        .text(this.metadataLookUp[this.metadataCatId].vardesc[0]);
+        .text(this.typeOfLookUp === 'mcc' ? this.metadataLookUp[this.metadataCatId].vardesc[0] : this.metadataCatId);
     }
     // svg
     //   .append('text')

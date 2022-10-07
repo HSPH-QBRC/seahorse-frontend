@@ -29,7 +29,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     if (this.typeOfLookUp === 'mcc') {
       this.getDataMCC(numerical1, numerical2)
     }else if(this.typeOfLookUp === 'm2g'){
-      
+      this.getDataM2G(numerical1, numerical2)
     }
 
   }
@@ -42,7 +42,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     if (this.typeOfLookUp === 'mcc') {
       this.getDataMCC(numerical1, numerical2)
     }else{
-      console.log("do something diff")
+      this.getDataM2G(numerical1, numerical2)
     }
   }
 
@@ -92,6 +92,8 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       })
 
   }
+
+  
 
   createScatterPlot() {
     // set the dimensions and margins of the graph
@@ -179,7 +181,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       })
       .on('mouseout', pointTip.hide);
 
-    if (this.metadataLookUp[this.metadata2Id].vardesc[0].length > 50) {
+    if (this.typeOfLookUp ==='mcc' &&  this.metadataLookUp[this.metadata2Id].vardesc[0].length > 50) {
       svg.append('text')
         .classed('label', true)
         .attr('transform', 'rotate(-90)')
@@ -211,7 +213,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         .style('font-size', '12px')
-        .text(this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50));
+        .text(this.typeOfLookUp ==='mcc' ? this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50) : this.metadata2Id);
     }
 
     if (this.metadataLookUp[this.metadataId].vardesc[0].length > 50) {
@@ -261,9 +263,10 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     this.yMax = -Infinity
   }
 
-  getDataM2G(numerical1, numerical2) {
+  getDataM2G(numMetadata, numGene) {
+    let limit = '1000';
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numerical1}%2C%0D%0A++${numerical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numerical1}+is+not+""%0D%0A++AND+${numerical2}+is+not+""%0D%0A`
+    let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${numMetadata}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+is+"${numGene}"%0D%0Alimit%0D%0A++${limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -272,6 +275,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
+        console.log("m2g res scatter: ", res['rows'] )
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
           if (res['rows'][i][1] < this.xMin) {
@@ -295,7 +299,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
 
           this.scatterPlotData.push(temp);
         }
-        console.log("scatterplot data: ", this.scatterPlotData)
+        console.log("scatterplot data: ", this.scatterPlotData, this.xMin, this.xMax, this.yMin, this.yMax)
         this.createScatterPlot()
       })
 

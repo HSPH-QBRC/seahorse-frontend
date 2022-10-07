@@ -58,7 +58,7 @@
                 </div>
                 <div *ngIf="displayBoxPlot">
                     <app-boxplot [metadataCatId]="metadata2Id" [metadataNumId]="metadataId"
-                        [metadataLookUp]="metadataLookUp"></app-boxplot>
+                        [metadataLookUp]="metadataLookUp" [typeOfLookUp]="typeOfLookUp"></app-boxplot>
                 </div>
                 <div *ngIf="displayHeatmap">
                     <app-heatmap2 [metadataId]="metadataId" [metadata2Id]="metadata2Id"

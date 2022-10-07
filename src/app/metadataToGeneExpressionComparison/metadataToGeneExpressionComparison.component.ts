@@ -14,7 +14,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 export class MetadataToGeneExpressionComparison implements OnInit {
   searchValue = '';
-  metadataId = 'SMEXNCRT';
+  metadataId = 'SMEXNCRT'; //for num
+  // metadataId = 'SMATSSCR' //for cat
   metadata2Id = '';
   displayScatterPlot = false;
   displayBoxPlot = false;
@@ -135,7 +136,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        console.log("res m2g: ", res['rows'], this.metadataId)
+        // console.log("res m2g: ", res['rows'], this.metadataId)
         this.dataSource = [];
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
@@ -183,13 +184,13 @@ export class MetadataToGeneExpressionComparison implements OnInit {
 
     //this is where we decide which plot to use if have the data for it. for now, will wait to see.
     if (this.plotTypeLookUp[this.metadataId] === 'integer, encoded value' || this.plotTypeLookUp[this.metadataId] === 'string') {
-      // this.displayBoxPlot = true;
-      // this.metadata2Id = test[0];
+      this.displayBoxPlot = true;
+      this.metadata2Id = test[0];
       console.log("meta1 = cat, meta2/gene = num")
     }
     else if (this.plotTypeLookUp[this.metadataId] === 'integer' || this.plotTypeLookUp[this.metadataId] === 'decimal') {
-      // this.displayScatterPlot = true;
-      // this.metadata2Id = test[0];
+      this.displayScatterPlot = true;
+      this.metadata2Id = test[0];
       console.log("meta1 = num, meta2/gene = num")
     }
 
@@ -255,7 +256,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        console.log("NEW res m2gCR: ", res['rows'])
+        // console.log("NEW res m2gCR: ", res['rows'])
         this.dataSource = [];
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
