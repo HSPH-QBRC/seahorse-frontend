@@ -24,13 +24,19 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   min = Infinity;
   max = -Infinity;
   xAxisArr = [];
+  sumstat = [];
 
+  limit = 1000;
+  offset = 0;
+  lengthOfResult = 0;
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void { }
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.offset = 0;
+    this.lengthOfResult = 0;
     this.resetVariables()
     this.isLoading = true;
     let numeric = this.metadataCatId;
@@ -84,10 +90,8 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   }
 
   getDataM2G(numericId, categoricalId) {
-    console.log("num/cat: ", numericId, categoricalId)
-    let limit = '1000'
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${categoricalId}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+like+"${numericId}%"%0D%0A++AND+"${categoricalId}"+is+not+""%0D%0A++AND+"GENE_EXPRESSION"+is+not+""%0D%0Alimit%0D%0A++${limit}`
+    let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${categoricalId}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+like+"${numericId}%"%0D%0A++AND+"${categoricalId}"+is+not+""%0D%0A++AND+"GENE_EXPRESSION"+is+not+""%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -97,8 +101,6 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
-        console.log("boxplot: ", res['rows'])
-        this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
           if (res['rows'][i][2] < this.min) {
             this.min = res['rows'][i][2];
@@ -116,11 +118,18 @@ export class BoxPlotComponent implements OnInit, OnChanges {
           };
           this.boxPlotData.push(temp);
         }
-        console.log("min/max: ", this.min, this.max)
-        this.createBoxPlot()
+        
+        this.lengthOfResult = res['rows'].length;
+        this.offset += this.limit
+        if (this.lengthOfResult > 0) {
+          this.getDataM2G(numericId, categoricalId)
+        } else {
+          this.isLoading = false;
+          this.isLoading = false;
+          this.createBoxPlot()
+        }
       })
   }
-  sumstat = []
 
   createBoxPlot() {
     // set the dimensions and margins of the graph
@@ -194,8 +203,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       })
       .entries(this.boxPlotData)
 
-    this.min = tempMin > 0 ? tempMin * .8 : tempMin * 1.2
-    console.log("updated min: ", this.min)
+    this.min = tempMin > 0 ? tempMin * .8 : tempMin * 1.2;
 
     if (this.sumstat.length > 12) {
       this.sumstat.sort((b, a) => b.value.median - a.value.median)
@@ -220,8 +228,6 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .style("text-anchor", "middle")
       .call(wrap, width / this.xAxisArr.length)
 
-
-    console.log("sumstat: ", this.sumstat, this.min)
     // Show the Y scale
     var y = d3.scaleLinear()
       .domain([this.min, this.max])

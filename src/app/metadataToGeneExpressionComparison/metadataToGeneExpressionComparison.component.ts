@@ -28,6 +28,13 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   metadataArr = []
   isLoading = false;
   typeOfLookUp = 'm2g'
+  currPage = 0;
+  limit = 25;
+  tableSize = 0;
+  plotTypeLookUp = {};
+  geneType = 'integer';
+  tableFromSearch = false;
+  searchEnsemblResults = [];
 
   //For the Comparison table
   dataSource = [];
@@ -42,7 +49,6 @@ export class MetadataToGeneExpressionComparison implements OnInit {
     this.getTableSize();
     this.getMetadataType(this.metadataId);
     this.getComparisonStats();
-
   }
 
   getListOfMetadata() {
@@ -65,7 +71,6 @@ export class MetadataToGeneExpressionComparison implements OnInit {
             "comment": res['rows'][i][3]
           }
           this.metadataArr.push(temp)
-
           this.metadataLookUp[res['rows'][i][0]] = temp
         }
       })
@@ -98,19 +103,18 @@ export class MetadataToGeneExpressionComparison implements OnInit {
     this.plotTypeLookUp = {};
     this.metadataId = name;
     this.getMetadataType(this.metadataId);
+
+    this.getTableSize()
     this.getComparisonStats();
     window.scrollTo(0, 0);
 
   }
-  // let metadata = "SMEXNCRT"
-  currPage = 0;
-  limit = 25;
-  tableSize = 0;
 
   getTableSize() {
+    this.tableSize = 0;
     let table = 'm2g'
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=SELECT%0D%0A++COUNT%28*%29%0D%0AFROM%0D%0A++${table}`
+    let annotationUrl = `sql=SELECT%0D%0A++COUNT%28*%29%0D%0AFROM%0D%0A++${table}%0D%0AWHERE%0D%0A++"METADATA"+is+"${this.metadataId}"`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -119,13 +123,11 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        console.log("table size: ", res['rows'][0][0])
         this.tableSize = res['rows'][0][0];
       })
   }
 
   getComparisonStats() {
-    console.log("GC ID: ",this.metadataId)
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++METADATA%2C%0D%0A++ENSG%2C%0D%0A++TEST%2C%0D%0A++%5BTEST+STATISTIC%5D%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2g%0D%0Awhere%0D%0A++"METADATA"+%3D+"${this.metadataId}"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D%0D%0Alimit%0D%0A++${this.currPage}%2C+${this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -136,7 +138,6 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        // console.log("res m2g: ", res['rows'], this.metadataId)
         this.dataSource = [];
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
@@ -148,27 +149,20 @@ export class MetadataToGeneExpressionComparison implements OnInit {
           }
           this.dataSource.push(temp)
         }
-        console.log("datasource: ", this.dataSource)
         // this.displayComparison()
       })
 
   }
 
-  plotTypeLookUp = {};
-  geneType = 'integer'
-
   displayComparison() {
     for (let i = 0; i < this.dataSource.length; i++) {
-      let tempMeta2 = this.dataSource[i]['gene']
-      console.log("temp: ", tempMeta2)
+      let tempMeta2 = this.dataSource[i]['gene'];
       this.getMetadataType(tempMeta2)
     }
-    console.log("metadata types: ", this.getMetadataType)
   }
 
   onSelectMetadata2(name) {
-    let test = name.split(".")
-    console.log("name: ", name, test)
+    let truncatedName = name.split(".")
     window.scrollTo(0, 600)
 
     d3.select("#plotArea")
@@ -179,28 +173,19 @@ export class MetadataToGeneExpressionComparison implements OnInit {
     this.displayBoxPlot = false;
     this.displayHeatmap = false;
 
-
-
-
     //this is where we decide which plot to use if have the data for it. for now, will wait to see.
     if (this.plotTypeLookUp[this.metadataId] === 'integer, encoded value' || this.plotTypeLookUp[this.metadataId] === 'string') {
       this.displayBoxPlot = true;
-      this.metadata2Id = test[0];
-      console.log("meta1 = cat, meta2/gene = num")
+      this.metadata2Id = truncatedName[0];
     }
     else if (this.plotTypeLookUp[this.metadataId] === 'integer' || this.plotTypeLookUp[this.metadataId] === 'decimal') {
       this.displayScatterPlot = true;
-      this.metadata2Id = test[0];
-      console.log("meta1 = num, meta2/gene = num")
+      this.metadata2Id = truncatedName[0];
     }
-
-
-
   }
 
 
-  getPageDetails(details, el) {
-    console.log("next page:", details)
+  getPageDetails(details) {
     this.currPage = details.pageIndex
     this.limit = details.pageSize
     this.getComparisonStats();
@@ -208,16 +193,16 @@ export class MetadataToGeneExpressionComparison implements OnInit {
     window.scrollTo(0, 500)
 
   }
-  tableFromSearch = false;
+  
 
   geneSearch() {
     this.tableFromSearch = true
-    console.log(this.searchValue)
+    this.tableSize = 0;
     this.getEnsemblId(this.searchValue)
   }
-
-  searchEnsemblResults = []
+  
   getEnsemblId(symbol) {
+    this.isLoading = true;
     this.searchEnsemblResults = [];
     let datasetteUrl = `sql=select%0D%0A++ENSEMBL%2C%0D%0A++SYMBOL%2C%0D%0A++ENTREZID%0D%0Afrom%0D%0A++e2s%0D%0Awhere%0D%0A++"SYMBOL"+is+"${symbol}"`;
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
@@ -230,6 +215,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
           if (!this.searchEnsemblResults.includes(res['rows'][i][0])) {
             this.searchEnsemblResults.push(res['rows'][i][0])
@@ -244,7 +230,6 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   getMetadataToGeneComparisonResults() {
     // for (let i = 0; i < this.searchEnsemblResults.length; i++) {
     let ensg = this.searchEnsemblResults[0]
-    // console.log("ensg: ", ensg)
     let datasetteUrl = `sql=select%0D%0A++METADATA%2C%0D%0A++ENSG%2C%0D%0A++TEST%2C%0D%0A++%5BTEST+STATISTIC%5D%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2g%0D%0Awhere%0D%0A++"ENSG"+like+"${ensg}%25"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D`;
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
 
@@ -256,7 +241,6 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        // console.log("NEW res m2gCR: ", res['rows'])
         this.dataSource = [];
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {

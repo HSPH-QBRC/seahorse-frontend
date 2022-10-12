@@ -50,9 +50,8 @@ ul li {
     -webkit-text-stroke: 1px rgba(40, 40, 40, 0.5);
     // -webkit-text-stroke: 1px rgba(40, 40, 40, 0.9);
     -webkit-text-fill-color: tomato;
-    
 }
-.titleLink:hover{
+.titleLink:hover {
     text-decoration: none;
 }
 
@@ -74,37 +73,46 @@ table {
     text-decoration: underline;
 }
 
-.metaId{
+.metaId {
     font-size: 24px;
     font-weight: 500;
     color: rgba(40, 40, 40, 0.9);
     text-transform: capitalize;
 }
 
-.metaDescription{
+.metaDescription {
     font-size: 18px;
     line-height: 32px;
     font-weight: 400;
-    color: rgba(40, 40, 40, 0.8);;
+    color: rgba(40, 40, 40, 0.8);
 }
 
-.metaComment{
+.metaComment {
     font-size: 14px;
     line-height: 32px;
     font-weight: 300;
-    color: rgba(40, 40, 40, 0.8);;
+    color: rgba(40, 40, 40, 0.8);
 }
-.pageDescription{
+.pageDescription {
     margin: 90px 20px 40px;
 }
 
-.paginator{
-    margin: 10px 0 50px
+.paginator {
+    margin: 10px 0 50px;
 }
-.searchTitle{
+.searchTitle {
     font-size: 24px;
     font-weight: 500;
     color: rgba(40, 40, 40, 0.9);
     text-transform: capitalize;
     margin: 90px 20px 40px;
+}
+
+.hideMessage {
+    font-size: 10px;
+    color: rgba(40, 40, 40, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
