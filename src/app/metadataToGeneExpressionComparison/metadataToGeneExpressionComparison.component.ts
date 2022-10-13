@@ -3,7 +3,6 @@ import * as d3 from 'd3';
 // import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 @Component({
@@ -43,6 +42,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
+    this.searchValue = '';
     this.tableFromSearch = false;
     this.isLoading = true;
     this.getListOfMetadata();
@@ -95,6 +95,8 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   }
 
   changeMetadata(name) {
+    this.searchValue = '';
+
     d3.select("#my_plotArea")
       .selectAll('div')
       .remove();
@@ -162,9 +164,6 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   }
 
   onSelectMetadata2(name) {
-    let truncatedName = name.split(".")
-    window.scrollTo(0, 600)
-
     d3.select("#plotArea")
       .selectAll('svg')
       .remove();
@@ -173,15 +172,31 @@ export class MetadataToGeneExpressionComparison implements OnInit {
     this.displayBoxPlot = false;
     this.displayHeatmap = false;
 
-    //this is where we decide which plot to use if have the data for it. for now, will wait to see.
-    if (this.plotTypeLookUp[this.metadataId] === 'integer, encoded value' || this.plotTypeLookUp[this.metadataId] === 'string') {
-      this.displayBoxPlot = true;
+    let truncatedName = name.split(".")
+    if (this.searchValue.length === 0) {
+      window.scrollTo(0, 600)
       this.metadata2Id = truncatedName[0];
+      if (this.plotTypeLookUp[this.metadataId] === 'integer, encoded value' || this.plotTypeLookUp[this.metadataId] === 'string') {
+        this.displayBoxPlot = true;
+      }
+      else if (this.plotTypeLookUp[this.metadataId] === 'integer' || this.plotTypeLookUp[this.metadataId] === 'decimal') {
+        this.displayScatterPlot = true;
+      }
+    } else {
+      window.scrollTo(0, 0)
+      this.getGeneNameFromSymbol(this.searchValue)
+      this.getMetadataType(name)
+      if (this.plotTypeLookUp[name] === 'integer, encoded value' || this.plotTypeLookUp[name] === 'string') {
+        this.displayBoxPlot = true;
+        this.metadata2Id = this.metadataId
+        this.metadataId = name;
+      }
+      else if (this.plotTypeLookUp[name] === 'integer' || this.plotTypeLookUp[name] === 'decimal') {
+        this.displayScatterPlot = true;
+        this.metadataId = truncatedName[0];
+      }
     }
-    else if (this.plotTypeLookUp[this.metadataId] === 'integer' || this.plotTypeLookUp[this.metadataId] === 'decimal') {
-      this.displayScatterPlot = true;
-      this.metadata2Id = truncatedName[0];
-    }
+
   }
 
 
@@ -193,14 +208,14 @@ export class MetadataToGeneExpressionComparison implements OnInit {
     window.scrollTo(0, 500)
 
   }
-  
+
 
   geneSearch() {
     this.tableFromSearch = true
     this.tableSize = 0;
     this.getEnsemblId(this.searchValue)
   }
-  
+
   getEnsemblId(symbol) {
     this.isLoading = true;
     this.searchEnsemblResults = [];
@@ -215,6 +230,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
           if (!this.searchEnsemblResults.includes(res['rows'][i][0])) {
@@ -224,8 +240,6 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         this.getMetadataToGeneComparisonResults();
       })
   }
-
-
 
   getMetadataToGeneComparisonResults() {
     // for (let i = 0; i < this.searchEnsemblResults.length; i++) {
@@ -244,18 +258,38 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         this.dataSource = [];
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
+          let varDescName = this.metadataLookUp[res['rows'][i][0]]['vardesc'][0]
+          let geneName = res['rows'][i][0];
+          this.getMetadataType(geneName)
+
           let temp = {
-            "gene": res['rows'][i][0],
+            "gene": geneName,
             // "symbol": res['rows'][i][1],
             "test": res['rows'][i][2],
             'test_statistic': res['rows'][i][3],
-            'pValue': res['rows'][i][4]
+            'pValue': res['rows'][i][4],
+            'vardesc': varDescName
           }
           this.dataSource.push(temp)
         }
       })
     // }
 
+  }
+
+  getGeneNameFromSymbol(geneName) {
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++ENSEMBL%2C%0D%0A++SYMBOL%0D%0Afrom%0D%0A++e2s%0D%0Awhere%0D%0A++"SYMBOL"+is+"${geneName}"%0D%0Alimit+10`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        this.metadata2Id = res['rows'][0][0]
+      })
   }
 
 }

@@ -10,7 +10,7 @@
         <hr>
         <mat-form-field class="example-form-field container sideBarContainer" appearance="outline">
             <mat-label>Gene Search</mat-label>
-            <input matInput type="text" [(ngModel)]="searchValue" (keyup.enter)="geneSearch()">
+            <input matInput type="search" name="search" [(ngModel)]="searchValue" (keyup.enter)="geneSearch()">
             <button *ngIf="searchValue" matSuffix mat-icon-button aria-label="Clear" (click)="searchValue = ''">
                 <mat-icon>close</mat-icon>
             </button>
@@ -29,8 +29,10 @@
     </div>
 
     <div class="col-md-9 content">
-        <div *ngIf="tableFromSearch && this.searchEnsemblResults.length > 0" class="searchTitle text-center">{{searchValue}} </div>
-        <p *ngIf="this.searchEnsemblResults.length === 0 && this.searchValue !== '' " class="hideMessage text-center">There is no data to be displayed.</p>
+        <div *ngIf="tableFromSearch && this.searchEnsemblResults.length > 0" class="searchTitle text-center">
+            {{searchValue}} </div>
+        <p *ngIf="this.searchEnsemblResults.length === 0 && this.searchValue !== '' " class="hideMessage text-center">
+            There is no data to be displayed.</p>
 
         <div class="row pageDescription" *ngIf="metadataLookUp[metadataId] && !tableFromSearch">
             <span class="metaId">{{metadataLookUp[metadataId]['vardescFull']}}: <span
@@ -74,7 +76,7 @@
                 <ng-container matColumnDef="metadata2">
                     <th mat-header-cell *matHeaderCellDef> {{tableFromSearch ? 'Metadata': 'Gene'}} </th>
                     <td class="metaColumn" mat-cell *matCellDef="let element" (click)="onSelectMetadata2(element.gene)">
-                        {{element.gene}}</td>
+                        {{tableFromSearch ? element.vardesc: element.gene}}</td>
                 </ng-container>
                 <!-- <ng-container matColumnDef="symbol">
                     <th mat-header-cell *matHeaderCellDef> Symbol </th>
@@ -98,7 +100,7 @@
 
         </div>
         <div class="d-flex justify-content-center paginator" *ngIf="tableSize > 0">
-        <!-- <div class="d-flex justify-content-center paginator" *ngIf="tableFromSearch === false"> -->
+            <!-- <div class="d-flex justify-content-center paginator" *ngIf="tableFromSearch === false"> -->
             <mat-paginator [length]="tableSize" [pageSize]="25" [pageSizeOptions]="[5, 10, 25, 100]"
                 aria-label="Select page" (page)="getPageDetails($event)">
             </mat-paginator>
