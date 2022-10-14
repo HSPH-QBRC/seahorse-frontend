@@ -204,13 +204,18 @@ export class MetadataToGeneExpressionComparison implements OnInit {
     this.currPage = details.pageIndex
     this.limit = details.pageSize
     this.getComparisonStats();
-
     window.scrollTo(0, 500)
-
   }
 
-
   geneSearch() {
+    d3.select("#my_scatterplot")
+      .selectAll('svg')
+      .remove();
+
+    d3.select("#my_boxplot")
+      .selectAll('svg')
+      .remove();
+
     this.tableFromSearch = true
     this.tableSize = 0;
     this.getEnsemblId(this.searchValue)
@@ -230,7 +235,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        
+
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
           if (!this.searchEnsemblResults.includes(res['rows'][i][0])) {
