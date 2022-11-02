@@ -1,6 +1,7 @@
 .sideBar {
     background-color: #f8f6f2;
-    height: 100vh;
+    min-height: 100vh;
+    flex: 1;
 }
 
 .page {
@@ -115,4 +116,14 @@ table {
     align-items: center;
     justify-content: center;
     height: 100vh;
+}
+
+.searchButton{
+    width: 75%;
+    margin: 0 50px;
+    
+}
+
+.flexContainer{
+    display: flex;
 }

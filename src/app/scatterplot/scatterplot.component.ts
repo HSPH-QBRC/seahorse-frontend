@@ -35,6 +35,8 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       this.getDataMCC(numerical1, numerical2)
     } else if (this.typeOfLookUp === 'm2g') {
       this.getDataM2G(numerical1, numerical2)
+    } else if (this.typeOfLookUp === 'g2g') {
+      this.getDataG2G(numerical1, numerical2)
     }
   }
 
@@ -49,6 +51,8 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       this.getDataMCC(numerical1, numerical2)
     } else if (this.typeOfLookUp === 'm2g') {
       this.getDataM2G(numerical1, numerical2)
+    } else if (this.typeOfLookUp === 'g2g') {
+      this.getDataG2G(numerical1, numerical2)
     }
   }
 
@@ -142,6 +146,49 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       })
   }
 
+  getDataG2G(numerical1, numerical2) {
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++t1.SAMPID%2C%0D%0A++t1.GENE_EXPRESSION+as+GENE_EXPRESSION_1%2C%0D%0A++t2.GENE_EXPRESSION+as+GENE_EXPRESSION_2%0D%0Afrom%0D%0A++expression+t1%2C%0D%0A++expression+t2%0D%0Awhere%0D%0A++t1.sampid+%3D+t2.sampid%0D%0A++AND+t1.ENSG+%3D+"${numerical1}"%0D%0A++AND+t2.ENSG+%3D+"${numerical2}"`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        console.log("res: ", res, numerical1, numerical2)
+        for (let i = 0; i < res['rows'].length; i++) {
+          if (res['rows'][i][1] < this.xMin) {
+            this.xMin = res['rows'][i][1];
+          }
+          if (res['rows'][i][1] > this.xMax) {
+            this.xMax = res['rows'][i][1];
+          }
+          if (res['rows'][i][2] < this.yMin) {
+            this.yMin = res['rows'][i][2];
+          }
+          if (res['rows'][i][2] > this.yMax) {
+            this.yMax = res['rows'][i][2];
+          }
+
+          let temp = {
+            'name': res['rows'][i][0],
+            'xValue': res['rows'][i][1],
+            'yValue': res['rows'][i][2]
+          };
+
+          this.scatterPlotData.push(temp);
+        }
+        // this.lengthOfResult = res['rows'].length;
+        // this.offset += this.limit
+        console.log("g2g scatterplot: ", this.scatterPlotData, res['rows'])
+        this.isLoading = false;
+        this.createScatterPlot();
+      })
+  }
+
   createScatterPlot() {
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 100, left: 100 },
@@ -219,7 +266,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       .append("circle")
       .attr("cx", function (d) { return x(d.xValue); })
       .attr("cy", function (d) { return y(d.yValue); })
-      .attr("r", 1)
+      .attr("r", this.typeOfLookUp != 'g2g' ? 1 : 5)
       .style("fill", "#69b3a2")
       .on('mouseover', function (mouseEvent: any, d) {
         pointTip.show(mouseEvent, d, this);
@@ -227,6 +274,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       })
       .on('mouseout', pointTip.hide);
 
+    //Y-Axis labels
     if (this.typeOfLookUp === 'mcc' && this.metadataLookUp[this.metadata2Id].vardesc[0].length > 50) {
       svg.append('text')
         .classed('label', true)
@@ -248,7 +296,20 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
           d3.select(this).style("cursor", "default");
         })
         .on('mouseout', yAxisTip.hide);
-    } else {
+    } else if (this.typeOfLookUp === 'g2g') {
+      svg.append('text')
+        .classed('label', true)
+        .attr('transform', 'rotate(-90)')
+        .attr("font-weight", "bold")
+        .attr('y', -margin.left + 10)
+        .attr('x', -height / 2)
+        .attr('dy', '.71em')
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .text(this.metadata2Id);
+    }
+    else {
       svg.append('text')
         .classed('label', true)
         .attr('transform', 'rotate(-90)')
@@ -262,7 +323,8 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         .text(this.typeOfLookUp === 'mcc' ? this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50) : this.metadata2Id);
     }
 
-    if (this.metadataLookUp[this.metadataId].vardesc[0].length > 50) {
+    //x-axis label
+    if (this.typeOfLookUp != 'g2g' && this.metadataLookUp[this.metadataId].vardesc[0].length > 50) {
       svg
         .append('text')
         .classed('label', true)
@@ -283,7 +345,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
           d3.select(this).style("cursor", "default");
         })
         .on('mouseout', xAxisTip.hide);
-    } else {
+    } else if (this.typeOfLookUp != 'g2g') {
       svg
         .append('text')
         .classed('label', true)
@@ -294,6 +356,17 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         .style('text-anchor', 'middle')
         .style('font-size', '12px')
         .text(this.metadataLookUp[this.metadataId].vardesc[0].slice(0, 50));
+    } else if (this.typeOfLookUp === 'g2g') {
+      svg
+        .append('text')
+        .classed('label', true)
+        .attr("font-weight", "bold")
+        .attr('x', width / 2)
+        .attr('y', height + margin.bottom - 10)
+        .style('fill', 'rgba(0,0,0,.8)')
+        .style('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .text(this.metadataId);
     }
   }
 

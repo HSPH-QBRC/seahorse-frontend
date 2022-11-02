@@ -13,15 +13,25 @@ import { catchError } from "rxjs/operators";
 
 export class HistogramComponent implements OnChanges {
   @Input() metadataId: string = '';
+  @Input() geneId: string = '';
   dataSize = 0;
   isLoading = false;
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.min = 0;
+    this.max = -Infinity;
+
     let numeric = this.metadataId;
+    let geneNum = this.geneId;
     this.isLoading = true;
-    this.getData(numeric);
+    if (this.geneId === '') {
+      this.getData(numeric);
+    } else {
+      this.getGeneData(geneNum)
+    }
+
   }
 
   histogramData = [];
@@ -57,6 +67,34 @@ export class HistogramComponent implements OnChanges {
       })
   }
 
+  getGeneData(numeric) {
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++GENE_EXPRESSION%0D%0Afrom%0D%0A++expression%0D%0Awhere%0D%0A++ENSG+is+"${numeric}"`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        this.isLoading = false;
+        this.dataSize = res['rows'].length;
+        for (let i = 0; i < res['rows'].length; i++) {
+          let num = res['rows'][i][1];
+          this.min = Math.min(num, this.min);
+          this.max = Math.max(num, this.max);
+          this.histogramData.push(num);
+        }
+        if (this.histogramData.length === 0) {
+          this.hideHistogram = true
+        } else {
+          this.createBoxPlot()
+        }
+        console.log("histogram data: ", this.histogramData)
+      })
+  }
+
   createBoxPlot() {
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 100, left: 100 },
@@ -86,7 +124,7 @@ export class HistogramComponent implements OnChanges {
         "translate(" + margin.left + "," + margin.top + ")");
 
     svg.call(pointTip);
-    
+
     // X axis: scale and draw:
     var x = d3.scaleLinear()
       .domain([this.min, this.max])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
@@ -95,7 +133,7 @@ export class HistogramComponent implements OnChanges {
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x))
       .selectAll("text")
-      .attr("transform", "translate(-10,0)rotate(-45)" )
+      .attr("transform", "translate(-10,0)rotate(-45)")
       .style("text-anchor", "end")
 
     // set the parameters for the histogram
