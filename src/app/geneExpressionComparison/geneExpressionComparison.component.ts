@@ -89,6 +89,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        window.scrollTo(0, 500)
         this.dataSource = [];
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
@@ -136,7 +137,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
     this.geneId = this.searchValue;
     this.getTableSize()
     this.getComparisonStats()
-    window.scrollTo(0, 500)
+    
   }
 
   onDropDownChange(value) {
