@@ -14,6 +14,7 @@ import { catchError } from "rxjs/operators";
 export class HistogramComponent implements OnChanges {
   @Input() metadataId: string = '';
   @Input() geneId: string = '';
+  @Input() comparisonType: string = '';
   dataSize = 0;
   isLoading = false;
 
@@ -26,10 +27,10 @@ export class HistogramComponent implements OnChanges {
     let numeric = this.metadataId;
     let geneNum = this.geneId;
     this.isLoading = true;
-    if (this.geneId === '') {
+    if (this.comparisonType === '') {
       this.getData(numeric);
-    } else {
-      this.getGeneData(geneNum)
+    } else if (this.comparisonType === 'g2g') {
+      this.getG2GGeneData(geneNum)
     }
 
   }
@@ -67,7 +68,7 @@ export class HistogramComponent implements OnChanges {
       })
   }
 
-  getGeneData(numeric) {
+  getG2GGeneData(numeric) {
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++GENE_EXPRESSION%0D%0Afrom%0D%0A++expression%0D%0Awhere%0D%0A++ENSG+is+"${numeric}"`
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -91,7 +92,6 @@ export class HistogramComponent implements OnChanges {
         } else {
           this.createBoxPlot()
         }
-        console.log("histogram data: ", this.histogramData)
       })
   }
 
@@ -192,6 +192,6 @@ export class HistogramComponent implements OnChanges {
       .style('fill', 'rgba(0,0,0,.8)')
       .style('text-anchor', 'middle')
       .style('font-size', '12px')
-      .text('Intervals');
+      .text(this.comparisonType === 'g2g' ? 'Gene Expression' : 'Intervals');
   }
 }

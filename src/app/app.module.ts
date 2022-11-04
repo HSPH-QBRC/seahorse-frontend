@@ -19,7 +19,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { LegendComponent } from './legend/legend.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,6 +27,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProgressSpinnerComponent } from './progress-spinner/progress-spinner.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { AutocompleteInputComponent } from './autocomplete-input/autocomplete-input.component';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { FormsModule, ReactiveFormsModule  } from "@angular/forms";
 
 
 
@@ -46,7 +48,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     HomepageComponent,
     ProgressSpinnerComponent,
     GeneExpressionComparisonComponent,
-    MetadataToGeneExpressionComparison
+    MetadataToGeneExpressionComparison,
+    AutocompleteInputComponent
   ],
   imports: [
     BrowserModule,
@@ -57,12 +60,14 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatCardModule,
     MatIconModule,
     FormsModule,
+    ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatAutocompleteModule
 
   ],
   providers: [],

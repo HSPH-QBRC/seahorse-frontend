@@ -17,7 +17,8 @@ export class GeneExpressionComparisonComponent implements OnInit {
   searchValue = '';
   metadataId = 'SMEXNCRT'; //for num
   metadata2Id = '';
-  geneId = 'ENSG00000227232'
+  geneId = 'ENSG00000227232';
+  symbolId = 'WASH7P'
   displayScatterPlot = false;
   displayBoxPlot = false;
   displayHeatmap = false;
@@ -38,11 +39,12 @@ export class GeneExpressionComparisonComponent implements OnInit {
 
   //For the Comparison table
   dataSource = [];
-  displayedColumns: string[] = ['gene', 'symbol', 'entrezid'];
+  displayedColumns: string[] = ['gene', 'symbol', 'correlation', 'entrezid'];
 
-  tissue = '';
+  tissue = 'Bladder';
   tissueList = [];
-  selectedTissue = '';
+  selectedTissue = 'Bladder';
+  autoFillData = [];
 
   constructor(private httpClient: HttpClient) { }
 
@@ -52,6 +54,8 @@ export class GeneExpressionComparisonComponent implements OnInit {
     this.tableFromSearch = false;
     this.isLoading = true;
 
+    this.getAutoCompleteData();
+
     this.getTableSize();
     this.getComparisonStats();
   }
@@ -60,7 +64,8 @@ export class GeneExpressionComparisonComponent implements OnInit {
     this.tableSize = 0;
     let table = 'g2g'
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=SELECT%0D%0A++COUNT%28*%29%0D%0AFROM%0D%0A++${table}%0D%0Awhere%0D%0A++GeneA+is+"${this.searchValue}"%0D%0A++AND+Tissue+is+"${this.selectedTissue}"`
+    // let annotationUrl = `sql=SELECT%0D%0A++COUNT%28*%29%0D%0AFROM%0D%0A++${table}%0D%0Awhere%0D%0A++GeneA+is+"${this.searchValue}"%0D%0A++AND+Tissue+is+"${this.selectedTissue}"`
+    let annotationUrl = `sql=select%0D%0A++COUNT+%28distinct+g2g.GeneB%29%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -75,7 +80,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
 
   getComparisonStats() {
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++distinct+g2g.GeneB%2C%0D%0A++e2s.SYMBOL%2C%0D%0A++e2s.ENTREZID%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"%0D%0Alimit%0D%0A++${this.currPage}%2C+${this.limit}`
+    let annotationUrl = `sql=select%0D%0A++distinct+g2g.GeneB%2C%0D%0A++e2s.SYMBOL%2C%0D%0A++e2s.ENTREZID%2C%0D%0A++g2g.correlation%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"%0D%0Aorder+by%0D%0A++g2g.correlation+desc%0D%0Alimit%0D%0A++${this.currPage}%2C+${this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -90,7 +95,8 @@ export class GeneExpressionComparisonComponent implements OnInit {
           let temp = {
             "gene": res['rows'][i][0],
             "symbol": res['rows'][i][1],
-            'entrezid': res['rows'][i][2]
+            'entrezid': res['rows'][i][2],
+            'correlation': res['rows'][i][3]
           }
           this.dataSource.push(temp)
         }
@@ -103,7 +109,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
       .selectAll('svg')
       .remove();
 
-    this.displayScatterPlot = false;
+    // this.displayScatterPlot = false;
 
     this.displayScatterPlot = true;
     this.metadataId = name;
@@ -130,9 +136,42 @@ export class GeneExpressionComparisonComponent implements OnInit {
     this.geneId = this.searchValue;
     this.getTableSize()
     this.getComparisonStats()
+    window.scrollTo(0, 500)
   }
 
   onDropDownChange(value) {
     this.selectedTissue = value;
+    this.geneSearch()
+  }
+
+  getAutoCompleteData() {
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++distinct+ENSEMBL%2C%0D%0A++SYMBOL%0D%0Afrom%0D%0A++e2s%0D%0Awhere%0D%0A++ENSEMBL+is+not+""%0D%0Aorder+by%0D%0A++SYMBOL`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        this.autoFillData = [];
+        for (let i = 0; i < res['rows'].length; i++) {
+          let temp = `${res['rows'][i][1]} (${res['rows'][i][0]})`
+          this.autoFillData.push(temp)
+        }
+      })
+  }
+
+  fromChild(value) {
+    let startSym = 0;
+    let endSym = value.indexOf(" ");
+    let newSymbol = value.slice(startSym, endSym)
+    this.symbolId = newSymbol;
+    let startGene = value.indexOf("(");
+    let endGene = value.indexOf(")")
+    let newstring = value.slice(startGene + 1, endGene)
+    this.searchValue = newstring;
+    this.geneSearch()
   }
 }

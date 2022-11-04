@@ -1,0 +1,13 @@
+<mat-form-field class="example-full-width container sideBarContainer" appearance="outline">
+    <mat-label>Gene Search</mat-label>
+    <input type="search" matInput [formControl]="myControl" [matAutocomplete]="auto" name="search"
+        [(ngModel)]="searchValue" (keyup.enter)="getParent()">
+    <button *ngIf="searchValue" matSuffix mat-icon-button aria-label="Clear" (click)="searchValue = ''">
+        <mat-icon>close</mat-icon>
+    </button>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="getParent()">
+        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+            {{option}}
+        </mat-option>
+    </mat-autocomplete>
+</mat-form-field>
