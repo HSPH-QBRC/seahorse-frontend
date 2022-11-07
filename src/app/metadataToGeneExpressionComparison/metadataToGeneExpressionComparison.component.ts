@@ -39,6 +39,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   dataSource = [];
   displayedColumns: string[] = ['metadata2', 'test', 'test_statistic', 'pValue'];
   autoFillData = [];
+  geneId = 'ENSG00000227232';
 
   constructor(private httpClient: HttpClient) { }
 
@@ -155,7 +156,6 @@ export class MetadataToGeneExpressionComparison implements OnInit {
           }
           this.dataSource.push(temp)
         }
-        // this.displayComparison()
       })
 
   }
@@ -203,7 +203,6 @@ export class MetadataToGeneExpressionComparison implements OnInit {
 
   }
 
-
   getPageDetails(details) {
     this.currPage = details.pageIndex
     this.limit = details.pageSize
@@ -212,6 +211,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   }
 
   geneSearch() {
+
     d3.select("#my_scatterplot")
       .selectAll('svg')
       .remove();
@@ -222,6 +222,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
 
     this.tableFromSearch = true
     this.tableSize = 0;
+
     this.getEnsemblId(this.searchValue)
   }
 
@@ -246,13 +247,12 @@ export class MetadataToGeneExpressionComparison implements OnInit {
             this.searchEnsemblResults.push(res['rows'][i][0])
           }
         }
-        console.log("getEmsemID results: ", this.searchEnsemblResults, symbol)
+        this.geneId = this.searchEnsemblResults[0];
         this.getMetadataToGeneComparisonResults();
       })
   }
 
   getMetadataToGeneComparisonResults() {
-    // for (let i = 0; i < this.searchEnsemblResults.length; i++) {
     let ensg = this.searchEnsemblResults[0]
     let datasetteUrl = `sql=select%0D%0A++METADATA%2C%0D%0A++ENSG%2C%0D%0A++TEST%2C%0D%0A++%5BTEST+STATISTIC%5D%2C%0D%0A++%5BP-VALUE%5D%0D%0Afrom%0D%0A++m2g%0D%0Awhere%0D%0A++"ENSG"+like+"${ensg}%25"%0D%0Aorder+by%0D%0A++%5BP-VALUE%5D`;
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
@@ -274,7 +274,6 @@ export class MetadataToGeneExpressionComparison implements OnInit {
 
           let temp = {
             "gene": geneName,
-            // "symbol": res['rows'][i][1],
             "test": res['rows'][i][2],
             'test_statistic': res['rows'][i][3],
             'pValue': res['rows'][i][4],
@@ -283,7 +282,6 @@ export class MetadataToGeneExpressionComparison implements OnInit {
           this.dataSource.push(temp)
         }
       })
-    // }
 
   }
 
@@ -301,7 +299,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         this.metadata2Id = res['rows'][0][0]
       })
   }
-  
+
 
   getAutoCompleteData() {
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";

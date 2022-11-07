@@ -42,6 +42,13 @@
             <div class="metaComment" *ngIf="metadataLookUp[metadataId]['comment']">
                 {{metadataLookUp[metadataId]['comment']}}</div>
         </div>
+        <div class="row">
+            <div *ngIf="tableFromSearch" class="col-md-12 d-flex justify-content-center">
+                <app-histogram [metadataId]="metadataId" [geneId]="geneId" [comparisonType]="typeOfLookUp">
+                </app-histogram>
+            </div>
+        </div>
+
 
         <div *ngIf="!tableFromSearch" class="d-flex justify-content-center">
             <div *ngIf="plotTypeLookUp[metadataId] === 'integer' || plotTypeLookUp[metadataId] === 'decimal'"

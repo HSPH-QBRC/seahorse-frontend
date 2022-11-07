@@ -64,7 +64,6 @@ export class GeneExpressionComparisonComponent implements OnInit {
     this.tableSize = 0;
     let table = 'g2g'
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    // let annotationUrl = `sql=SELECT%0D%0A++COUNT%28*%29%0D%0AFROM%0D%0A++${table}%0D%0Awhere%0D%0A++GeneA+is+"${this.searchValue}"%0D%0A++AND+Tissue+is+"${this.selectedTissue}"`
     let annotationUrl = `sql=select%0D%0A++COUNT+%28distinct+g2g.GeneB%29%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -134,6 +133,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
 
     this.tableFromSearch = true
     this.tableSize = 0;
+
     this.geneId = this.searchValue;
     this.getTableSize()
     this.getComparisonStats()
