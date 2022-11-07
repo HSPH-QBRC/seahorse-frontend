@@ -8,13 +8,15 @@
             </a>
         </div>
         <hr>
-        <mat-form-field class="example-form-field container sideBarContainer" appearance="outline">
+        <app-autocomplete-input [autoFillData]="autoFillData" (onSearch)="fromChild($event)">
+        </app-autocomplete-input>
+        <!-- <mat-form-field class="example-form-field container sideBarContainer" appearance="outline">
             <mat-label>Gene Search</mat-label>
             <input matInput type="search" name="search" [(ngModel)]="searchValue" (keyup.enter)="geneSearch()">
             <button *ngIf="searchValue" matSuffix mat-icon-button aria-label="Clear" (click)="searchValue = ''">
                 <mat-icon>close</mat-icon>
             </button>
-        </mat-form-field>
+        </mat-form-field> -->
         <div class="container sideBarContainer" *ngIf="metadataArr.length > 0">
             <ul>
                 <div class="pageTitle">Metadata:</div>

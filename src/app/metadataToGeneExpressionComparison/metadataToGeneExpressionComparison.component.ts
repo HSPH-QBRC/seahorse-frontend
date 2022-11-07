@@ -38,6 +38,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   //For the Comparison table
   dataSource = [];
   displayedColumns: string[] = ['metadata2', 'test', 'test_statistic', 'pValue'];
+  autoFillData = [];
 
   constructor(private httpClient: HttpClient) { }
 
@@ -45,6 +46,9 @@ export class MetadataToGeneExpressionComparison implements OnInit {
     this.searchValue = '';
     this.tableFromSearch = false;
     this.isLoading = true;
+
+    this.getAutoCompleteData();
+
     this.getListOfMetadata();
     this.getTableSize();
     this.getMetadataType(this.metadataId);
@@ -242,6 +246,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
             this.searchEnsemblResults.push(res['rows'][i][0])
           }
         }
+        console.log("getEmsemID results: ", this.searchEnsemblResults, symbol)
         this.getMetadataToGeneComparisonResults();
       })
   }
@@ -295,6 +300,34 @@ export class MetadataToGeneExpressionComparison implements OnInit {
       .subscribe(res => {
         this.metadata2Id = res['rows'][0][0]
       })
+  }
+  
+
+  getAutoCompleteData() {
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++distinct+ENSEMBL%2C%0D%0A++SYMBOL%0D%0Afrom%0D%0A++e2s%0D%0Awhere%0D%0A++ENSEMBL+is+not+""%0D%0Aorder+by%0D%0A++SYMBOL`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        this.autoFillData = [];
+        for (let i = 0; i < res['rows'].length; i++) {
+          let temp = `${res['rows'][i][1]} (${res['rows'][i][0]})`
+          this.autoFillData.push(temp)
+        }
+      })
+  }
+
+  fromChild(value) {
+    let startSym = 0;
+    let endSym = value.indexOf(" ");
+    let newSymbol = value.slice(startSym, endSym)
+    this.searchValue = newSymbol;
+    this.geneSearch()
   }
 
 }
