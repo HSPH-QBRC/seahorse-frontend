@@ -106,7 +106,6 @@ export class MetadataCrossComparisonComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        console.log("getComp res: ", res['rows'], this.metadataId)
         this.dataSource = [];
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {

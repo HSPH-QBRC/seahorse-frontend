@@ -27,7 +27,8 @@ export class HistogramComponent implements OnChanges {
     let numeric = this.metadataId;
     let geneNum = this.geneId;
     this.isLoading = true;
-    if (this.comparisonType === '') {
+    console.log("comparison type: ", this.comparisonType)
+    if (this.comparisonType === 'mcc') {
       this.getData(numeric);
     } else if (this.comparisonType === 'g2g' || this.comparisonType === 'm2g') {
       this.getG2GGeneData(geneNum)
@@ -192,6 +193,6 @@ export class HistogramComponent implements OnChanges {
       .style('fill', 'rgba(0,0,0,.8)')
       .style('text-anchor', 'middle')
       .style('font-size', '12px')
-      .text(this.comparisonType === 'g2g' ? 'Gene Expression' : 'Intervals');
+      .text(this.comparisonType === 'mcc' ? 'Intervals' : 'Gene Expression');
   }
 }

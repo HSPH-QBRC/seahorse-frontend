@@ -31,7 +31,7 @@
         <div class="d-flex justify-content-center">
             <div *ngIf="plotTypeLookUp[metadataId] === 'integer' || plotTypeLookUp[metadataId] === 'decimal'"
                 class="row">
-                <app-histogram [metadataId]="metadataId"></app-histogram>
+                <app-histogram [metadataId]="metadataId" [comparisonType]="typeOfLookUp"></app-histogram>
             </div>
             <div *ngIf="plotTypeLookUp[metadataId] === 'integer, encoded value' || plotTypeLookUp[metadataId] === 'string'"
                 class="row">

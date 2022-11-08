@@ -15,10 +15,9 @@ import tissuesJson from './tissueList.json';
 
 export class GeneExpressionComparisonComponent implements OnInit {
   searchValue = '';
-  metadataId = 'SMEXNCRT'; //for num
-  metadata2Id = '';
-  geneId = 'ENSG00000227232';
-  symbolId = 'WASH7P'
+  metadataId = 'P2RX1';
+  geneId = 'ENSG00000108405';
+  symbolId = 'P2RX1'
   displayScatterPlot = false;
   displayBoxPlot = false;
   displayHeatmap = false;
@@ -64,7 +63,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
     this.tableSize = 0;
     let table = 'g2g'
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++COUNT+%28distinct+g2g.GeneB%29%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"`
+    let annotationUrl = `sql=select%0D%0A++COUNT+%28distinct+g2g.GeneB%29%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue === '' ? this.geneId : this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -79,7 +78,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
 
   getComparisonStats() {
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++distinct+g2g.GeneB%2C%0D%0A++e2s.SYMBOL%2C%0D%0A++e2s.ENTREZID%2C%0D%0A++g2g.correlation%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"%0D%0Aorder+by%0D%0A++g2g.correlation+desc%0D%0Alimit%0D%0A++${this.currPage}%2C+${this.limit}`
+    let annotationUrl = `sql=select%0D%0A++distinct+g2g.GeneB%2C%0D%0A++e2s.SYMBOL%2C%0D%0A++e2s.ENTREZID%2C%0D%0A++g2g.correlation%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue === '' ? this.geneId : this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"%0D%0Aorder+by%0D%0A++g2g.correlation+desc%0D%0Alimit+${this.limit}+offset+${this.currPage * this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -98,7 +97,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
             'entrezid': res['rows'][i][2],
             'correlation': res['rows'][i][3]
           }
-          this.dataSource.push(temp)
+          this.dataSource.push(temp);
         }
       })
 
@@ -108,8 +107,6 @@ export class GeneExpressionComparisonComponent implements OnInit {
     d3.select("#plotArea")
       .selectAll('svg')
       .remove();
-
-    // this.displayScatterPlot = false;
 
     this.displayScatterPlot = true;
     this.metadataId = name;
