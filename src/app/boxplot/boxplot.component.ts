@@ -17,7 +17,8 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   @Input() metadataCatId = '';
   @Input() metadataNumId = '';
   @Input() metadataLookUp = {};
-  @Input() typeOfLookUp = 'mcc'
+  @Input() typeOfLookUp = 'mcc';
+  @Input() symbolId = '';
 
   isLoading = false;
   boxPlotData = [];
@@ -35,6 +36,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   ngOnInit(): void { }
 
   ngOnChanges(changes: SimpleChanges): void {
+    console.log("metadatacat id: ", this.metadataCatId, this.symbolId)
     this.offset = 0;
     this.lengthOfResult = 0;
     this.resetVariables()
@@ -118,7 +120,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
           };
           this.boxPlotData.push(temp);
         }
-        
+
         this.lengthOfResult = res['rows'].length;
         this.offset += this.limit
         if (this.lengthOfResult > 0) {
@@ -196,7 +198,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         let interQuantileRange = q3 - q1
         let min = q1 - 1.5 * interQuantileRange
         let max = q3 + 1.5 * interQuantileRange
-        
+
         tempMin = Math.min(min, tempMin)
         tempMax = Math.max(max, tempMax)
         return ({ q1: q1, median: median, q3: q3, interQuantileRange: interQuantileRange, min: min, max: max })
@@ -360,18 +362,9 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         .style('font-size', '12px')
-        .text(this.typeOfLookUp === 'mcc' ? this.metadataLookUp[this.metadataCatId].vardesc[0] : this.metadataCatId);
+        .text(this.getXAxisLabelNames())
+        // .text(this.typeOfLookUp === 'mcc' ? this.metadataLookUp[this.metadataCatId].vardesc[0] : this.symbolId === undefined ? this.metadataCatId : this.symbolId);
     }
-    // svg
-    //   .append('text')
-    //   .classed('label', true)
-    //   .attr("font-weight", "bold")
-    //   .attr('x', width / 2)
-    //   .attr('y', height + margin.bottom - 10)
-    //   .style('fill', 'rgba(0,0,0,.8)')
-    //   .style('text-anchor', 'middle')
-    //   .style('font-size', '12px')
-    //   .text(this.metadataCatId);
 
     function wrap(text, width) {
       text.each(function () {
@@ -402,5 +395,16 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     this.boxPlotData = [];
     this.min = Infinity;
     this.max = -Infinity;
+  }
+
+  getXAxisLabelNames() {
+    switch (this.typeOfLookUp) {
+      case 'mcc':
+        return this.metadataLookUp[this.metadataCatId].vardesc[0]
+      case 'm2g':
+        return this.symbolId === undefined ? this.metadataCatId : this.symbolId
+      default:
+        return "N/A"
+    }
   }
 }
