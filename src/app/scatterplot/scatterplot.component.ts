@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
+import { TestBed } from '@angular/core/testing';
 
 @Component({
   selector: 'app-scatterplot',
@@ -15,7 +16,9 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   @Input() metadataId = '';
   @Input() metadata2Id = '';
   @Input() metadataLookUp = {};
-  @Input() typeOfLookUp = 'mcc'
+  @Input() typeOfLookUp = 'mcc';
+  @Input() symbolId = '';
+  @Input() symbolId2 = '';
 
   isLoading = false;
   limit = 1000;
@@ -38,6 +41,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     } else if (this.typeOfLookUp === 'g2g') {
       this.getDataG2G(numerical1, numerical2)
     }
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -158,7 +162,6 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
-        console.log("res: ", res, numerical1, numerical2)
         for (let i = 0; i < res['rows'].length; i++) {
           if (res['rows'][i][1] < this.xMin) {
             this.xMin = res['rows'][i][1];
@@ -181,9 +184,6 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
 
           this.scatterPlotData.push(temp);
         }
-        // this.lengthOfResult = res['rows'].length;
-        // this.offset += this.limit
-        console.log("g2g scatterplot: ", this.scatterPlotData, res['rows'])
         this.isLoading = false;
         this.createScatterPlot();
       })
@@ -296,7 +296,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
           d3.select(this).style("cursor", "default");
         })
         .on('mouseout', yAxisTip.hide);
-    } else if (this.typeOfLookUp === 'g2g') {
+    } else {
       svg.append('text')
         .classed('label', true)
         .attr('transform', 'rotate(-90)')
@@ -307,21 +307,10 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         .style('font-size', '12px')
-        .text(this.metadata2Id);
+        .text(this.getYAxisLabelNames())
+      // .text(this.typeOfLookUp === 'mcc' ? this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50) : this.symbolId === undefined ? this.metadata2Id : this.symbolId);
     }
-    else {
-      svg.append('text')
-        .classed('label', true)
-        .attr('transform', 'rotate(-90)')
-        .attr("font-weight", "bold")
-        .attr('y', -margin.left + 10)
-        .attr('x', -height / 2)
-        .attr('dy', '.71em')
-        .style('fill', 'rgba(0,0,0,.8)')
-        .style('text-anchor', 'middle')
-        .style('font-size', '12px')
-        .text(this.typeOfLookUp === 'mcc' ? this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50) : this.metadata2Id);
-    }
+
 
     //x-axis label
     if (this.typeOfLookUp != 'g2g' && this.metadataLookUp[this.metadataId].vardesc[0].length > 50) {
@@ -334,7 +323,6 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         .style('font-size', '8px')
-        // .text(this.metadataId);
         .text(this.metadataLookUp[this.metadataId].vardesc[0].slice(0, 50) + "...")
         .on('mouseover', function (mouseEvent: any) {
           xAxisTip.show(mouseEvent, this);
@@ -345,7 +333,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
           d3.select(this).style("cursor", "default");
         })
         .on('mouseout', xAxisTip.hide);
-    } else if (this.typeOfLookUp != 'g2g') {
+    } else {
       svg
         .append('text')
         .classed('label', true)
@@ -355,18 +343,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         .style('font-size', '12px')
-        .text(this.metadataLookUp[this.metadataId].vardesc[0].slice(0, 50));
-    } else if (this.typeOfLookUp === 'g2g') {
-      svg
-        .append('text')
-        .classed('label', true)
-        .attr("font-weight", "bold")
-        .attr('x', width / 2)
-        .attr('y', height + margin.bottom - 10)
-        .style('fill', 'rgba(0,0,0,.8)')
-        .style('text-anchor', 'middle')
-        .style('font-size', '12px')
-        .text(this.metadataId);
+        .text(this.getXAxisLabelNames());
     }
   }
 
@@ -376,6 +353,32 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     this.xMax = -Infinity
     this.yMin = Infinity
     this.yMax = -Infinity
+  }
+
+  getYAxisLabelNames() {
+    switch (this.typeOfLookUp) {
+      case 'mcc':
+        return this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50)
+      case 'm2g':
+        return this.symbolId === undefined ? this.metadata2Id : this.symbolId
+      case 'g2g':
+        return this.symbolId
+      default:
+        return "N/A"
+    }
+  }
+
+  getXAxisLabelNames() {
+    switch (this.typeOfLookUp) {
+      case 'mcc':
+        return this.metadataLookUp[this.metadataId].vardesc[0].slice(0, 50)
+      case 'm2g':
+        return this.metadataLookUp[this.metadataId].vardesc[0].slice(0, 50)
+      case 'g2g':
+        return this.symbolId2
+      default:
+        return "N/A"
+    }
   }
 
 }

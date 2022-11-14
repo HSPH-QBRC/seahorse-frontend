@@ -17,7 +17,8 @@ export class GeneExpressionComparisonComponent implements OnInit {
   searchValue = '';
   metadataId = 'P2RX1';
   geneId = 'ENSG00000108405';
-  symbolId = 'P2RX1'
+  symbolId = 'P2RX1';
+  symbolId2 = '';
   displayScatterPlot = false;
   displayBoxPlot = false;
   displayHeatmap = false;
@@ -38,7 +39,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
 
   //For the Comparison table
   dataSource = [];
-  displayedColumns: string[] = ['gene', 'symbol', 'correlation', 'entrezid'];
+  displayedColumns: string[] = ['symbol', 'correlation', 'entrezid'];
 
   tissue = 'Bladder';
   tissueList = [];
@@ -103,13 +104,14 @@ export class GeneExpressionComparisonComponent implements OnInit {
 
   }
 
-  onSelectMetadata2(name) {
+  onSelectMetadata2(name, symbol) {
     d3.select("#plotArea")
       .selectAll('svg')
       .remove();
 
     this.displayScatterPlot = true;
     this.metadataId = name;
+    this.symbolId2 = symbol;
   }
 
   getPageDetails(details) {
@@ -134,7 +136,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
     this.geneId = this.searchValue;
     this.getTableSize()
     this.getComparisonStats()
-    
+
   }
 
   onDropDownChange(value) {
@@ -162,6 +164,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
   }
 
   fromChild(value) {
+    this.displayScatterPlot = false;
     let startSym = 0;
     let endSym = value.indexOf(" ");
     let newSymbol = value.slice(startSym, endSym)

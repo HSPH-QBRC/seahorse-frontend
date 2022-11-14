@@ -53,7 +53,8 @@
         <div *ngIf="!tableFromSearch" class="d-flex justify-content-center">
             <div *ngIf="plotTypeLookUp[metadataId] === 'integer' || plotTypeLookUp[metadataId] === 'decimal'"
                 class="row">
-                <app-histogram [metadataId]="metadataId" [geneId]="geneId" [comparisonType]="typeOfLookUp"></app-histogram>
+                <app-histogram [metadataId]="metadataId" [geneId]="geneId" [comparisonType]="typeOfLookUp">
+                </app-histogram>
             </div>
             <div *ngIf="plotTypeLookUp[metadataId] === 'integer, encoded value' || plotTypeLookUp[metadataId] === 'string'"
                 class="row">
@@ -66,7 +67,7 @@
             <div id="my_plotArea">
                 <div *ngIf="displayScatterPlot">
                     <app-scatterplot [metadataId]="metadataId" [metadata2Id]="metadata2Id"
-                        [metadataLookUp]="metadataLookUp" [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
+                        [metadataLookUp]="metadataLookUp" [typeOfLookUp]="typeOfLookUp" [symbolId]="symbolId"></app-scatterplot>
                 </div>
                 <div *ngIf="displayBoxPlot">
                     <app-boxplot [metadataCatId]="metadata2Id" [metadataNumId]="metadataId"
@@ -85,7 +86,7 @@
                 <ng-container matColumnDef="metadata2">
                     <th mat-header-cell *matHeaderCellDef> {{tableFromSearch ? 'Metadata': 'Gene'}} </th>
                     <td class="metaColumn" mat-cell *matCellDef="let element" (click)="onSelectMetadata2(element.gene)">
-                        {{tableFromSearch ? element.vardesc: element.gene}}</td>
+                        {{tableFromSearch ? element.vardesc: geneToSym[element.gene.split(".")[0]] !== undefined ? geneToSym[element.gene.split(".")[0]] : element.gene}}</td>
                 </ng-container>
                 <!-- <ng-container matColumnDef="symbol">
                     <th mat-header-cell *matHeaderCellDef> Symbol </th>

@@ -32,8 +32,6 @@ export class Heatmap2Component implements OnInit, OnChanges {
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
-    console.log("look up from heatmap: ", this.metadataLookUp)
-
     this.isLoading = true;
     let categorical1 = this.metadataId;
     let categorical2 = this.metadata2Id;

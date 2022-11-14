@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
-// import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
-
 
 @Component({
   selector: 'app-metadataToGeneExpressionComparison',
@@ -14,7 +12,6 @@ import { catchError } from "rxjs/operators";
 export class MetadataToGeneExpressionComparison implements OnInit {
   searchValue = '';
   metadataId = 'SMEXNCRT'; //for num
-  // metadataId = 'SMATSSCR' //for cat
   metadata2Id = '';
   displayScatterPlot = false;
   displayBoxPlot = false;
@@ -40,6 +37,8 @@ export class MetadataToGeneExpressionComparison implements OnInit {
   displayedColumns: string[] = ['metadata2', 'test', 'test_statistic', 'pValue'];
   autoFillData = [];
   geneId = 'ENSG00000227232';
+  geneToSym = {}
+  symbolId;
 
   constructor(private httpClient: HttpClient) { }
 
@@ -50,10 +49,33 @@ export class MetadataToGeneExpressionComparison implements OnInit {
 
     this.getAutoCompleteData();
 
+    this.getListOfGeneToSymbol();
+    
     this.getListOfMetadata();
     this.getTableSize();
     this.getMetadataType(this.metadataId);
     this.getComparisonStats();
+  }
+
+  
+
+  getListOfGeneToSymbol() {
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++distinct+ENSEMBL%2C%0D%0A++SYMBOL%0D%0Afrom%0D%0A++e2s%0D%0Awhere%0D%0A++ENSEMBL+is+not+""`;
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        for (let i = 0; i < res['rows'].length; i++) {
+          if (this.geneToSym[res['rows'][i][0]] === undefined) {
+            this.geneToSym[res['rows'][i][0]] = res['rows'][i][1];
+          }
+        }
+      })
   }
 
   getListOfMetadata() {
@@ -157,7 +179,6 @@ export class MetadataToGeneExpressionComparison implements OnInit {
           this.dataSource.push(temp)
         }
       })
-
   }
 
   displayComparison() {
@@ -200,7 +221,7 @@ export class MetadataToGeneExpressionComparison implements OnInit {
         this.metadataId = truncatedName[0];
       }
     }
-
+    this.symbolId = this.geneToSym[this.metadata2Id]
   }
 
   getPageDetails(details) {

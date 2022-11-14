@@ -17,29 +17,26 @@ export class HistogramComponent implements OnChanges {
   @Input() comparisonType: string = '';
   dataSize = 0;
   isLoading = false;
+  histogramData = [];
+  min = 0;
+  max = -Infinity;
+  hideHistogram = false;
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.min = 0;
     this.max = -Infinity;
-
     let numeric = this.metadataId;
     let geneNum = this.geneId;
     this.isLoading = true;
-    console.log("comparison type: ", this.comparisonType)
+    
     if (this.comparisonType === 'mcc') {
       this.getData(numeric);
     } else if (this.comparisonType === 'g2g' || this.comparisonType === 'm2g') {
       this.getG2GGeneData(geneNum)
     }
-
   }
-
-  histogramData = [];
-  min = 0;
-  max = -Infinity;
-  hideHistogram = false;
 
   getData(numeric) {
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";

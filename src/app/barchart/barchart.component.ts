@@ -70,7 +70,6 @@ export class BarChartComponent implements OnInit, OnChanges {
           }
           this.countArr.push(temp)
         }
-        console.log("bar chart data: ", this.countArr)
         this.createBarChart()
       })
   }
