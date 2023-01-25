@@ -205,6 +205,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       })
       .entries(this.boxPlotData)
 
+      console.log("boxplot data: ", this.boxPlotData)
     this.min = tempMin > 0 ? tempMin * .8 : tempMin * 1.2;
 
     if (this.sumstat.length > 12) {
