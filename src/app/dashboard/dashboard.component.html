@@ -53,7 +53,9 @@
                 <h1>Summary Plot</h1>
             </div>
         </div>
-        <h2>+ Phenotype</h2>
+        <h4 (click)="showPhenotype = !showPhenotype">
+            <span class="expandObj">{{showPhenotype ? "-":"+"}}</span> Phenotype
+        </h4>
         <div *ngIf="showPhenotype">
             <div class="row justify-content-center">
                 <div class="testBackground">
@@ -108,7 +110,9 @@
         </div>
 
         <br>
-        <h2>+ Library Metadata</h2>
+        <h4 (click)="showLibraryMetadata = !showLibraryMetadata">
+            <span class="expandObj">{{showLibraryMetadata ? "-":"+"}}</span> Library Metadata
+        </h4>
         <br>
         <div *ngIf="showLibraryMetadata">
             <div class="row justify-content-center">
@@ -162,8 +166,10 @@
             </div>
         </div>
 
+        <h4 (click)="showGene = !showGene">
+            <span class="expandObj">{{showGene ? "-":"+"}}</span> Gene
+        </h4>
         <br>
-        <h2>+ Gene</h2>
         <div *ngIf="showGene">
             <mat-form-field appearance="outline" class="d-flex container dropDown">
                 <mat-label>Tissue</mat-label>
@@ -244,7 +250,7 @@
 
             </div>
             <div class="d-flex justify-content-center paginator" *ngIf="tableSize > 0">
-                <mat-paginator [length]="tableSize" [pageSize]="25" [pageSizeOptions]="[5, 10, 25, 100]"
+                <mat-paginator [length]="tableSize" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"
                     aria-label="Select page" (page)="getPageDetails($event)">
                 </mat-paginator>
             </div>

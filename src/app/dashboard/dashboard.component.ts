@@ -16,7 +16,7 @@ import tissuesJson from './tissueList.json';
 export class DashboardComponent implements OnInit {
   searchValue = '';
   metadataId = 'P2RX1';
-  geneId = 'ENSG00000108405';
+  geneId = 'ENSG00000188976';
   symbolId = 'P2RX1';
   symbolId2 = '';
   displayScatterPlot = false;
@@ -51,21 +51,21 @@ export class DashboardComponent implements OnInit {
 
   displayedColumns1: string[] = ['metadata2', 'test', 'testStat', 'pVal'];
   testData = [
-    {metadata2: "Intronic Rate", test: "ANOVA", testStat: "51.9725741752891", pVal: "0"},
-    {metadata2: "Tissue Type, area from which the tissue sample was taken. This is a parent value to SMTSD.", test: "ANOVA", testStat: "101.9725741752891", pVal: "0"},
-    {metadata2: "Fragment Length StdDev", test: "ANOVA", testStat: "61.9725741752891", pVal: "0"},
-    {metadata2: "Code for BSS collection site", test: "ANOVA", testStat: "81.9725741752891", pVal: "0"},
-    {metadata2: "End 2 Sense", test: "ANOVA", testStat: "121.9725741752891", pVal: "0"},
-    {metadata2: "Intronic Rate", test: "ANOVA", testStat: "51.9725741752891", pVal: "0"},
-    {metadata2: "Tissue Type, area from which the tissue sample was taken. This is a parent value to SMTSD.", test: "ANOVA", testStat: "101.9725741752891", pVal: "0"},
-    {metadata2: "Fragment Length StdDev", test: "ANOVA", testStat: "61.9725741752891", pVal: "0"},
-    {metadata2: "Code for BSS collection site", test: "ANOVA", testStat: "81.9725741752891", pVal: "0"},
-    {metadata2: "End 2 Sense", test: "ANOVA", testStat: "121.9725741752891", pVal: "0"}
+    { metadata2: "Intronic Rate", test: "ANOVA", testStat: "51.9725741752891", pVal: "0" },
+    { metadata2: "Tissue Type, area from which the tissue sample was taken. This is a parent value to SMTSD.", test: "ANOVA", testStat: "101.9725741752891", pVal: "0" },
+    { metadata2: "Fragment Length StdDev", test: "ANOVA", testStat: "61.9725741752891", pVal: "0" },
+    { metadata2: "Code for BSS collection site", test: "ANOVA", testStat: "81.9725741752891", pVal: "0" },
+    { metadata2: "End 2 Sense", test: "ANOVA", testStat: "121.9725741752891", pVal: "0" },
+    { metadata2: "Intronic Rate", test: "ANOVA", testStat: "51.9725741752891", pVal: "0" },
+    { metadata2: "Tissue Type, area from which the tissue sample was taken. This is a parent value to SMTSD.", test: "ANOVA", testStat: "101.9725741752891", pVal: "0" },
+    { metadata2: "Fragment Length StdDev", test: "ANOVA", testStat: "61.9725741752891", pVal: "0" },
+    { metadata2: "Code for BSS collection site", test: "ANOVA", testStat: "81.9725741752891", pVal: "0" },
+    { metadata2: "End 2 Sense", test: "ANOVA", testStat: "121.9725741752891", pVal: "0" }
   ]
 
   showPhenotype = false;
   showLibraryMetadata = false;
-  showGene = true;  
+  showGene = true;
 
   constructor(private httpClient: HttpClient) { }
 
@@ -82,13 +82,11 @@ export class DashboardComponent implements OnInit {
   }
 
   getTableSize() {
-    console.log("getting table size")
     this.tableSize = 0;
     let table = 'g2g'
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++COUNT+%28distinct+g2g.GeneB%29%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue === '' ? this.geneId : this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"`
     let queryURL = `${apiUrl}${annotationUrl}`;
-    // let queryURL = `https://api.seahorse.tm4.org/g2g/statistics?geneA=ENSG00000188976&tissue=Liver`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         console.log("Error: ", error);
@@ -96,7 +94,6 @@ export class DashboardComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        // console.log("table size: ", res)
         this.tableSize = res['rows'][0][0];
       })
   }
@@ -105,7 +102,7 @@ export class DashboardComponent implements OnInit {
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++distinct+g2g.GeneB%2C%0D%0A++e2s.SYMBOL%2C%0D%0A++e2s.ENTREZID%2C%0D%0A++g2g.correlation%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue === '' ? this.geneId : this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"%0D%0Aorder+by%0D%0A++g2g.correlation+desc%0D%0Alimit+${this.limit}+offset+${this.currPage * this.limit}`
     // let queryURL = `${apiUrl}${annotationUrl}`;
-    let queryURL = `https://api.seahorse.tm4.org/g2g/statistics?geneA=ENSG00000188976&tissue=Liver&limit=${this.limit}&offset=${this.currPage * this.limit}`
+    let queryURL = `https://api.seahorse.tm4.org/g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         console.log("Error: ", error);
@@ -116,7 +113,7 @@ export class DashboardComponent implements OnInit {
         // window.scrollTo(0, 500)
         this.dataSource = [];
         this.isLoading = false;
-        for(let index in res){
+        for (let index in res) {
           let temp = {
             "gene": res[index][0],
             "symbol": res[index][1],
@@ -158,7 +155,7 @@ export class DashboardComponent implements OnInit {
     this.tableFromSearch = true
     this.tableSize = 0;
 
-    this.geneId = this.searchValue;
+    this.geneId = this.searchValue !== '' ? this.searchValue : this.geneId;
     this.getTableSize()
     this.getComparisonStats()
 
