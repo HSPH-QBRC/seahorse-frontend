@@ -1,6 +1,7 @@
 .sideBar {
     background-color: #f8f6f2;
-    height: 100%;
+    min-height: 100vh;
+    flex: 1;
 }
 
 .page {
@@ -50,9 +51,8 @@ ul li {
     -webkit-text-stroke: 1px rgba(40, 40, 40, 0.5);
     // -webkit-text-stroke: 1px rgba(40, 40, 40, 0.9);
     -webkit-text-fill-color: tomato;
-    
 }
-.titleLink:hover{
+.titleLink:hover {
     text-decoration: none;
 }
 
@@ -74,30 +74,77 @@ table {
     text-decoration: underline;
 }
 
-.metaId{
+.metaId {
     font-size: 24px;
     font-weight: 500;
     color: rgba(40, 40, 40, 0.9);
     text-transform: capitalize;
 }
 
-.metaDescription{
+.metaDescription {
     font-size: 18px;
     line-height: 32px;
     font-weight: 400;
-    color: rgba(40, 40, 40, 0.8);;
+    color: rgba(40, 40, 40, 0.8);
 }
 
-.metaComment{
+.metaComment {
     font-size: 14px;
     line-height: 32px;
     font-weight: 300;
-    color: rgba(40, 40, 40, 0.8);;
+    color: rgba(40, 40, 40, 0.8);
 }
-.pageDescription{
+.pageDescription {
     margin: 90px 20px 40px;
 }
 
-.logo{
-    opacity: 0.75
+.paginator {
+    margin: 10px 0 50px;
+}
+.searchTitle {
+    font-size: 24px;
+    font-weight: 500;
+    color: rgba(40, 40, 40, 0.9);
+    text-transform: capitalize;
+    margin: 10px 20px 40px;
+}
+
+.hideMessage {
+    font-size: 10px;
+    color: rgba(40, 40, 40, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.searchButton{
+    width: 75%;
+    margin: 0 50px;
+    
+}
+
+.flexContainer{
+    display: flex;
+}
+
+.dropDown{
+    margin-top: 10px;
+}
+
+.testBackground{
+    background-color: royalblue;
+    width: 300px;
+    height: 200px;
+    border: black 2px solid;
+    margin: 2px;
+    padding: 4px;
+}
+.testBackgroundSummaryPlot{
+    background-color: royalblue;
+    width: 600px;
+    height: 400px;
+    border: black 2px solid;
+    margin: 2px;
+    padding: 4px;
 }

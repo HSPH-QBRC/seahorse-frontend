@@ -1,0 +1,131 @@
+[
+    {
+        "name": "Adipose - Subcutaneous"
+    },
+    {
+        "name": "Adipose - Visceral (Omentum)"
+    },
+    {
+        "name": "Adrenal Gland"
+    },
+    {
+        "name": "Artery - Aorta"
+    },
+    {
+        "name": "Artery - Coronary"
+    },
+    {
+        "name": "Artery - Tibial"
+    },
+    {
+        "name": "Bladder"
+    },
+    {
+        "name": "Brain - cluster 1"
+    },
+    {
+        "name": "Brain - cluster 2"
+    },
+    {
+        "name": "Brain - cluster 3"
+    },
+    {
+        "name": "Breast - Mammary Tissue"
+    },
+    {
+        "name": "Cells - Cultured Fibroblasts"
+    },
+    {
+        "name": "Cells - EBV-Transformed Lymphocytes"
+    },
+    {
+        "name": "Cervix - Ectocervix"
+    },
+    {
+        "name": "Cervix - Endocervix"
+    },
+    {
+        "name": "Colon - Sigmoid"
+    },
+    {
+        "name": "Colon - Transverse"
+    },
+    {
+        "name": "Esophagus - Gastroesophageal Junction"
+    },
+    {
+        "name": "Esophagus - Mucosa"
+    },
+    {
+        "name": "Esophagus - Muscularis"
+    },
+    {
+        "name": "Fallopian Tube"
+    },
+    {
+        "name": "Heart - Atrial Appendage"
+    },
+    {
+        "name": "Heart - Left Ventricle"
+    },
+    {
+        "name": "Kidney - Cortex"
+    },
+    {
+        "name": "Kidney - Medulla"
+    },
+    {
+        "name": "Liver"
+    },
+    {
+        "name": "Lung"
+    },
+    {
+        "name": "Minor Salivary Gland"
+    },
+    {
+        "name": "Muscle Skeletal"
+    },
+    {
+        "name": "Nerve Tibial"
+    },
+    {
+        "name": "Ovary"
+    },
+    {
+        "name": "Pancreas"
+    },
+    {
+        "name": "Pituitary"
+    },
+    {
+        "name": "Prostate"
+    },
+    {
+        "name": "Skin"
+    },
+    {
+        "name": "Small Intestine - Terminal Ileum"
+    },
+    {
+        "name": "Spleen"
+    },
+    {
+        "name": "Stomach"
+    },
+    {
+        "name": "Testis"
+    },
+    {
+        "name": "Thyroid"
+    },
+    {
+        "name": "Uterus"
+    },
+    {
+        "name": "Vagina"
+    },
+    {
+        "name": "Whole Blood"
+    }
+]

@@ -8,12 +8,12 @@ import tissuesJson from './tissueList.json';
 
 
 @Component({
-  selector: 'app-geneExpressionComparison',
-  templateUrl: './geneExpressionComparison.component.html',
-  styleUrls: ['./geneExpressionComparison.component.scss']
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss']
 })
 
-export class GeneExpressionComparisonComponent implements OnInit {
+export class DashboardComponent implements OnInit {
   searchValue = '';
   metadataId = 'P2RX1';
   geneId = 'ENSG00000108405';
@@ -30,7 +30,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
   isLoading = false;
   typeOfLookUp = 'g2g'
   currPage = 0;
-  limit = 25;
+  limit = 10;
   tableSize = 0;
   plotTypeLookUp = {};
   geneType = 'integer';
@@ -45,6 +45,27 @@ export class GeneExpressionComparisonComponent implements OnInit {
   tissueList = [];
   selectedTissue = 'Bladder';
   autoFillData = [];
+
+  PhenotypeArr = ["Sex", "Age", "Smoking History", "Etc"]
+  LibraryMetadataArr = ["RIN", "Source"]
+
+  displayedColumns1: string[] = ['metadata2', 'test', 'testStat', 'pVal'];
+  testData = [
+    {metadata2: "Intronic Rate", test: "ANOVA", testStat: "51.9725741752891", pVal: "0"},
+    {metadata2: "Tissue Type, area from which the tissue sample was taken. This is a parent value to SMTSD.", test: "ANOVA", testStat: "101.9725741752891", pVal: "0"},
+    {metadata2: "Fragment Length StdDev", test: "ANOVA", testStat: "61.9725741752891", pVal: "0"},
+    {metadata2: "Code for BSS collection site", test: "ANOVA", testStat: "81.9725741752891", pVal: "0"},
+    {metadata2: "End 2 Sense", test: "ANOVA", testStat: "121.9725741752891", pVal: "0"},
+    {metadata2: "Intronic Rate", test: "ANOVA", testStat: "51.9725741752891", pVal: "0"},
+    {metadata2: "Tissue Type, area from which the tissue sample was taken. This is a parent value to SMTSD.", test: "ANOVA", testStat: "101.9725741752891", pVal: "0"},
+    {metadata2: "Fragment Length StdDev", test: "ANOVA", testStat: "61.9725741752891", pVal: "0"},
+    {metadata2: "Code for BSS collection site", test: "ANOVA", testStat: "81.9725741752891", pVal: "0"},
+    {metadata2: "End 2 Sense", test: "ANOVA", testStat: "121.9725741752891", pVal: "0"}
+  ]
+
+  showPhenotype = false;
+  showLibraryMetadata = false;
+  showGene = true;  
 
   constructor(private httpClient: HttpClient) { }
 
@@ -61,11 +82,13 @@ export class GeneExpressionComparisonComponent implements OnInit {
   }
 
   getTableSize() {
+    console.log("getting table size")
     this.tableSize = 0;
     let table = 'g2g'
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++COUNT+%28distinct+g2g.GeneB%29%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue === '' ? this.geneId : this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"`
     let queryURL = `${apiUrl}${annotationUrl}`;
+    // let queryURL = `https://api.seahorse.tm4.org/g2g/statistics?geneA=ENSG00000188976&tissue=Liver`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         console.log("Error: ", error);
@@ -73,6 +96,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        // console.log("table size: ", res)
         this.tableSize = res['rows'][0][0];
       })
   }
@@ -80,7 +104,8 @@ export class GeneExpressionComparisonComponent implements OnInit {
   getComparisonStats() {
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++distinct+g2g.GeneB%2C%0D%0A++e2s.SYMBOL%2C%0D%0A++e2s.ENTREZID%2C%0D%0A++g2g.correlation%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue === '' ? this.geneId : this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"%0D%0Aorder+by%0D%0A++g2g.correlation+desc%0D%0Alimit+${this.limit}+offset+${this.currPage * this.limit}`
-    let queryURL = `${apiUrl}${annotationUrl}`;
+    // let queryURL = `${apiUrl}${annotationUrl}`;
+    let queryURL = `https://api.seahorse.tm4.org/g2g/statistics?geneA=ENSG00000188976&tissue=Liver&limit=${this.limit}&offset=${this.currPage * this.limit}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         console.log("Error: ", error);
@@ -88,16 +113,15 @@ export class GeneExpressionComparisonComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        console.log("g2g res: ", res)
-        window.scrollTo(0, 500)
+        // window.scrollTo(0, 500)
         this.dataSource = [];
         this.isLoading = false;
-        for (let i = 0; i < res['rows'].length; i++) {
+        for(let index in res){
           let temp = {
-            "gene": res['rows'][i][0],
-            "symbol": res['rows'][i][1],
-            'entrezid': res['rows'][i][2],
-            'correlation': res['rows'][i][3]
+            "gene": res[index][0],
+            "symbol": res[index][1],
+            'entrezid': res[index][2],
+            'correlation': res[index][3]
           }
           this.dataSource.push(temp);
         }
@@ -119,7 +143,7 @@ export class GeneExpressionComparisonComponent implements OnInit {
     this.currPage = details.pageIndex
     this.limit = details.pageSize
     this.getComparisonStats();
-    window.scrollTo(0, 500)
+    // window.scrollTo(0, 500)
   }
 
   geneSearch() {

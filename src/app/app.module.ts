@@ -8,6 +8,7 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { MetadataCrossComparisonComponent } from './metadataCrossComparison/metadataCrossComparison.component';
 import { GeneExpressionComparisonComponent } from './geneExpressionComparison/geneExpressionComparison.component';
 import { MetadataToGeneExpressionComparison } from './metadataToGeneExpressionComparison/metadataToGeneExpressionComparison.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 import { HeatmapComponent } from './heatmap/heatmap.component';
 import { Heatmap2Component } from './heatmap2/heatmap2.component';
 import { BoxPlotComponent } from './boxplot/boxplot.component';
@@ -49,6 +50,7 @@ import { FormsModule, ReactiveFormsModule  } from "@angular/forms";
     ProgressSpinnerComponent,
     GeneExpressionComparisonComponent,
     MetadataToGeneExpressionComparison,
+    DashboardComponent,
     AutocompleteInputComponent
   ],
   imports: [
