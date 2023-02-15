@@ -77,26 +77,26 @@ export class DashboardComponent implements OnInit {
 
     this.getAutoCompleteData();
 
-    this.getTableSize();
+    // this.getTableSize();
     this.getComparisonStats();
   }
 
-  getTableSize() {
-    this.tableSize = 0;
-    let table = 'g2g'
-    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++COUNT+%28distinct+g2g.GeneB%29%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue === '' ? this.geneId : this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"`
-    let queryURL = `${apiUrl}${annotationUrl}`;
-    this.httpClient.get(queryURL).pipe(
-      catchError(error => {
-        console.log("Error: ", error);
-        let message = `Error: ${error.error.error}`;
-        throw message
-      }))
-      .subscribe(res => {
-        this.tableSize = res['rows'][0][0];
-      })
-  }
+  // getTableSize() {
+    // this.tableSize = 0;
+    // let table = 'g2g'
+    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    // let annotationUrl = `sql=select%0D%0A++COUNT+%28distinct+g2g.GeneB%29%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue === '' ? this.geneId : this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"`
+    // let queryURL = `${apiUrl}${annotationUrl}`;
+    // this.httpClient.get(queryURL).pipe(
+    //   catchError(error => {
+    //     console.log("Error: ", error);
+    //     let message = `Error: ${error.error.error}`;
+    //     throw message
+    //   }))
+    //   .subscribe(res => {
+    //     this.tableSize = res['rows'][0][0];
+    //   })
+  // }
 
   getComparisonStats() {
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
@@ -111,14 +111,15 @@ export class DashboardComponent implements OnInit {
       }))
       .subscribe(res => {
         // window.scrollTo(0, 500)
+        this.tableSize = res['count']
         this.dataSource = [];
         this.isLoading = false;
-        for (let index in res) {
+        for (let index in res['result']) {
           let temp = {
-            "gene": res[index][0],
-            "symbol": res[index][1],
-            'entrezid': res[index][2],
-            'correlation': res[index][3]
+            "gene": res['result'][index][0],
+            "symbol": res['result'][index][1],
+            'entrezid': res['result'][index][2],
+            'correlation': res['result'][index][3]
           }
           this.dataSource.push(temp);
         }
@@ -156,7 +157,7 @@ export class DashboardComponent implements OnInit {
     this.tableSize = 0;
 
     this.geneId = this.searchValue !== '' ? this.searchValue : this.geneId;
-    this.getTableSize()
+    // this.getTableSize()
     this.getComparisonStats()
 
   }
