@@ -25,7 +25,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   offset = 0;
   lengthOfResult = 0;
 
-  imageUrl = "https://dummyimage.com/640x360/fff/aaa"
+  imageUrl = ""
 
   constructor(private httpClient: HttpClient) { }
 

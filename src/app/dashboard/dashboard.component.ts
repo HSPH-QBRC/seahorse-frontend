@@ -239,14 +239,14 @@ export class DashboardComponent implements OnInit {
   }
 
   changeMetadata(name) {
-    d3.select("#my_plotArea")
-      .selectAll('div')
-      .remove();
+    // d3.select("#my_plotArea")
+    //   .selectAll('div')
+    //   .remove();
 
-    this.plotTypeLookUp = {};
+    // this.plotTypeLookUp = {};
     this.metadataId = name;
-    // this.getMetadataType(this.metadataId);
-    // this.getComparisonStats();
+    // // this.getMetadataType(this.metadataId);
+    // // this.getComparisonStats();
     this.getM2MComparisonStats();
     window.scrollTo(0, 0);
 
