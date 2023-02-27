@@ -25,6 +25,8 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   offset = 0;
   lengthOfResult = 0;
 
+  imageUrl = "https://dummyimage.com/640x360/fff/aaa"
+
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
@@ -67,9 +69,10 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   yMax = -Infinity
 
   getDataMCC(numerical1, numerical2) {
-    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numerical1}%2C%0D%0A++${numerical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numerical1}+is+not+""%0D%0A++AND+${numerical2}+is+not+""%0D%0A`
-    let queryURL = `${apiUrl}${annotationUrl}`;
+    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numerical1}%2C%0D%0A++${numerical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numerical1}+is+not+""%0D%0A++AND+${numerical2}+is+not+""%0D%0A`
+    // let queryURL = `${apiUrl}${annotationUrl}`;
+    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${this.metadataId}&category_b=${this.metadata2Id}&comparison=m2m`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         console.log("Error: ", error);
@@ -77,30 +80,33 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
+        console.log("mcc scatterplot res: ", res)
+        this.imageUrl = res["url"]
+        // console.log("scatter: ", res['rows'])
         this.isLoading = false;
-        for (let i = 0; i < res['rows'].length; i++) {
-          if (res['rows'][i][1] < this.xMin) {
-            this.xMin = res['rows'][i][1];
-          }
-          if (res['rows'][i][1] > this.xMax) {
-            this.xMax = res['rows'][i][1];
-          }
-          if (res['rows'][i][2] < this.yMin) {
-            this.yMin = res['rows'][i][2];
-          }
-          if (res['rows'][i][2] > this.yMax) {
-            this.yMax = res['rows'][i][2];
-          }
+        // for (let i = 0; i < res['rows'].length; i++) {
+        //   if (res['rows'][i][1] < this.xMin) {
+        //     this.xMin = res['rows'][i][1];
+        //   }
+        //   if (res['rows'][i][1] > this.xMax) {
+        //     this.xMax = res['rows'][i][1];
+        //   }
+        //   if (res['rows'][i][2] < this.yMin) {
+        //     this.yMin = res['rows'][i][2];
+        //   }
+        //   if (res['rows'][i][2] > this.yMax) {
+        //     this.yMax = res['rows'][i][2];
+        //   }
 
-          let temp = {
-            'name': res['rows'][i][0],
-            'xValue': res['rows'][i][1],
-            'yValue': res['rows'][i][2]
-          };
+        //   let temp = {
+        //     'name': res['rows'][i][0],
+        //     'xValue': res['rows'][i][1],
+        //     'yValue': res['rows'][i][2]
+        //   };
 
-          this.scatterPlotData.push(temp);
-        }
-        this.createScatterPlot()
+        //   this.scatterPlotData.push(temp);
+        // }
+        // this.createScatterPlot()
       })
 
   }

@@ -25,9 +25,15 @@
         <div class="container sideBarContainer">
             <ul>
                 <div class="pageTitle">Phenotype:</div>
-                <div *ngFor="let cat of PhenotypeArr">
+                <!-- <div *ngFor="let cat of PhenotypeArr">
                     <li>
                         <a class="page">{{cat}}</a>
+                    </li>
+                </div> -->
+                <div *ngFor="let cat of metadataArr">
+                    <li *ngIf="!notIncludeList.includes(cat.varname)">
+                        <!-- <a class="page" >{{cat.vardesc[0]}}</a> -->
+                        <a class="page" (click)="changeMetadata(cat.varname)">{{cat.vardesc[0]}}</a>
                     </li>
                 </div>
             </ul>
@@ -45,6 +51,7 @@
     <div class="col-md-9 content">
         <br>
         <br>
+        <h1>{{this.metadataId}}</h1>
         <br>
         <div class=" row justify-content-center">
             <!-- <app-histogram [metadataId]="metadataId" [geneId]="geneId" [comparisonType]="typeOfLookUp">
@@ -56,54 +63,67 @@
         <h4 (click)="showPhenotype = !showPhenotype">
             <span class="expandObj">{{showPhenotype ? "-":"+"}}</span> Phenotype
         </h4>
-        <div *ngIf="showPhenotype">
+        <div *ngIf="showPhenotype" >
             <div class="row justify-content-center">
                 <div class="testBackground">
-                    <h1>1</h1>
+                    <!-- <h1>1 {{this.dataSourceM2M[0]["category_b"]}}</h1> -->
+                    <app-scatterplot [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[0]["category_b"]' [metadataLookUp]="metadataLookUp"
+                        [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
                 </div>
                 <div class="testBackground">
-                    <h1>2</h1>
+                    <!-- <h1>2 {{this.dataSourceM2M[1]["category_b"]}}</h1> -->
+                    <app-scatterplot [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[1]["category_b"]' [metadataLookUp]="metadataLookUp"
+                        [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
                 </div>
                 <div class="testBackground">
-                    <h1>3</h1>
+                    <!-- <h1>3 {{this.dataSourceM2M[2]["category_b"]}}</h1> -->
+                    <app-scatterplot [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[2]["category_b"]' [metadataLookUp]="metadataLookUp"
+                        [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
                 </div>
             </div>
             <div class="row justify-content-center">
                 <div class="testBackground">
-                    <h1>4</h1>
+                    <!-- <h1>4 {{this.dataSourceM2M[3]["category_b"]}}</h1> -->
+
+                    <app-scatterplot [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[3]["category_b"]' [metadataLookUp]="metadataLookUp"
+                        [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
                 </div>
                 <div class="testBackground">
-                    <h1>5</h1>
+                    <!-- <h1>5 {{this.dataSourceM2M[4]["category_b"]}}</h1> -->
+                    <app-scatterplot [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[4]["category_b"]' [metadataLookUp]="metadataLookUp"
+                        [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
                 </div>
                 <div class="testBackground">
-                    <h1>6</h1>
+                    <!-- <h1>6 {{this.dataSourceM2M[5]["category_b"]}}</h1> -->
+                    <app-scatterplot [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[5]["category_b"]' [metadataLookUp]="metadataLookUp"
+                        [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
                 </div>
             </div>
             <br>
             <div class="d-flex justify-content-center">
-                <table mat-table [dataSource]='testData' class="mat-elevation-z8">
-                    <ng-container matColumnDef="metadata2">
+                <table mat-table [dataSource]='dataSourceM2M' class="mat-elevation-z8">
+                    <ng-container matColumnDef="category_b">
                         <th mat-header-cell *matHeaderCellDef> Metadata2 </th>
-                        <td class="metaColumn" mat-cell *matCellDef="let element"> {{element.metadata2}} </td>
+                        <td class="metaColumn" mat-cell *matCellDef="let element"> {{element.category_b}} </td>
                     </ng-container>
                     <ng-container matColumnDef="test">
                         <th mat-header-cell *matHeaderCellDef> Test </th>
                         <td mat-cell *matCellDef="let element"> {{element.test}} </td>
                     </ng-container>
-                    <ng-container matColumnDef="testStat">
+                    <ng-container matColumnDef="test_statistics">
                         <th mat-header-cell *matHeaderCellDef> Test Statistic</th>
-                        <td mat-cell *matCellDef="let element"> {{element.testStat}} </td>
+                        <td mat-cell *matCellDef="let element"> {{element.test_statistics}} </td>
                     </ng-container>
-                    <ng-container matColumnDef="pVal">
+                    <ng-container matColumnDef="pvalue">
                         <th mat-header-cell *matHeaderCellDef> P-Value</th>
-                        <td mat-cell *matCellDef="let element"> {{element.pVal}} </td>
+                        <td mat-cell *matCellDef="let element"> {{element.pvalue}} </td>
                     </ng-container>
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns1"></tr>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsM2M"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsM2M"></tr>
                 </table>
             </div>
-            <div class="d-flex justify-content-center paginator" *ngIf="tableSize > 0">
-                <mat-paginator [length]="tableSize" [pageSize]="25" [pageSizeOptions]="[5, 10, 25, 100]"
+            <div class="d-flex justify-content-center paginator" *ngIf="tableSizeM2M > 0">
+                <mat-paginator [length]="tableSizeM2M" [pageSize]="25" [pageSizeOptions]="[5, 10, 25, 100]"
                     aria-label="Select page" (page)="getPageDetails($event)">
                 </mat-paginator>
             </div>
@@ -138,25 +158,25 @@
                 </div>
             </div>
             <div class="d-flex justify-content-center">
-                <table mat-table [dataSource]='testData' class="mat-elevation-z8">
-                    <ng-container matColumnDef="metadata2">
+                <table mat-table [dataSource]='dataSourceM2M' class="mat-elevation-z8">
+                    <ng-container matColumnDef="category_b">
                         <th mat-header-cell *matHeaderCellDef> Metadata2 </th>
-                        <td class="metaColumn" mat-cell *matCellDef="let element"> {{element.metadata2}} </td>
+                        <td class="metaColumn" mat-cell *matCellDef="let element"> {{element.category_b}} </td>
                     </ng-container>
                     <ng-container matColumnDef="test">
                         <th mat-header-cell *matHeaderCellDef> Test </th>
                         <td mat-cell *matCellDef="let element"> {{element.test}} </td>
                     </ng-container>
-                    <ng-container matColumnDef="testStat">
+                    <ng-container matColumnDef="test_statistics">
                         <th mat-header-cell *matHeaderCellDef> Test Statistic</th>
-                        <td mat-cell *matCellDef="let element"> {{element.testStat}} </td>
+                        <td mat-cell *matCellDef="let element"> {{element.test_statistics}} </td>
                     </ng-container>
-                    <ng-container matColumnDef="pVal">
+                    <ng-container matColumnDef="pvalue">
                         <th mat-header-cell *matHeaderCellDef> P-Value</th>
-                        <td mat-cell *matCellDef="let element"> {{element.pVal}} </td>
+                        <td mat-cell *matCellDef="let element"> {{element.pvalue}} </td>
                     </ng-container>
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns1"></tr>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsM2M"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsM2M"></tr>
                 </table>
             </div>
             <div class="d-flex justify-content-center paginator" *ngIf="tableSize > 0">
@@ -206,16 +226,16 @@
                 </div>
             </div>
 
-            <p *ngIf="this.dataSource.length === 0 && this.searchValue !== '' && this.selectedTissue !== ''"
+            <p *ngIf="this.dataSourceG2G.length === 0 && this.searchValue !== '' && this.selectedTissue !== ''"
                 class="hideMessage text-center">
                 There is no data to be displayed.</p>
 
             <div class="d-flex justify-content-center">
                 <div id="my_plotArea">
                     <div *ngIf="displayScatterPlot">
-                        <app-scatterplot [metadataId]="metadataId" [metadata2Id]="geneId"
+                        <!-- <app-scatterplot [metadataId]="metadataId" [metadata2Id]="geneId"
                             [metadataLookUp]="metadataLookUp" [typeOfLookUp]="typeOfLookUp" [symbolId]="symbolId"
-                            [symbolId2]="symbolId2"></app-scatterplot>
+                            [symbolId2]="symbolId2"></app-scatterplot> -->
                     </div>
                 </div>
             </div>
@@ -223,7 +243,7 @@
             <br>
 
             <div class="d-flex justify-content-center">
-                <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" *ngIf="dataSource.length > 0">
+                <table mat-table [dataSource]="dataSourceG2G" class="mat-elevation-z8" *ngIf="dataSourceG2G.length > 0">
                     <!-- <ng-container matColumnDef="gene">
                         <th mat-header-cell *matHeaderCellDef> Gene </th>
                         <td class="metaColumn" mat-cell *matCellDef="let element" (click)="onSelectMetadata2(element.gene, element.symbol)">
@@ -244,13 +264,13 @@
                                 href="{{'https://www.ncbi.nlm.nih.gov/gene/' + element.entrezid}}">NIH Link</a>
                         </td>
                     </ng-container>
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsG2G"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsG2G"></tr>
                 </table>
 
             </div>
-            <div class="d-flex justify-content-center paginator" *ngIf="tableSize > 0">
-                <mat-paginator [length]="tableSize" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"
+            <div class="d-flex justify-content-center paginator" *ngIf="tableSizeG2G > 0">
+                <mat-paginator [length]="tableSizeG2G" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"
                     aria-label="Select page" (page)="getPageDetails($event)">
                 </mat-paginator>
             </div>
