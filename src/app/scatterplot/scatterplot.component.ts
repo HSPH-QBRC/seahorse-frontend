@@ -30,19 +30,19 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
-    this.offset = 0;
-    this.lengthOfResult = 0;
-    this.isLoading = true;
-    let numerical1 = this.metadataId;
-    let numerical2 = this.metadata2Id
-    this.refreshData();
-    if (this.typeOfLookUp === 'mcc') {
-      this.getDataMCC(numerical1, numerical2)
-    } else if (this.typeOfLookUp === 'm2g') {
-      this.getDataM2G(numerical1, numerical2)
-    } else if (this.typeOfLookUp === 'g2g') {
-      this.getDataG2G(numerical1, numerical2)
-    }
+    // this.offset = 0;
+    // this.lengthOfResult = 0;
+    // this.isLoading = true;
+    // let numerical1 = this.metadataId;
+    // let numerical2 = this.metadata2Id
+    // this.refreshData();
+    // if (this.typeOfLookUp === 'mcc') {
+    //   this.getDataMCC(numerical1, numerical2)
+    // } else if (this.typeOfLookUp === 'm2g') {
+    //   this.getDataM2G(numerical1, numerical2)
+    // } else if (this.typeOfLookUp === 'g2g') {
+    //   this.getDataG2G(numerical1, numerical2)
+    // }
 
   }
 
@@ -52,6 +52,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     this.isLoading = true;
     let numerical1 = this.metadataId;
     let numerical2 = this.metadata2Id;
+    console.log("num1/num2: ", numerical1, numerical2)
     this.refreshData();
     if (this.typeOfLookUp === 'mcc') {
       this.getDataMCC(numerical1, numerical2)

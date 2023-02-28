@@ -103,7 +103,7 @@ export class DashboardComponent implements OnInit {
       })
 
   }
-
+  metadataIdForGraph = ""
   // currMetadata = "SMATSSCR"
   getM2MComparisonStats() {
     let apiUrl = "https://api.seahorse.tm4.org/";
@@ -128,6 +128,7 @@ export class DashboardComponent implements OnInit {
           }
           this.dataSourceM2M.push(temp);
         }
+        this.metadataIdForGraph = this.metadataId;
       })
 
   }
@@ -239,6 +240,7 @@ export class DashboardComponent implements OnInit {
   }
 
   changeMetadata(name) {
+    console.log("changemeta: ", name)
     // d3.select("#my_plotArea")
     //   .selectAll('div')
     //   .remove();
