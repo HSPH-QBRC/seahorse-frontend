@@ -28,14 +28,15 @@ export class Heatmap2Component implements OnInit, OnChanges {
   countDict = {};
   maxCount = 1;
   isLoading = false;
+  noData = false;
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
-    this.isLoading = true;
-    let categorical1 = this.metadataId;
-    let categorical2 = this.metadata2Id;
-    this.getData(categorical1, categorical2);
+    // this.isLoading = true;
+    // let categorical1 = this.metadataId;
+    // let categorical2 = this.metadata2Id;
+    // this.getData(categorical1, categorical2);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -63,8 +64,10 @@ export class Heatmap2Component implements OnInit, OnChanges {
   getData(categorical1, categorical2) {
     //Create annotations look up table too identify metadata for genes
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categorical1}%2C%0D%0A++${categorical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categorical1}+is+not+%22%22%0D%0A++AND+${categorical2}+is+not+%22%22%0D%0A`
     let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categorical1}%2C%0D%0A++${categorical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categorical1}+is+not+%22%22%0D%0A++AND+${categorical2}+is+not+%22%22%0D%0A`
-    let queryURL = `${apiUrl}${annotationUrl}`;
+    // let queryURL = `${apiUrl}${annotationUrl}`;
+    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${categorical1}&category_b=${categorical2}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         console.log("Error: ", error);
@@ -72,6 +75,7 @@ export class Heatmap2Component implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
+        console.log("heatmap rows: ", res, this.metadataId, this.metadata2Id)
         this.isLoading = false;
         for (let i = 0; i < res['rows'].length; i++) {
           let name = res['rows'][i][0];
@@ -116,7 +120,12 @@ export class Heatmap2Component implements OnInit, OnChanges {
           }
         }
         this.heatMapData = this.annotationsDict
-        this.createHeatMap()
+        if (res["rows"].length > 0) {
+          this.createHeatMap()
+        } else {
+          this.noData = true;
+        }
+
       })
   }
 
@@ -156,15 +165,22 @@ export class Heatmap2Component implements OnInit, OnChanges {
         return tipBox
       });
 
-    d3.select("#my_heatmap2")
+    // d3.select("#my_heatmap2")
+    //   .selectAll('svg')
+    //   .remove();
+    d3.select(".my_heatmap_" + this.metadata2Id)
       .selectAll('svg')
       .remove();
 
     // append the svg object to the body of the page
-    var svg = d3.select("#my_heatmap2")
+    var svg = d3.select(".my_heatmap_" + this.metadata2Id)
       .append("svg")
+      .attr("preserveAspectRatio", "xMinYMin meet")
+      .attr("viewBox", "0 0 460 600")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
+      .attr("width", 300)
+      .attr("height", 230)
       .append("g")
       .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
@@ -320,7 +336,7 @@ export class Heatmap2Component implements OnInit, OnChanges {
       .tickSize(barHeight * 2)
       .tickValues(xTicksCorr);
 
-    var countLegend = d3.select("#my_heatmap2").select("svg")
+    var countLegend = d3.select(".my_heatmap_" + this.metadata2Id).select("svg")
       .append("svg")
       .attr("width", widthGradient)
       .attr("height", heightGradient)

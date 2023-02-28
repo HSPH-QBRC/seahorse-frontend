@@ -63,33 +63,70 @@
         <h4 (click)="showPhenotype = !showPhenotype">
             <span class="expandObj">{{showPhenotype ? "-":"+"}}</span> Phenotype
         </h4>
-        <div *ngIf="showPhenotype" >
+        <div *ngIf="showPhenotype">
             <div class="row justify-content-center">
                 <div class="testBackground">
-                    <app-scatterplot [metadataId]="metadataIdForGraph" [metadata2Id]='this.dataSourceM2M[0]["category_b"]' [metadataLookUp]="metadataLookUp"
+                    <app-scatterplot [metadataId]="metadataIdForGraph"
+                        [metadata2Id]='this.dataSourceM2M[0]["category_b"]' [metadataLookUp]="metadataLookUp"
                         [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
+                    <div
+                        *ngIf="(metadataLookUp[metadataId]['type'] === 'string' || metadataLookUp[metadataId]['type'] === 'integer, encoded value') && (metadataLookUp[this.dataSourceM2M[0]['category_b']]['type'] === 'string' || metadataLookUp[this.dataSourceM2M[0]['category_b']]['type'] === 'integer, encoded value')">
+                        <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[0]["category_b"]'
+                            [metadataLookUp]="metadataLookUp"></app-heatmap2>
+                    </div>
+
                 </div>
                 <div class="testBackground">
-                    <app-scatterplot [metadataId]="metadataIdForGraph" [metadata2Id]='this.dataSourceM2M[1]["category_b"]' [metadataLookUp]="metadataLookUp"
+                    <app-scatterplot [metadataId]="metadataIdForGraph"
+                        [metadata2Id]='this.dataSourceM2M[1]["category_b"]' [metadataLookUp]="metadataLookUp"
                         [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
+                    <div
+                        *ngIf="(metadataLookUp[metadataId]['type'] === 'string' || metadataLookUp[metadataId]['type'] === 'integer, encoded value') && (metadataLookUp[this.dataSourceM2M[1]['category_b']]['type'] === 'string' || metadataLookUp[this.dataSourceM2M[1]['category_b']]['type'] === 'integer, encoded value')">
+                        <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[1]["category_b"]'
+                            [metadataLookUp]="metadataLookUp"></app-heatmap2>
+                    </div>
                 </div>
                 <div class="testBackground">
-                    <app-scatterplot [metadataId]="metadataIdForGraph" [metadata2Id]='this.dataSourceM2M[2]["category_b"]' [metadataLookUp]="metadataLookUp"
+                    <app-scatterplot [metadataId]="metadataIdForGraph"
+                        [metadata2Id]='this.dataSourceM2M[2]["category_b"]' [metadataLookUp]="metadataLookUp"
                         [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
+                    <div
+                        *ngIf="(metadataLookUp[metadataId]['type'] === 'string' || metadataLookUp[metadataId]['type'] === 'integer, encoded value') && (metadataLookUp[this.dataSourceM2M[2]['category_b']]['type'] === 'string' || metadataLookUp[this.dataSourceM2M[2]['category_b']]['type'] === 'integer, encoded value')">
+                        <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[2]["category_b"]'
+                            [metadataLookUp]="metadataLookUp"></app-heatmap2>
+                    </div>
+
                 </div>
             </div>
             <div class="row justify-content-center">
                 <div class="testBackground">
-                    <app-scatterplot [metadataId]="metadataIdForGraph" [metadata2Id]='this.dataSourceM2M[3]["category_b"]' [metadataLookUp]="metadataLookUp"
+                    <app-scatterplot [metadataId]="metadataIdForGraph"
+                        [metadata2Id]='this.dataSourceM2M[3]["category_b"]' [metadataLookUp]="metadataLookUp"
                         [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
+                    <div
+                        *ngIf="(metadataLookUp[metadataId]['type'] === 'string' || metadataLookUp[metadataId]['type'] === 'integer, encoded value') && (metadataLookUp[this.dataSourceM2M[3]['category_b']]['type'] === 'string' || metadataLookUp[this.dataSourceM2M[3]['category_b']]['type'] === 'integer, encoded value')">
+                        <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[3]["category_b"]'
+                            [metadataLookUp]="metadataLookUp"></app-heatmap2>
+                    </div>
                 </div>
                 <div class="testBackground">
-                    <app-scatterplot [metadataId]="metadataIdForGraph" [metadata2Id]='this.dataSourceM2M[4]["category_b"]' [metadataLookUp]="metadataLookUp"
+                    <app-scatterplot [metadataId]="metadataIdForGraph"
+                        [metadata2Id]='this.dataSourceM2M[4]["category_b"]' [metadataLookUp]="metadataLookUp"
                         [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
+                    <div
+                        *ngIf="(metadataLookUp[metadataId]['type'] === 'string' || metadataLookUp[metadataId]['type'] === 'integer, encoded value') && (metadataLookUp[this.dataSourceM2M[4]['category_b']]['type'] === 'string' || metadataLookUp[this.dataSourceM2M[4]['category_b']]['type'] === 'integer, encoded value')">
+                        <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[4]["category_b"]'
+                            [metadataLookUp]="metadataLookUp"></app-heatmap2>
+                    </div>
                 </div>
                 <div class="testBackground">
                     <app-scatterplot [metadataId]="metadataIdForGraph" [metadata2Id]='this.dataSourceM2M[5]["category_b"]' [metadataLookUp]="metadataLookUp"
                         [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
+                    <div
+                        *ngIf="(metadataLookUp[metadataId]['type'] === 'string' || metadataLookUp[metadataId]['type'] === 'integer, encoded value') && (metadataLookUp[this.dataSourceM2M[5]['category_b']]['type'] === 'string' || metadataLookUp[this.dataSourceM2M[5]['category_b']]['type'] === 'integer, encoded value')">
+                        <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[5]["category_b"]'
+                            [metadataLookUp]="metadataLookUp"></app-heatmap2>
+                    </div>
                 </div>
             </div>
             <br>

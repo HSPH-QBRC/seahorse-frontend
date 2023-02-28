@@ -78,10 +78,11 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       catchError(error => {
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
+        this.isLoading = false;
         throw message
       }))
       .subscribe(res => {
-        console.log("mcc scatterplot res: ", res)
+        console.log("mcc scatterplot res: ", res["url"])
         this.imageUrl = res["url"]
         // console.log("scatter: ", res['rows'])
         this.isLoading = false;

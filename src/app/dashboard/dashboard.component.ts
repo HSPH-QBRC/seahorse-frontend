@@ -15,10 +15,11 @@ import tissuesJson from './tissueList.json';
 
 export class DashboardComponent implements OnInit {
   searchValue = '';
-  metadataId = 'SMGNSDTC';
+  // metadataId = 'SMEXNCRT';
+  metadataId = 'SMCENTER';
   metadata2Id = ''
-  geneId = 'ENSG00000188976';
-  symbolId = 'P2RX1';
+  geneId = '';
+  symbolId = '';
   symbolId2 = '';
   displayScatterPlot = false;
   displayBoxPlot = false;
@@ -113,6 +114,7 @@ export class DashboardComponent implements OnInit {
       catchError(error => {
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
+        this.isLoading = false;
         throw message
       }))
       .subscribe(res => {

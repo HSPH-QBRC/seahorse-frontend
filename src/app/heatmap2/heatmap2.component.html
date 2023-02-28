@@ -1,4 +1,6 @@
-<br>
-<br>
-<app-progress-spinner *ngIf="isLoading"></app-progress-spinner>
-<div id="my_heatmap2"></div>
+<!-- <app-progress-spinner *ngIf="isLoading"></app-progress-spinner> -->
+<!-- <div id="my_heatmap2"></div> -->
+<h1 [className]="'my_heatmap_' + metadata2Id"></h1>
+<div *ngIf="noData">
+    <div class="noData_description">No Data to display for Heatmap</div>
+</div>
