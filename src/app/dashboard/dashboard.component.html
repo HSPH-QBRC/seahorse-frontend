@@ -65,18 +65,39 @@
         </h4>
         <div *ngIf="showPhenotype">
             <div class="row justify-content-center">
-                <div class="testBackground">
+                <div class="testBackground" *ngFor="let i of [0,1,2]">
+                    <!-- <div
+                        *ngIf="(metadataLookUp[metadataId]['type'] === 'decimal' || metadataLookUp[metadataId]['type'] === 'integer') && (metadataLookUp[this.dataSourceM2M[i]['category_b']]['type'] === 'decimal' || metadataLookUp[this.dataSourceM2M[i]['category_b']]['type'] === 'integer')">
+                        <app-scatterplot [metadataId]="metadataIdForGraph"
+                            [metadata2Id]='this.dataSourceM2M[i]["category_b"]' [metadataLookUp]="metadataLookUp"
+                            [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
+                    </div> -->
                     <app-scatterplot [metadataId]="metadataIdForGraph"
-                        [metadata2Id]='this.dataSourceM2M[0]["category_b"]' [metadataLookUp]="metadataLookUp"
+                        [metadata2Id]='this.dataSourceM2M[i]["category_b"]' [metadataLookUp]="metadataLookUp"
                         [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
                     <div
-                        *ngIf="(metadataLookUp[metadataId]['type'] === 'string' || metadataLookUp[metadataId]['type'] === 'integer, encoded value') && (metadataLookUp[this.dataSourceM2M[0]['category_b']]['type'] === 'string' || metadataLookUp[this.dataSourceM2M[0]['category_b']]['type'] === 'integer, encoded value')">
-                        <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[0]["category_b"]'
+                        *ngIf="(metadataLookUp[metadataId]['type'] === 'string' || metadataLookUp[metadataId]['type'] === 'integer, encoded value') && (metadataLookUp[this.dataSourceM2M[i]['category_b']]['type'] === 'string' || metadataLookUp[this.dataSourceM2M[i]['category_b']]['type'] === 'integer, encoded value')">
+                        <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[i]["category_b"]'
                             [metadataLookUp]="metadataLookUp"></app-heatmap2>
                     </div>
 
                 </div>
-                <div class="testBackground">
+            </div>
+            <div class="row justify-content-center">
+                <div class="testBackground" *ngFor="let i of [3,4,5]">
+                    
+                    <app-scatterplot [metadataId]="metadataIdForGraph"
+                        [metadata2Id]='this.dataSourceM2M[i]["category_b"]' [metadataLookUp]="metadataLookUp"
+                        [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
+                    <div
+                        *ngIf="(metadataLookUp[metadataId]['type'] === 'string' || metadataLookUp[metadataId]['type'] === 'integer, encoded value') && (metadataLookUp[this.dataSourceM2M[i]['category_b']]['type'] === 'string' || metadataLookUp[this.dataSourceM2M[i]['category_b']]['type'] === 'integer, encoded value')">
+                        <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[i]["category_b"]'
+                            [metadataLookUp]="metadataLookUp"></app-heatmap2>
+                    </div>
+
+                </div>
+            </div>
+            <!-- <div class="testBackground">
                     <app-scatterplot [metadataId]="metadataIdForGraph"
                         [metadata2Id]='this.dataSourceM2M[1]["category_b"]' [metadataLookUp]="metadataLookUp"
                         [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
@@ -100,6 +121,9 @@
             </div>
             <div class="row justify-content-center">
                 <div class="testBackground">
+                    <div *ngIf="(metadataLookUp[metadataId]['type'] === 'decimal' || metadataLookUp[metadataId]['type'] === 'integer') && (metadataLookUp[this.dataSourceM2M[3]['category_b']]['type'] === 'decimal' || metadataLookUp[this.dataSourceM2M[3]['category_b']]['type'] === 'integer, encoded value')">
+
+                    </div>
                     <app-scatterplot [metadataId]="metadataIdForGraph"
                         [metadata2Id]='this.dataSourceM2M[3]["category_b"]' [metadataLookUp]="metadataLookUp"
                         [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
@@ -127,8 +151,8 @@
                         <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[5]["category_b"]'
                             [metadataLookUp]="metadataLookUp"></app-heatmap2>
                     </div>
-                </div>
-            </div>
+                </div> -->
+            <!-- </div> -->
             <br>
             <div class="d-flex justify-content-center">
                 <table mat-table [dataSource]='dataSourceM2M' class="mat-elevation-z8">

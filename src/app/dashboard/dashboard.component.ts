@@ -15,8 +15,9 @@ import tissuesJson from './tissueList.json';
 
 export class DashboardComponent implements OnInit {
   searchValue = '';
-  // metadataId = 'SMEXNCRT';
-  metadataId = 'SMCENTER';
+  metadataId = 'SME2MPRT';
+  // metadataId = 'SMATSSCR';
+  // metadataId = 'SMUBRID'
   metadata2Id = ''
   geneId = '';
   symbolId = '';
@@ -160,7 +161,7 @@ export class DashboardComponent implements OnInit {
           this.metadataArr.push(temp)
           this.metadataLookUp[res[i][0]] = temp
         }
-        // console.log(this.metadataArr, this.metadataLookUp)
+        console.log("lookup: ", this.metadataLookUp)
       })
   }
 
