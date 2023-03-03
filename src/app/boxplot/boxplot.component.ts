@@ -36,7 +36,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   ngOnInit(): void { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log("metadatacat id: ", this.metadataCatId, this.symbolId)
+    this.noData = false
     this.offset = 0;
     this.lengthOfResult = 0;
     this.resetVariables()
@@ -57,11 +57,15 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     this.max = -Infinity;
     this.xAxisArr = [];
   }
+  tempBPData = [];
 
   getDataMCC(numericId, categoricalId) {
+    console.log("mcc: ", numericId, categoricalId)
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numericId}%2C%0D%0A++${categoricalId}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numericId}+is+not+""%0D%0A++AND+${categoricalId}+is+not+""%0D%0A`
-    let queryURL = `${apiUrl}${annotationUrl}`;
+    // let queryURL = `${apiUrl}${annotationUrl}`;
+    // let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=SMTS&category_b=SMEXPEFF&comparison=m2m`
+    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numericId}&category_b=${categoricalId}&comparison=m2m`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         console.log("Error: ", error);
@@ -69,77 +73,94 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
+        this.tempBPData = res["boxplot"]["boxPlotData"]
         this.isLoading = false;
-        for (let i = 0; i < res['rows'].length; i++) {
-          if (res['rows'][i][2] < this.min) {
-            this.min = res['rows'][i][2];
-          }
-          if (res['rows'][i][2] > this.max) {
-            this.max = res['rows'][i][2];
-          }
-          if (!this.xAxisArr.includes(res['rows'][i][1].toString())) {
-            this.xAxisArr.push(res['rows'][i][1].toString())
-          }
-          let temp = {
-            'name': res['rows'][i][0],
-            'key': res['rows'][i][1],
-            'value': res['rows'][i][2]
-          };
-          this.boxPlotData.push(temp);
-        }
-        this.createBoxPlot()
-      })
-  }
-
-  getDataM2G(numericId, categoricalId) {
-    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${categoricalId}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+like+"${numericId}%"%0D%0A++AND+"${categoricalId}"+is+not+""%0D%0A++AND+"GENE_EXPRESSION"+is+not+""%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
-    let queryURL = `${apiUrl}${annotationUrl}`;
-    this.httpClient.get(queryURL).pipe(
-      catchError(error => {
-        this.isLoading = false;
-        console.log("Error: ", error);
-        let message = `Error: ${error.error.error}`;
-        throw message
-      }))
-      .subscribe(res => {
-        for (let i = 0; i < res['rows'].length; i++) {
-          if (res['rows'][i][2] < this.min) {
-            this.min = res['rows'][i][2];
-          }
-          if (res['rows'][i][2] > this.max) {
-            this.max = res['rows'][i][2];
-          }
-          if (!this.xAxisArr.includes(res['rows'][i][1].toString())) {
-            this.xAxisArr.push(res['rows'][i][1].toString())
-          }
-          let temp = {
-            'name': res['rows'][i][0],
-            'key': res['rows'][i][1],
-            'value': res['rows'][i][2]
-          };
-          this.boxPlotData.push(temp);
-        }
-
-        this.lengthOfResult = res['rows'].length;
-        this.offset += this.limit
-        if (this.lengthOfResult > 0) {
-          this.getDataM2G(numericId, categoricalId)
+        if (this.tempBPData.length === 0) {
+          this.noData = true
         } else {
-          this.isLoading = false;
-          this.isLoading = false;
+          for (let i = 0; i < this.tempBPData.length; i++) {
+            if (this.tempBPData[i]["value"]["min"] < this.min) {
+              this.min = this.tempBPData[i]["value"]["min"];
+            }
+            if (this.tempBPData[i]["value"]["max"] > this.max) {
+              this.max = this.tempBPData[i]["value"]["max"];
+            }
+            if (!this.xAxisArr.includes(this.tempBPData[i]["key"].toString())) {
+              this.xAxisArr.push(this.tempBPData[i]["key"].toString())
+            }
+            // let temp = {
+            //   'name': res['rows'][i][0],
+            //   'key': res['rows'][i][1],
+            //   'value': res['rows'][i][2]
+            // };
+            // this.boxPlotData.push(temp);
+          }
           this.createBoxPlot()
         }
+
+
       })
   }
+  noData = false
+  getDataM2G(numericId, categoricalId) {
+    console.log("m2g: ", numericId, categoricalId)
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${categoricalId}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+like+"${numericId}%"%0D%0A++AND+"${categoricalId}"+is+not+""%0D%0A++AND+"GENE_EXPRESSION"+is+not+""%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
+    // let queryURL = `${apiUrl}${annotationUrl}`;
+    // let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=SMTS&category_b=ENSG00000180806&comparison=m2g`
+    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${categoricalId}&category_b=${numericId}&comparison=m2g`
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        this.isLoading = false;
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        console.log("bpdata: ", res["boxplot"])
+        this.tempBPData = res["boxplot"]["boxPlotData"];
+        if (this.tempBPData.length === 0) {
+          this.noData = true
+        } else {
+          for (let i = 0; i < this.tempBPData.length; i++) {
+            if (this.tempBPData[i]["value"]["min"] < this.min) {
+              this.min = this.tempBPData[i]["value"]["min"];
+            }
+            if (this.tempBPData[i]["value"]["max"] > this.max) {
+              this.max = this.tempBPData[i]["value"]["max"];
+            }
+            if (!this.xAxisArr.includes(this.tempBPData[i]["key"].toString())) {
+              this.xAxisArr.push(this.tempBPData[i]["key"].toString())
+            }
+          }
+
+          this.createBoxPlot()
+        }
+        this.isLoading = false;
+      })
+  }
+
+  small = true
 
   createBoxPlot() {
     // set the dimensions and margins of the graph
-    var margin = { top: 10, right: 30, bottom: 100, left: 100 },
-      width = 800 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom;
+    // var margin = { top: 10, right: 30, bottom: 100, left: 100 },
+    //   width = 800 - margin.left - margin.right,
+    //   height = 500 - margin.top - margin.bottom;
 
-    d3.select("#my_boxplot")
+    //FOR SMALL SIZE
+    if (this.small = true) {
+      var margin = { top: 5, right: 15, bottom: 50, left: 50 },
+        width = 300 - margin.left - margin.right,
+        height = 230 - margin.top - margin.bottom;
+    } else {
+      var margin = { top: 10, right: 30, bottom: 100, left: 100 },
+        width = 800 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+    }
+
+
+    d3.select(".my_boxplot_" + this.metadataCatId)
       .selectAll('svg')
       .remove();
 
@@ -148,11 +169,11 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .offset([-10, 0])
       .html((event, d) => {
         let tipBox = `<div><div class="category">Name: </div> ${d.key}</div>
-    <div><div class="category">Max: </div> ${d.value.max.toFixed(2)}</div>
+    <div><div class="category">Max: </div> ${d.value.upper_whisker.toFixed(2)}</div>
     <div><div class="category">Q3: </div> ${d.value.q3.toFixed(2)}</div>
     <div><div class="category">Median: </div> ${d.value.median.toFixed(2)}</div>
     <div><div class="category">Q1: </div> ${d.value.q1.toFixed(2)}</div>
-    <div><div class="category">Min: </div> ${d.value.min.toFixed(2)}</div>`
+    <div><div class="category">Min: </div> ${d.value.lower_whisker.toFixed(2)}</div>`
         return tipBox
       });
 
@@ -173,10 +194,12 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       });
 
     // append the svg object to the body of the page
-    var svg = d3.select("#my_boxplot")
+    var svg = d3.select(".my_boxplot_" + this.metadataCatId)
       .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
+      // .attr("width", width + margin.left + margin.right)
+      // .attr("height", height + margin.top + margin.bottom)
+      .attr("width", 300)
+      .attr("height", 230)
       .append("g")
       .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
@@ -189,24 +212,25 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     let tempMax = this.max
 
     // Compute quartiles, median, inter quantile range min and max --> these info are then used to draw the box.
-    this.sumstat = d3Collection.nest() // nest function allows to group the calculation per level of a factor
-      .key(function (d) { return d.key; })
-      .rollup(function (d) {
-        let q1 = d3.quantile(d.map(function (g) { return g.value; }).sort(d3.ascending), .25)
-        let median = d3.quantile(d.map(function (g) { return g.value; }).sort(d3.ascending), .5)
-        let q3 = d3.quantile(d.map(function (g) { return g.value; }).sort(d3.ascending), .75)
-        let interQuantileRange = q3 - q1
-        let min = q1 - 1.5 * interQuantileRange
-        let max = q3 + 1.5 * interQuantileRange
+    // this.sumstat = d3Collection.nest() // nest function allows to group the calculation per level of a factor
+    //   .key(function (d) { return d.key; })
+    //   .rollup(function (d) {
+    //     let q1 = d3.quantile(d.map(function (g) { return g.value; }).sort(d3.ascending), .25)
+    //     let median = d3.quantile(d.map(function (g) { return g.value; }).sort(d3.ascending), .5)
+    //     let q3 = d3.quantile(d.map(function (g) { return g.value; }).sort(d3.ascending), .75)
+    //     let interQuantileRange = q3 - q1
+    //     let min = q1 - 1.5 * interQuantileRange
+    //     let max = q3 + 1.5 * interQuantileRange
 
-        tempMin = Math.min(min, tempMin)
-        tempMax = Math.max(max, tempMax)
-        return ({ q1: q1, median: median, q3: q3, interQuantileRange: interQuantileRange, min: min, max: max })
-      })
-      .entries(this.boxPlotData)
+    //     tempMin = Math.min(min, tempMin)
+    //     tempMax = Math.max(max, tempMax)
+    //     return ({ q1: q1, median: median, q3: q3, interQuantileRange: interQuantileRange, min: min, max: max })
+    //   })
+    //   .entries(this.boxPlotData)
+    this.sumstat = this.tempBPData
 
-      console.log("boxplot data: ", this.boxPlotData)
-    this.min = tempMin > 0 ? tempMin * .8 : tempMin * 1.2;
+    this.min = tempMin > 0 ? tempMin * .8 : (tempMin != 0 ? tempMin * 1.2 : -(this.max / 4));
+
 
     if (this.sumstat.length > 12) {
       this.sumstat.sort((b, a) => b.value.median - a.value.median)
@@ -229,6 +253,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .call(d3.axisBottom(x))
       .selectAll("text")
       .style("text-anchor", "middle")
+      .style("font-size", "4px") //only for small size
       .call(wrap, width / this.xAxisArr.length)
 
     // Show the Y scale
@@ -245,13 +270,14 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .append("line")
       .attr("x1", function (d) { return (x(d.key)) })
       .attr("x2", function (d) { return (x(d.key)) })
-      .attr("y1", function (d) { return (y(d.value.min)) })
-      .attr("y2", function (d) { return (y(d.value.max)) })
+      .attr("y1", function (d) { return (y(d.value.lower_whisker)) })
+      .attr("y2", function (d) { return (y(d.value.upper_whisker)) })
       .attr("stroke", "black")
       .style("width", 40)
 
     // // rectangle for the main box
-    var boxWidth = 20
+    // var boxWidth = 20
+    var boxWidth = 10
     svg
       .selectAll("boxes")
       .data(this.sumstat)
@@ -292,8 +318,9 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         .attr('dy', '.71em')
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
-        .style('font-size', '8px')
-        .text(this.metadataNumId)
+        // .style('font-size', '8px')
+        .style('font-size', '4px')
+        // .text(this.metadataNumId)
         .text(this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 50) + "...")
         .on('mouseover', function (mouseEvent: any) {
           yAxisTip.show(mouseEvent, this);
@@ -314,9 +341,10 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         .attr('dy', '.71em')
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
-        .style('font-size', '12px')
+        // .style('font-size', '12px')
+        .style('font-size', '6px')
         // .text(this.metadataNumId)
-        .text(this.metadataLookUp[this.metadataNumId].vardesc[0])
+        .text(this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "...")
 
     }
 
@@ -341,7 +369,8 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         .attr('y', height + margin.bottom - 10)
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
-        .style('font-size', '8px')
+        // .style('font-size', '8px')
+        .style('font-size', '4px')
         // .text(this.metadataCatId)
         .text(this.metadataLookUp[this.metadataCatId].vardesc[0].slice(0, 50) + "...")
         .on('mouseover', function (mouseEvent: any) {
@@ -362,9 +391,10 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         .attr('y', height + margin.bottom - 10)
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
-        .style('font-size', '12px')
+        // .style('font-size', '12px')
+        .style('font-size', '6px')
         .text(this.getXAxisLabelNames())
-        // .text(this.typeOfLookUp === 'mcc' ? this.metadataLookUp[this.metadataCatId].vardesc[0] : this.symbolId === undefined ? this.metadataCatId : this.symbolId);
+      // .text(this.typeOfLookUp === 'mcc' ? this.metadataLookUp[this.metadataCatId].vardesc[0] : this.symbolId === undefined ? this.metadataCatId : this.symbolId);
     }
 
     function wrap(text, width) {

@@ -15,10 +15,8 @@ import tissuesJson from './tissueList.json';
 
 export class DashboardComponent implements OnInit {
   searchValue = '';
-  metadataId = 'SME2MPRT';
-  // metadataId = 'SMATSSCR';
-  // metadataId = 'SMUBRID'
-  metadata2Id = ''
+  metadataId = 'SMUBRID';
+  metadata2Id = 'ENSG00000180806'
   geneId = '';
   symbolId = '';
   symbolId2 = '';
@@ -27,7 +25,6 @@ export class DashboardComponent implements OnInit {
   displayHeatmap = false;
   currMetadataType = ''
   metadataLookUp = {};
-
 
   notIncludeList = ["SUBJID", "AGE", "SAMPID", "SMRIN"]
   isLoading = false;
@@ -64,6 +61,7 @@ export class DashboardComponent implements OnInit {
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
+
     this.tissueList = tissuesJson;
     this.searchValue = '';
     this.tableFromSearch = false;
@@ -74,6 +72,7 @@ export class DashboardComponent implements OnInit {
 
     this.getListOfMetadata();
     // this.getG2GComparisonStats();
+
     this.getM2MComparisonStats();
   }
 
@@ -105,12 +104,12 @@ export class DashboardComponent implements OnInit {
       })
 
   }
-  metadataIdForGraph = ""
+  // metadataIdForGraph = ""
   // currMetadata = "SMATSSCR"
   getM2MComparisonStats() {
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `m2m/statistics?category_a=${this.metadataId}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
-    let queryURL = `${apiUrl}${annotationUrl}`; 
+    let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         console.log("Error: ", error);
@@ -131,7 +130,7 @@ export class DashboardComponent implements OnInit {
           }
           this.dataSourceM2M.push(temp);
         }
-        this.metadataIdForGraph = this.metadataId;
+        // this.metadataIdForGraph = this.metadataId;
       })
 
   }
@@ -149,7 +148,6 @@ export class DashboardComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        // console.log("metadata: ", res)
         for (let i in res) {
           let temp = {
             "varname": res[i][0],
@@ -161,7 +159,9 @@ export class DashboardComponent implements OnInit {
           this.metadataArr.push(temp)
           this.metadataLookUp[res[i][0]] = temp
         }
-        console.log("lookup: ", this.metadataLookUp)
+        console.log("cat type: ", this.checkPlotType("SMTSD"))
+        console.log("num type: ", this.checkPlotType("ENSG00000207776"))
+        // console.log("num type: ", this.checkPlotType("SMCHMPRS"))
       })
   }
 
@@ -227,7 +227,7 @@ export class DashboardComponent implements OnInit {
     this.geneSearch()
   }
 
-  
+
 
   fromChild(value) {
     this.displayScatterPlot = false;
@@ -243,7 +243,6 @@ export class DashboardComponent implements OnInit {
   }
 
   changeMetadata(name) {
-    console.log("changemeta: ", name)
     // d3.select("#my_plotArea")
     //   .selectAll('div')
     //   .remove();
@@ -255,5 +254,16 @@ export class DashboardComponent implements OnInit {
     this.getM2MComparisonStats();
     window.scrollTo(0, 0);
 
+  }
+
+  checkPlotType(name: string) {
+    if (name.startsWith("ENSG")) {
+      return "numeric"
+    }
+    else if (this.metadataLookUp[name]['type'] === 'string' || this.metadataLookUp[name]['type'] === 'integer, encoded value') {
+      return "categoric"
+    } else {
+      return "numeric"
+    }
   }
 }
