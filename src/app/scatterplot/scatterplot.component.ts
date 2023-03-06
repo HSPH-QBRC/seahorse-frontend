@@ -1,9 +1,10 @@
 import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
-import { TestBed } from '@angular/core/testing';
+declare const matplotlib: any;
+import io from 'buffer';
 
 @Component({
   selector: 'app-scatterplot',
@@ -25,7 +26,11 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   offset = 0;
   lengthOfResult = 0;
 
+  noData = false;
+
   imageUrl = ""
+  imagePng
+  imageBase64
 
   constructor(private httpClient: HttpClient) { }
 
@@ -52,9 +57,10 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     this.isLoading = true;
     let numerical1 = this.metadataId;
     let numerical2 = this.metadata2Id;
-    console.log("num1/num2: ", numerical1, numerical2)
+    // console.log("num1/num2: ", numerical1, numerical2)
     this.refreshData();
     if (this.typeOfLookUp === 'mcc') {
+      console.log("type = mcc")
       this.getDataMCC(numerical1, numerical2)
     } else if (this.typeOfLookUp === 'm2g') {
       this.getDataM2G(numerical1, numerical2)
@@ -70,22 +76,46 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   yMax = -Infinity
 
   getDataMCC(numerical1, numerical2) {
-    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numerical1}%2C%0D%0A++${numerical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numerical1}+is+not+""%0D%0A++AND+${numerical2}+is+not+""%0D%0A`
-    // let queryURL = `${apiUrl}${annotationUrl}`;
+    const headers = new HttpHeaders().set('Accept', 'image/png');
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${this.metadataId}&category_b=${this.metadata2Id}&comparison=m2m`
-    this.httpClient.get(queryURL).pipe(
+    this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
         this.isLoading = false;
         throw message
       }))
-      .subscribe(res => {
-        console.log("mcc scatterplot res: ", res["url"])
-        this.imageUrl = res["url"]
-        // console.log("scatter: ", res['rows'])
+      // .subscribe(res => {
+        
+      //   const blob = new Blob([res], { type: 'image/png' });
+      //   const reader = new FileReader();
+      //   reader.readAsDataURL(blob);
+      //   reader.onloadend = () => {
+      //     console.log('Image loaded successfully');
+      //     this.imageBase64 = reader.result as string;
+      //   };
+      //   this.isLoading = false;
+      // })
+      .subscribe(dataUrl => {
         this.isLoading = false;
+        this.imageBase64 = `data:image/png;base64,${dataUrl}`
+      });
+  }
+
+  getDataM2G(numMetadata, numGene) {
+    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${numMetadata}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+is+"${numGene}"%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        this.isLoading = false;
+        console.log("from m2g")
         // for (let i = 0; i < res['rows'].length; i++) {
         //   if (res['rows'][i][1] < this.xMin) {
         //     this.xMin = res['rows'][i][1];
@@ -108,53 +138,14 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
 
         //   this.scatterPlotData.push(temp);
         // }
-        // this.createScatterPlot()
-      })
+        // this.lengthOfResult = res['rows'].length;
+        // this.offset += this.limit
+        // if (this.lengthOfResult > 0) {
+        //   this.getDataM2G(numMetadata, numGene)
+        // } else {
 
-  }
-
-  getDataM2G(numMetadata, numGene) {
-    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${numMetadata}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+is+"${numGene}"%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
-    let queryURL = `${apiUrl}${annotationUrl}`;
-
-    this.httpClient.get(queryURL).pipe(
-      catchError(error => {
-        console.log("Error: ", error);
-        let message = `Error: ${error.error.error}`;
-        throw message
-      }))
-      .subscribe(res => {
-        for (let i = 0; i < res['rows'].length; i++) {
-          if (res['rows'][i][1] < this.xMin) {
-            this.xMin = res['rows'][i][1];
-          }
-          if (res['rows'][i][1] > this.xMax) {
-            this.xMax = res['rows'][i][1];
-          }
-          if (res['rows'][i][2] < this.yMin) {
-            this.yMin = res['rows'][i][2];
-          }
-          if (res['rows'][i][2] > this.yMax) {
-            this.yMax = res['rows'][i][2];
-          }
-
-          let temp = {
-            'name': res['rows'][i][0],
-            'xValue': res['rows'][i][1],
-            'yValue': res['rows'][i][2]
-          };
-
-          this.scatterPlotData.push(temp);
-        }
-        this.lengthOfResult = res['rows'].length;
-        this.offset += this.limit
-        if (this.lengthOfResult > 0) {
-          this.getDataM2G(numMetadata, numGene)
-        } else {
-          this.isLoading = false;
-          this.createScatterPlot();
-        }
+        //   this.createScatterPlot();
+        // }
       })
   }
 
@@ -170,30 +161,31 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
-        for (let i = 0; i < res['rows'].length; i++) {
-          if (res['rows'][i][1] < this.xMin) {
-            this.xMin = res['rows'][i][1];
-          }
-          if (res['rows'][i][1] > this.xMax) {
-            this.xMax = res['rows'][i][1];
-          }
-          if (res['rows'][i][2] < this.yMin) {
-            this.yMin = res['rows'][i][2];
-          }
-          if (res['rows'][i][2] > this.yMax) {
-            this.yMax = res['rows'][i][2];
-          }
+        console.log("from g2g")
+        // for (let i = 0; i < res['rows'].length; i++) {
+        //   if (res['rows'][i][1] < this.xMin) {
+        //     this.xMin = res['rows'][i][1];
+        //   }
+        //   if (res['rows'][i][1] > this.xMax) {
+        //     this.xMax = res['rows'][i][1];
+        //   }
+        //   if (res['rows'][i][2] < this.yMin) {
+        //     this.yMin = res['rows'][i][2];
+        //   }
+        //   if (res['rows'][i][2] > this.yMax) {
+        //     this.yMax = res['rows'][i][2];
+        //   }
 
-          let temp = {
-            'name': res['rows'][i][0],
-            'xValue': res['rows'][i][1],
-            'yValue': res['rows'][i][2]
-          };
+        //   let temp = {
+        //     'name': res['rows'][i][0],
+        //     'xValue': res['rows'][i][1],
+        //     'yValue': res['rows'][i][2]
+        //   };
 
-          this.scatterPlotData.push(temp);
-        }
+        //   this.scatterPlotData.push(temp);
+        // }
         this.isLoading = false;
-        this.createScatterPlot();
+        // this.createScatterPlot();
       })
   }
 

@@ -16,6 +16,7 @@ import tissuesJson from './tissueList.json';
 export class DashboardComponent implements OnInit {
   searchValue = '';
   metadataId = 'SMUBRID';
+  // metadataId = 'SME2MPRT'
   metadata2Id = 'ENSG00000180806'
   geneId = '';
   symbolId = '';
@@ -57,11 +58,12 @@ export class DashboardComponent implements OnInit {
   showPhenotype = true;
   showLibraryMetadata = false;
   showGene = false;
+  m2mTableReady = false;
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
-
+    this.m2mTableReady = false;
     this.tissueList = tissuesJson;
     this.searchValue = '';
     this.tableFromSearch = false;
@@ -104,9 +106,10 @@ export class DashboardComponent implements OnInit {
       })
 
   }
-  // metadataIdForGraph = ""
-  // currMetadata = "SMATSSCR"
+
+
   getM2MComparisonStats() {
+    this.m2mTableReady = false;
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `m2m/statistics?category_a=${this.metadataId}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -118,6 +121,7 @@ export class DashboardComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+
         this.tableSizeM2M = res['count']
         this.dataSourceM2M = [];
         this.isLoading = false;
@@ -130,6 +134,7 @@ export class DashboardComponent implements OnInit {
           }
           this.dataSourceM2M.push(temp);
         }
+        this.m2mTableReady = true
         // this.metadataIdForGraph = this.metadataId;
       })
 
@@ -159,9 +164,6 @@ export class DashboardComponent implements OnInit {
           this.metadataArr.push(temp)
           this.metadataLookUp[res[i][0]] = temp
         }
-        console.log("cat type: ", this.checkPlotType("SMTSD"))
-        console.log("num type: ", this.checkPlotType("ENSG00000207776"))
-        // console.log("num type: ", this.checkPlotType("SMCHMPRS"))
       })
   }
 
@@ -259,8 +261,7 @@ export class DashboardComponent implements OnInit {
   checkPlotType(name: string) {
     if (name.startsWith("ENSG")) {
       return "numeric"
-    }
-    else if (this.metadataLookUp[name]['type'] === 'string' || this.metadataLookUp[name]['type'] === 'integer, encoded value') {
+    } else if (this.metadataLookUp[name]['type'] === 'string' || this.metadataLookUp[name]['type'] === 'integer, encoded value') {
       return "categoric"
     } else {
       return "numeric"

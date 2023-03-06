@@ -25,11 +25,6 @@
         <div class="container sideBarContainer">
             <ul>
                 <div class="pageTitle">Phenotype:</div>
-                <!-- <div *ngFor="let cat of PhenotypeArr">
-                    <li>
-                        <a class="page">{{cat}}</a>
-                    </li>
-                </div> -->
                 <div *ngFor="let cat of metadataArr">
                     <li *ngIf="!notIncludeList.includes(cat.varname)">
                         <!-- <a class="page" >{{cat.vardesc[0]}}</a> -->
@@ -66,7 +61,7 @@
         <h4 (click)="showPhenotype = !showPhenotype">
             <span class="expandObj">{{showPhenotype ? "-":"+"}}</span> Phenotype
         </h4>
-        <div *ngIf="showPhenotype">
+        <div *ngIf="showPhenotype && m2mTableReady && !isLoading">
             <div class="row justify-content-center" *ngIf="metadataLookUp">
                 <div class="testBackground" *ngFor="let i of [0,1,2]">
                     <div
@@ -205,15 +200,13 @@
                     <mat-option [value]="option.name" *ngFor="let option of tissueList">{{ option.name }}</mat-option>
                 </mat-select>
             </mat-form-field>
-            <!-- <div class="row">
+            <div class="row">
                 <div class="searchTitle col-md-12 d-flex justify-content-center">{{symbolId}} </div>
-            </div> -->
+            </div>
 
             <div class="row justify-content-center">
                 <div class="testBackground">
                     <h1>1</h1>
-                    <!-- <app-histogram [metadataId]="metadataId" [geneId]="geneId" [comparisonType]="typeOfLookUp">
-                    </app-histogram> -->
                 </div>
                 <div class="testBackground">
                     <h1>2</h1>
@@ -238,25 +231,11 @@
                 class="hideMessage text-center">
                 There is no data to be displayed.</p>
 
-            <div class="d-flex justify-content-center">
-                <div id="my_plotArea">
-                    <div *ngIf="displayScatterPlot">
-                        <!-- <app-scatterplot [metadataId]="metadataId" [metadata2Id]="geneId"
-                            [metadataLookUp]="metadataLookUp" [typeOfLookUp]="typeOfLookUp" [symbolId]="symbolId"
-                            [symbolId2]="symbolId2"></app-scatterplot> -->
-                    </div>
-                </div>
-            </div>
             <br>
             <br>
 
             <div class="d-flex justify-content-center">
                 <table mat-table [dataSource]="dataSourceG2G" class="mat-elevation-z8" *ngIf="dataSourceG2G.length > 0">
-                    <!-- <ng-container matColumnDef="gene">
-                        <th mat-header-cell *matHeaderCellDef> Gene </th>
-                        <td class="metaColumn" mat-cell *matCellDef="let element" (click)="onSelectMetadata2(element.gene, element.symbol)">
-                            {{element.gene}}</td>
-                    </ng-container> -->
                     <ng-container matColumnDef="symbol">
                         <th mat-header-cell *matHeaderCellDef> Symbol </th>
                         <td class="metaColumn" mat-cell *matCellDef="let element"

@@ -2,6 +2,10 @@
 <app-progress-spinner *ngIf="isLoading"></app-progress-spinner>
 <div id="my_scatterplot"></div>
 <div class="imgDiv">
-    <img [src]="this.imageUrl">
+    <!-- <img [src]="this.imageUrl"> -->
+    <img [src]="this.imageBase64">
+</div>
+<div *ngIf="noData">
+    <div class="noData_description">No Data to display for Heatmap</div>
 </div>
 

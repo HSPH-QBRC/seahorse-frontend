@@ -76,6 +76,7 @@ export class Heatmap2Component implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
+        console.log("heatmap res: ", res, categorical1, categorical2)
         this.isLoading = false;
         // for (let i = 0; i < res['rows'].length; i++) {
         //   let name = res['rows'][i][0];
