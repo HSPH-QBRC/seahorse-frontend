@@ -73,6 +73,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
+        console.log("bp data: ", res["boxplot"])
         this.tempBPData = res["boxplot"]["boxPlotData"]
         this.isLoading = false;
         if (this.tempBPData.length === 0) {

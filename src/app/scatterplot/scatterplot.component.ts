@@ -17,7 +17,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   @Input() metadataId = '';
   @Input() metadata2Id = '';
   @Input() metadataLookUp = {};
-  @Input() typeOfLookUp = 'mcc';
+  @Input() typeOfLookUp = '';
   @Input() symbolId = '';
   @Input() symbolId2 = '';
 
@@ -26,30 +26,21 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   offset = 0;
   lengthOfResult = 0;
 
+  scatterPlotData = [];
+  xMin = Infinity;
+  xMax = -Infinity;
+  yMin = Infinity;
+  yMax = -Infinity;
+
   noData = false;
 
-  imageUrl = ""
-  imagePng
-  imageBase64
+  imageUrl = "";
+  imagePng = "";
+  imageBase64 = "";
 
   constructor(private httpClient: HttpClient) { }
 
-  ngOnInit(): void {
-    // this.offset = 0;
-    // this.lengthOfResult = 0;
-    // this.isLoading = true;
-    // let numerical1 = this.metadataId;
-    // let numerical2 = this.metadata2Id
-    // this.refreshData();
-    // if (this.typeOfLookUp === 'mcc') {
-    //   this.getDataMCC(numerical1, numerical2)
-    // } else if (this.typeOfLookUp === 'm2g') {
-    //   this.getDataM2G(numerical1, numerical2)
-    // } else if (this.typeOfLookUp === 'g2g') {
-    //   this.getDataG2G(numerical1, numerical2)
-    // }
-
-  }
+  ngOnInit(): void { }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.offset = 0;
@@ -57,11 +48,9 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     this.isLoading = true;
     let numerical1 = this.metadataId;
     let numerical2 = this.metadata2Id;
-    // console.log("num1/num2: ", numerical1, numerical2)
     this.refreshData();
-    if (this.typeOfLookUp === 'mcc') {
-      console.log("type = mcc")
-      this.getDataMCC(numerical1, numerical2)
+    if (this.typeOfLookUp === 'm2m') {
+      this.getDataM2M(numerical1, numerical2)
     } else if (this.typeOfLookUp === 'm2g') {
       this.getDataM2G(numerical1, numerical2)
     } else if (this.typeOfLookUp === 'g2g') {
@@ -69,15 +58,9 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     }
   }
 
-  scatterPlotData = [];
-  xMin = Infinity
-  xMax = -Infinity
-  yMin = Infinity
-  yMax = -Infinity
-
-  getDataMCC(numerical1, numerical2) {
+  getDataM2M(numerical1, numerical2) {
     const headers = new HttpHeaders().set('Accept', 'image/png');
-    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${this.metadataId}&category_b=${this.metadata2Id}&comparison=m2m`
+    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numerical1}&category_b=${numerical2}&comparison=${this.typeOfLookUp}`
     this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
         console.log("Error: ", error);
@@ -85,107 +68,82 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         this.isLoading = false;
         throw message
       }))
-      // .subscribe(res => {
-        
-      //   const blob = new Blob([res], { type: 'image/png' });
-      //   const reader = new FileReader();
-      //   reader.readAsDataURL(blob);
-      //   reader.onloadend = () => {
-      //     console.log('Image loaded successfully');
-      //     this.imageBase64 = reader.result as string;
-      //   };
-      //   this.isLoading = false;
-      // })
       .subscribe(dataUrl => {
         this.isLoading = false;
         this.imageBase64 = `data:image/png;base64,${dataUrl}`
       });
   }
 
-  getDataM2G(numMetadata, numGene) {
-    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${numMetadata}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+is+"${numGene}"%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
-    let queryURL = `${apiUrl}${annotationUrl}`;
-
-    this.httpClient.get(queryURL).pipe(
+  getDataM2G(numGene, numMetadata) {
+    // console.log("m2g scatter: ", numMetadata, numGene)
+    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    // let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${numMetadata}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+is+"${numGene}"%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
+    // let queryURL = `${apiUrl}${annotationUrl}`;
+    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numMetadata}&category_b=${numGene}&comparison=${this.typeOfLookUp}`
+    this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
+        this.isLoading = false;
         throw message
       }))
-      .subscribe(res => {
+      .subscribe(dataUrl => {
         this.isLoading = false;
-        console.log("from m2g")
-        // for (let i = 0; i < res['rows'].length; i++) {
-        //   if (res['rows'][i][1] < this.xMin) {
-        //     this.xMin = res['rows'][i][1];
-        //   }
-        //   if (res['rows'][i][1] > this.xMax) {
-        //     this.xMax = res['rows'][i][1];
-        //   }
-        //   if (res['rows'][i][2] < this.yMin) {
-        //     this.yMin = res['rows'][i][2];
-        //   }
-        //   if (res['rows'][i][2] > this.yMax) {
-        //     this.yMax = res['rows'][i][2];
-        //   }
+        this.imageBase64 = `data:image/png;base64,${dataUrl}`
 
-        //   let temp = {
-        //     'name': res['rows'][i][0],
-        //     'xValue': res['rows'][i][1],
-        //     'yValue': res['rows'][i][2]
-        //   };
-
-        //   this.scatterPlotData.push(temp);
-        // }
-        // this.lengthOfResult = res['rows'].length;
-        // this.offset += this.limit
-        // if (this.lengthOfResult > 0) {
-        //   this.getDataM2G(numMetadata, numGene)
-        // } else {
-
-        //   this.createScatterPlot();
-        // }
       })
   }
 
   getDataG2G(numerical1, numerical2) {
-    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++t1.SAMPID%2C%0D%0A++t1.GENE_EXPRESSION+as+GENE_EXPRESSION_1%2C%0D%0A++t2.GENE_EXPRESSION+as+GENE_EXPRESSION_2%0D%0Afrom%0D%0A++expression+t1%2C%0D%0A++expression+t2%0D%0Awhere%0D%0A++t1.sampid+%3D+t2.sampid%0D%0A++AND+t1.ENSG+%3D+"${numerical1}"%0D%0A++AND+t2.ENSG+%3D+"${numerical2}"`
-    let queryURL = `${apiUrl}${annotationUrl}`;
+    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    // let annotationUrl = `sql=select%0D%0A++t1.SAMPID%2C%0D%0A++t1.GENE_EXPRESSION+as+GENE_EXPRESSION_1%2C%0D%0A++t2.GENE_EXPRESSION+as+GENE_EXPRESSION_2%0D%0Afrom%0D%0A++expression+t1%2C%0D%0A++expression+t2%0D%0Awhere%0D%0A++t1.sampid+%3D+t2.sampid%0D%0A++AND+t1.ENSG+%3D+"${numerical1}"%0D%0A++AND+t2.ENSG+%3D+"${numerical2}"`
+    // let queryURL = `${apiUrl}${annotationUrl}`;
 
-    this.httpClient.get(queryURL).pipe(
+    // this.httpClient.get(queryURL).pipe(
+    //   catchError(error => {
+    //     console.log("Error: ", error);
+    //     let message = `Error: ${error.error.error}`;
+    //     throw message
+    //   }))
+    //   .subscribe(res => {
+    //     console.log("from g2g")
+    //     // for (let i = 0; i < res['rows'].length; i++) {
+    //     //   if (res['rows'][i][1] < this.xMin) {
+    //     //     this.xMin = res['rows'][i][1];
+    //     //   }
+    //     //   if (res['rows'][i][1] > this.xMax) {
+    //     //     this.xMax = res['rows'][i][1];
+    //     //   }
+    //     //   if (res['rows'][i][2] < this.yMin) {
+    //     //     this.yMin = res['rows'][i][2];
+    //     //   }
+    //     //   if (res['rows'][i][2] > this.yMax) {
+    //     //     this.yMax = res['rows'][i][2];
+    //     //   }
+
+    //     //   let temp = {
+    //     //     'name': res['rows'][i][0],
+    //     //     'xValue': res['rows'][i][1],
+    //     //     'yValue': res['rows'][i][2]
+    //     //   };
+
+    //     //   this.scatterPlotData.push(temp);
+    //     // }
+    //     this.isLoading = false;
+    //     // this.createScatterPlot();
+    //   })
+    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numerical1}&category_b=${numerical2}&comparison=${this.typeOfLookUp}`
+    this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
+        this.isLoading = false;
         throw message
       }))
-      .subscribe(res => {
-        console.log("from g2g")
-        // for (let i = 0; i < res['rows'].length; i++) {
-        //   if (res['rows'][i][1] < this.xMin) {
-        //     this.xMin = res['rows'][i][1];
-        //   }
-        //   if (res['rows'][i][1] > this.xMax) {
-        //     this.xMax = res['rows'][i][1];
-        //   }
-        //   if (res['rows'][i][2] < this.yMin) {
-        //     this.yMin = res['rows'][i][2];
-        //   }
-        //   if (res['rows'][i][2] > this.yMax) {
-        //     this.yMax = res['rows'][i][2];
-        //   }
-
-        //   let temp = {
-        //     'name': res['rows'][i][0],
-        //     'xValue': res['rows'][i][1],
-        //     'yValue': res['rows'][i][2]
-        //   };
-
-        //   this.scatterPlotData.push(temp);
-        // }
+      .subscribe(dataUrl => {
         this.isLoading = false;
-        // this.createScatterPlot();
+        this.imageBase64 = `data:image/png;base64,${dataUrl}`
+
       })
   }
 
@@ -275,7 +233,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       .on('mouseout', pointTip.hide);
 
     //Y-Axis labels
-    if (this.typeOfLookUp === 'mcc' && this.metadataLookUp[this.metadata2Id].vardesc[0].length > 50) {
+    if (this.typeOfLookUp === 'm2m' && this.metadataLookUp[this.metadata2Id].vardesc[0].length > 50) {
       svg.append('text')
         .classed('label', true)
         .attr('transform', 'rotate(-90)')
@@ -308,7 +266,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         .style('text-anchor', 'middle')
         .style('font-size', '12px')
         .text(this.getYAxisLabelNames())
-      // .text(this.typeOfLookUp === 'mcc' ? this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50) : this.symbolId === undefined ? this.metadata2Id : this.symbolId);
+      // .text(this.typeOfLookUp === 'm2m' ? this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50) : this.symbolId === undefined ? this.metadata2Id : this.symbolId);
     }
 
 
@@ -357,7 +315,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
 
   getYAxisLabelNames() {
     switch (this.typeOfLookUp) {
-      case 'mcc':
+      case 'm2m':
         return this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50)
       case 'm2g':
         return this.symbolId === undefined ? this.metadata2Id : this.symbolId
@@ -370,7 +328,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
 
   getXAxisLabelNames() {
     switch (this.typeOfLookUp) {
-      case 'mcc':
+      case 'm2m':
         return this.metadataLookUp[this.metadataId].vardesc[0].slice(0, 50)
       case 'm2g':
         return this.metadataLookUp[this.metadataId].vardesc[0].slice(0, 50)

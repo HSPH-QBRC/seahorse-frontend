@@ -14,6 +14,11 @@ import tissuesJson from './tissueList.json';
 })
 
 export class DashboardComponent implements OnInit {
+  //for m2g test ids
+  test_id1 ="ENSG00000188976"
+  test_id2 ="SME2MPRT"
+  // test_id1 ="ENSG00000188976"
+  // test_id2 ="ENSG00000000457"
   searchValue = '';
   metadataId = 'SMUBRID';
   // metadataId = 'SME2MPRT'
@@ -29,11 +34,12 @@ export class DashboardComponent implements OnInit {
 
   notIncludeList = ["SUBJID", "AGE", "SAMPID", "SMRIN"]
   isLoading = false;
-  typeOfLookUp = 'mcc'
+  typeOfLookUp = 'm2g'
   currPage = 0;
   limit = 10;
   tableSizeG2G = 0;
   tableSizeM2M = 0;
+  tableSizeG2M = 0;
   tableSize = 0;
   plotTypeLookUp = {};
   geneType = 'integer';
@@ -43,6 +49,7 @@ export class DashboardComponent implements OnInit {
   //For the Comparison table
   dataSourceG2G = [];
   dataSourceM2M = [];
+  dataSourceG2M = [];
   displayedColumnsG2G: string[] = ['symbol', 'correlation', 'entrezid'];
 
   tissue = 'Bladder';
@@ -54,15 +61,20 @@ export class DashboardComponent implements OnInit {
   LibraryMetadataArr = ["RIN Number", "Source"]
 
   displayedColumnsM2M: string[] = ['category_b', 'test', 'test_statistics', 'pvalue'];
+  displayedColumnsG2M: string[] = ['category_b', 'test', 'test_statistics', 'pvalue'];
 
   showPhenotype = true;
   showLibraryMetadata = false;
   showGene = false;
   m2mTableReady = false;
+  g2mTableReady = false;
+  layoutType = ""
 
   constructor(private httpClient: HttpClient) { }
 
   ngOnInit(): void {
+    this.layoutType = this.metadataId.startsWith("ENSG") ? "gene" : "metadata"
+    console.log(this.layoutType)
     this.m2mTableReady = false;
     this.tissueList = tissuesJson;
     this.searchValue = '';
@@ -74,8 +86,14 @@ export class DashboardComponent implements OnInit {
 
     this.getListOfMetadata();
     // this.getG2GComparisonStats();
-
-    this.getM2MComparisonStats();
+    if(this.layoutType ===  "metadata"){
+      this.typeOfLookUp = "m2m"
+      this.getM2MComparisonStats();
+    }else if(this.layoutType ===  "gene"){
+      this.typeOfLookUp = "g2m"
+      this.getG2MComparisonStats();
+    }
+    
   }
 
   getG2GComparisonStats() {
@@ -140,6 +158,38 @@ export class DashboardComponent implements OnInit {
 
   }
 
+  getG2MComparisonStats() {
+    this.g2mTableReady = false;
+    let apiUrl = "https://api.seahorse.tm4.org/";
+    let annotationUrl = `g2m/statistics?category_a=${this.metadataId}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        this.isLoading = false;
+        throw message
+      }))
+      .subscribe(res => {
+        console.log("g2m res: ", res, this.metadataId)
+        this.tableSizeG2M = res['count']
+        this.dataSourceG2M = [];
+        this.isLoading = false;
+        for (let index in res['result']) {
+          let temp = {
+            "category_b": res['result'][index][0],
+            "test": res['result'][index][2],
+            'test_statistics': res['result'][index][3],
+            'pvalue': res['result'][index][4]
+          }
+          this.dataSourceG2M.push(temp);
+        }
+        this.g2mTableReady = true
+        // this.metadataIdForGraph = this.metadataId;
+      })
+
+  }
+
   metadataArr = [];
 
   getListOfMetadata() {
@@ -153,6 +203,7 @@ export class DashboardComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        console.log("list of meta: ", res)
         for (let i in res) {
           let temp = {
             "varname": res[i][0],
@@ -220,7 +271,8 @@ export class DashboardComponent implements OnInit {
 
     this.geneId = this.searchValue !== '' ? this.searchValue : this.geneId;
     // this.getTableSize()
-    this.getG2GComparisonStats()
+    this.getG2MComparisonStats();
+    // this.getG2GComparisonStats()
 
   }
 
@@ -241,10 +293,15 @@ export class DashboardComponent implements OnInit {
     let endGene = value.indexOf(")")
     let newstring = value.slice(startGene + 1, endGene)
     this.searchValue = newstring;
+
+    this.layoutType = "gene"
+    this.metadataId = this.searchValue;
+    
     this.geneSearch()
   }
 
   changeMetadata(name) {
+    this.layoutType = "metadata"
     // d3.select("#my_plotArea")
     //   .selectAll('div')
     //   .remove();
