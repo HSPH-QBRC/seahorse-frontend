@@ -1,6 +1,6 @@
 
 <app-progress-spinner *ngIf="isLoading"></app-progress-spinner>
-<div [className]="'my_boxplot_' + metadataCatId"></div>
+<div [className]="'my_boxplot_' + metadataCatId +'_'+ metadataNumId.split('.')[0]"></div>
 <div *ngIf="noData">
     <div class="noData_description">No Data to display for Boxplot</div>
 </div>

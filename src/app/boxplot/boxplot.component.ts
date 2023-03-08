@@ -60,9 +60,8 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   tempBPData = [];
 
   getDataMCC(numericId, categoricalId) {
-    console.log("mcc: ", numericId, categoricalId)
-    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numericId}%2C%0D%0A++${categoricalId}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numericId}+is+not+""%0D%0A++AND+${categoricalId}+is+not+""%0D%0A`
+    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numericId}%2C%0D%0A++${categoricalId}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numericId}+is+not+""%0D%0A++AND+${categoricalId}+is+not+""%0D%0A`
     // let queryURL = `${apiUrl}${annotationUrl}`;
     // let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=SMTS&category_b=SMEXPEFF&comparison=m2m`
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numericId}&category_b=${categoricalId}&comparison=m2m`
@@ -73,7 +72,6 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
-        console.log("bp data: ", res["boxplot"])
         this.tempBPData = res["boxplot"]["boxPlotData"]
         this.isLoading = false;
         if (this.tempBPData.length === 0) {
@@ -104,7 +102,6 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   }
   noData = false
   getDataM2G(numericId, categoricalId) {
-    console.log("m2g: ", numericId, categoricalId)
     let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${categoricalId}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+like+"${numericId}%"%0D%0A++AND+"${categoricalId}"+is+not+""%0D%0A++AND+"GENE_EXPRESSION"+is+not+""%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
     // let queryURL = `${apiUrl}${annotationUrl}`;
@@ -118,7 +115,6 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
-        console.log("bpdata: ", res["boxplot"])
         this.tempBPData = res["boxplot"]["boxPlotData"];
         if (this.tempBPData.length === 0) {
           this.noData = true
@@ -134,7 +130,6 @@ export class BoxPlotComponent implements OnInit, OnChanges {
               this.xAxisArr.push(this.tempBPData[i]["key"].toString())
             }
           }
-
           this.createBoxPlot()
         }
         this.isLoading = false;
@@ -195,7 +190,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       });
 
     // append the svg object to the body of the page
-    var svg = d3.select(".my_boxplot_" + this.metadataCatId)
+    var svg = d3.select(".my_boxplot_" + this.metadataCatId + "_"+ this.metadataNumId.split(".")[0])
       .append("svg")
       // .attr("width", width + margin.left + margin.right)
       // .attr("height", height + margin.top + margin.bottom)
@@ -345,7 +340,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         // .style('font-size', '12px')
         .style('font-size', '6px')
         // .text(this.metadataNumId)
-        .text(this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "...")
+        .text(this.typeOfLookUp === 'm2g' ? '': this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "...")
 
     }
 

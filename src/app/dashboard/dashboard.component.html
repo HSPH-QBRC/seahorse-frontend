@@ -74,7 +74,7 @@
                     </div>
                 </div>
                 <div class="row justify-content-center">
-                    <div class="testBackground" *ngFor="let i of [3,4,5]">
+                    <!-- <div class="testBackground" *ngFor="let i of [3,4,5]">
                         <div
                             *ngIf="checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric'">
                             <app-scatterplot [metadataId]="metadataId"
@@ -92,7 +92,7 @@
                                 [metadataLookUp]="metadataLookUp">
                             </app-boxplot>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <br>
                 <div class="d-flex justify-content-center">
@@ -128,45 +128,28 @@
             <div *ngIf="showPhenotype && g2mTableReady && !isLoading">
                 <div class="row justify-content-center" *ngIf="metadataLookUp">
                     <div class="testBackground" *ngFor="let i of [0,1,2]">
-                        <!-- <div *ngIf="checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric'">
-                            <h2>should be a scatter plot</h2>
+                        <div *ngIf="checkPlotType(dataSourceG2M[i]['category_b']) === 'numeric'">
                             <app-scatterplot [metadataId]="metadataId"
-                                [metadata2Id]='this.dataSourceM2M[i]["category_b"]' [metadataLookUp]="metadataLookUp"
-                                [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
-                        </div> -->
-                        <app-scatterplot [metadataId]="test_id1" [metadata2Id]='test_id2'
-                            [metadataLookUp]="metadataLookUp"
-                            [typeOfLookUp]="'g2g'"></app-scatterplot>
-                        <!-- <div
-                            *ngIf="checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric'">
-                            <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[i]["category_b"]'
-                                [metadataLookUp]="metadataLookUp"></app-heatmap2>
-                        </div> -->
-                        <!-- <div
-                            *ngIf="checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric'">
-                            <app-boxplot [metadataCatId]="dataSourceM2M[i]['category_b']" [metadataNumId]="metadataId"
-                                [metadataLookUp]="metadataLookUp">
+                                [metadata2Id]='this.dataSourceG2M[i]["category_b"]' [metadataLookUp]="metadataLookUp"
+                                [typeOfLookUp]="'m2g'"></app-scatterplot>
+                        </div>
+                        <div *ngIf="checkPlotType(dataSourceG2M[i]['category_b']) === 'categoric'">
+                            <app-boxplot [metadataCatId]="metadataId" [metadataNumId]="dataSourceG2M[i]['category_b']"
+                                [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'">
                             </app-boxplot>
-                        </div> -->
+                        </div>
                     </div>
                 </div>
-                <!-- <div class="row justify-content-center">
+                <!-- <div class="row justify-content-center" *ngIf="metadataLookUp">
                     <div class="testBackground" *ngFor="let i of [3,4,5]">
-                        <div
-                            *ngIf="checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric'">
+                        <div *ngIf="checkPlotType(dataSourceG2M[i]['category_b']) === 'numeric'">
                             <app-scatterplot [metadataId]="metadataId"
-                                [metadata2Id]='this.dataSourceM2M[i]["category_b"]' [metadataLookUp]="metadataLookUp"
-                                [typeOfLookUp]="typeOfLookUp"></app-scatterplot>
+                                [metadata2Id]='this.dataSourceG2M[i]["category_b"]' [metadataLookUp]="metadataLookUp"
+                                [typeOfLookUp]="'m2g'"></app-scatterplot>
                         </div>
-                        <div
-                            *ngIf="checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric'">
-                            <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[i]["category_b"]'
-                                [metadataLookUp]="metadataLookUp"></app-heatmap2>
-                        </div>
-                        <div
-                            *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric') || (checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric')">
-                            <app-boxplot [metadataCatId]="dataSourceM2M[i]['category_b']" [metadataNumId]="metadataId"
-                                [metadataLookUp]="metadataLookUp">
+                        <div *ngIf="checkPlotType(dataSourceG2M[i]['category_b']) === 'categoric'">
+                            <app-boxplot [metadataCatId]="metadataId" [metadataNumId]="dataSourceG2M[i]['category_b']"
+                                [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'">
                             </app-boxplot>
                         </div>
                     </div>
@@ -264,76 +247,162 @@
             <span class="expandObj">{{showGene ? "-":"+"}}</span> Gene
         </h4>
         <br>
-        <div *ngIf="showGene">
-            <mat-form-field appearance="outline" class="d-flex container dropDown">
-                <mat-label>Tissue</mat-label>
-                <mat-select [(value)]="tissue" (selectionChange)="onDropDownChange($event.value)">
-                    <mat-option [value]="option.name" *ngFor="let option of tissueList">{{ option.name }}</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <div class="row">
-                <div class="searchTitle col-md-12 d-flex justify-content-center">{{symbolId}} </div>
+        <div *ngIf="layoutType === 'metadata'">
+            <div *ngIf="showGene && m2gTableReady && !isLoading">
+                <!-- <h1>This is the M2G data</h1> -->
+                <div *ngIf="showGene">
+                    <mat-form-field appearance="outline" class="d-flex container dropDown">
+                        <mat-label>Tissue</mat-label>
+                        <mat-select [(value)]="tissue" (selectionChange)="onDropDownChange($event.value)">
+                            <mat-option [value]="option.name" *ngFor="let option of tissueList">{{ option.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <div class="row">
+                        <div class="searchTitle col-md-12 d-flex justify-content-center">{{symbolId}} </div>
+                    </div>
+
+                    <div class="row justify-content-center" *ngIf="metadataLookUp">
+                        <div class="testBackground" *ngFor="let i of [0,1,2]">
+                            <div *ngIf="checkPlotType(metadataId) === 'numeric'">
+                                <app-scatterplot [metadata2Id]="metadataId" [metadataId]='this.dataSourceM2G[i]["gene"]'
+                                    [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'"></app-scatterplot>
+                            </div>
+
+                            <div *ngIf="checkPlotType(metadataId) === 'categoric'">
+                                <app-boxplot [metadataNumId]="dataSourceM2G[i]['gene']" [metadataCatId]="metadataId"
+                                    [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'">
+                                </app-boxplot>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center" *ngIf="metadataLookUp">
+                        <div class="testBackground" *ngFor="let i of [3,4,5]">
+                            <div *ngIf="checkPlotType(metadataId) === 'numeric'">
+                                <app-scatterplot [metadata2Id]="metadataId" [metadataId]='this.dataSourceM2G[i]["gene"]'
+                                    [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'"></app-scatterplot>
+                            </div>
+
+                            <div *ngIf="checkPlotType(metadataId) === 'categoric'">
+                                <app-boxplot [metadataNumId]="dataSourceM2G[i]['gene']" [metadataCatId]="metadataId"
+                                    [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'">
+                                </app-boxplot>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <p *ngIf="this.dataSourceM2G.length === 0 && this.searchValue !== '' && this.selectedTissue !== ''"
+                        class="hideMessage text-center">
+                        There is no data to be displayed.</p>
+                    <br>
+                    <br>
+
+                    <div class="d-flex justify-content-center">
+                        <table mat-table [dataSource]="dataSourceM2G" class="mat-elevation-z8"
+                            *ngIf="dataSourceM2G.length > 0">
+                            <ng-container matColumnDef="symbol">
+                                <th mat-header-cell *matHeaderCellDef> Symbol </th>
+                                <td class="metaColumn" mat-cell *matCellDef="let element"
+                                    (click)="onSelectMetadata2(element.metadata, element.gene)">
+                                    {{geneToSym[element.gene.split(".")[0]] !== undefined ?
+                                    geneToSym[element.gene.split(".")[0]] : element.gene}} </td>
+                            </ng-container>
+                            <ng-container matColumnDef="correlation">
+                                <th mat-header-cell *matHeaderCellDef> Correlation </th>
+                                <td mat-cell *matCellDef="let element"> {{element.correlation}} </td>
+                            </ng-container>
+                            <ng-container matColumnDef="entrezid">
+                                <th mat-header-cell *matHeaderCellDef> Link </th>
+                                <td mat-cell *matCellDef="let element"> <a target="_blank"
+                                        href="{{'https://www.ncbi.nlm.nih.gov/gene/' + element.entrezid}}">NIH Link</a>
+                                </td>
+                            </ng-container>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsM2G"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsM2G"></tr>
+                        </table>
+
+                    </div>
+                    <div class="d-flex justify-content-center paginator" *ngIf="tableSizeM2G > 0">
+                        <mat-paginator [length]="tableSizeM2G" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"
+                            aria-label="Select page" (page)="getPageDetails($event)">
+                        </mat-paginator>
+                    </div>
+                </div>
+
+
             </div>
-
-            <div class="row justify-content-center">
-                <div class="testBackground">
-                    <h1>1</h1>
-                </div>
-                <div class="testBackground">
-                    <h1>2</h1>
-                </div>
-                <div class="testBackground">
-                    <h1>3</h1>
-                </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="testBackground">
-                    <h1>4</h1>
-                </div>
-                <div class="testBackground">
-                    <h1>5</h1>
-                </div>
-                <div class="testBackground">
-                    <h1>6</h1>
-                </div>
-            </div>
-
-            <p *ngIf="this.dataSourceG2G.length === 0 && this.searchValue !== '' && this.selectedTissue !== ''"
-                class="hideMessage text-center">
-                There is no data to be displayed.</p>
-
-            <br>
-            <br>
-
-            <div class="d-flex justify-content-center">
-                <table mat-table [dataSource]="dataSourceG2G" class="mat-elevation-z8" *ngIf="dataSourceG2G.length > 0">
-                    <ng-container matColumnDef="symbol">
-                        <th mat-header-cell *matHeaderCellDef> Symbol </th>
-                        <td class="metaColumn" mat-cell *matCellDef="let element"
-                            (click)="onSelectMetadata2(element.gene, element.symbol)"> {{element.symbol}} </td>
-                    </ng-container>
-                    <ng-container matColumnDef="correlation">
-                        <th mat-header-cell *matHeaderCellDef> Correlation </th>
-                        <td mat-cell *matCellDef="let element"> {{element.correlation}} </td>
-                    </ng-container>
-                    <ng-container matColumnDef="entrezid">
-                        <th mat-header-cell *matHeaderCellDef> Link </th>
-                        <td mat-cell *matCellDef="let element"> <a target="_blank"
-                                href="{{'https://www.ncbi.nlm.nih.gov/gene/' + element.entrezid}}">NIH Link</a>
-                        </td>
-                    </ng-container>
-                    <tr mat-header-row *matHeaderRowDef="displayedColumnsG2G"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumnsG2G"></tr>
-                </table>
-
-            </div>
-            <div class="d-flex justify-content-center paginator" *ngIf="tableSizeG2G > 0">
-                <mat-paginator [length]="tableSizeG2G" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"
-                    aria-label="Select page" (page)="getPageDetails($event)">
-                </mat-paginator>
-            </div>
-
         </div>
+        <div *ngIf="layoutType === 'gene'">
+            <div *ngIf="showGene">
+                <mat-form-field appearance="outline" class="d-flex container dropDown">
+                    <mat-label>Tissue</mat-label>
+                    <mat-select [(value)]="tissue" (selectionChange)="onDropDownChange($event.value)">
+                        <mat-option [value]="option.name" *ngFor="let option of tissueList">{{ option.name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div class="row">
+                    <div class="searchTitle col-md-12 d-flex justify-content-center">{{symbolId}} </div>
+                </div>
+
+                <div class="row justify-content-center" *ngIf="metadataLookUp">
+                    <div class="testBackground" *ngFor="let i of [0,1,2]">
+                        <div>
+                            <app-scatterplot [metadataId]="metadataId" [metadata2Id]='this.dataSourceG2G[i]["gene"]'
+                                [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'g2g'"></app-scatterplot>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center" *ngIf="metadataLookUp">
+                    <div class="testBackground" *ngFor="let i of [3,4,5]">
+                        <div>
+                            <app-scatterplot [metadataId]="metadataId" [metadata2Id]='this.dataSourceG2G[i]["gene"]'
+                                [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'g2g'"></app-scatterplot>
+                        </div>
+                    </div>
+                </div>
+
+                <p *ngIf="this.dataSourceG2G.length === 0 && this.searchValue !== '' && this.selectedTissue !== ''"
+                    class="hideMessage text-center">
+                    There is no data to be displayed.</p>
+
+                <br>
+                <br>
+
+                <div class="d-flex justify-content-center">
+                    <table mat-table [dataSource]="dataSourceG2G" class="mat-elevation-z8"
+                        *ngIf="dataSourceG2G.length > 0">
+                        <ng-container matColumnDef="symbol">
+                            <th mat-header-cell *matHeaderCellDef> Symbol </th>
+                            <td class="metaColumn" mat-cell *matCellDef="let element"
+                                (click)="onSelectMetadata2(element.gene, element.symbol)"> {{element.symbol}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="correlation">
+                            <th mat-header-cell *matHeaderCellDef> Correlation </th>
+                            <td mat-cell *matCellDef="let element"> {{element.correlation}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="entrezid">
+                            <th mat-header-cell *matHeaderCellDef> Link </th>
+                            <td mat-cell *matCellDef="let element"> <a target="_blank"
+                                    href="{{'https://www.ncbi.nlm.nih.gov/gene/' + element.entrezid}}">NIH Link</a>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumnsG2G"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumnsG2G"></tr>
+                    </table>
+
+                </div>
+                <div class="d-flex justify-content-center paginator" *ngIf="tableSizeG2G > 0">
+                    <mat-paginator [length]="tableSizeG2G" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"
+                        aria-label="Select page" (page)="getPageDetails($event)">
+                    </mat-paginator>
+                </div>
+
+            </div>
+        </div>
+
 
     </div>
 </div>
