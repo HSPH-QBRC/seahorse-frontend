@@ -40,35 +40,22 @@ export class BarChartComponent implements OnInit, OnChanges {
   sumstat = [];
 
   getData(categoric) {
-    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categoric}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categoric}+is+not+""`
-    let queryURL = `${apiUrl}${annotationUrl}`;
+    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categoric}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categoric}+is+not+""`
+    // let queryURL = `${apiUrl}${annotationUrl}`;
+    let queryURL = `https://api.seahorse.tm4.org/metadata2/metadata-summary-plot?category_a=${categoric}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
+        this.isLoading = false;
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
         throw message
       }))
       .subscribe(res => {
         this.isLoading = false;
-        this.dataSize = res['rows'].length;
-        for (let i = 0; i < res['rows'].length; i++) {
-          let cat = res['rows'][i][1];
-          if (!this.categoryArr.includes(cat)) {
-            this.categoryArr.push(cat);
-            this.categoryCount[cat] = 1;
-          } else {
-            this.categoryCount[cat] += 1;
-            this.maxCount = Math.max(this.categoryCount[cat], this.maxCount);
-          }
-        }
-
-        for (let cat in this.categoryCount) {
-          let temp = {
-            "name": cat,
-            "count": this.categoryCount[cat]
-          }
-          this.countArr.push(temp)
+        for (let index in res) {
+          this.countArr.push(res[index])
+          this.maxCount = Math.max(res[index]["count"], this.maxCount);
         }
         this.createBarChart()
       })

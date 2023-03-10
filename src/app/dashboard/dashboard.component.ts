@@ -20,7 +20,8 @@ export class DashboardComponent implements OnInit {
   // test_id1 ="ENSG00000188976"
   // test_id2 ="ENSG00000000457"
   searchValue = '';
-  metadataId = 'SMUBRID';
+  // metadataId = 'SMUBRID';
+  metadataId = 'SMNTRART';
   // metadataId = 'SME2MPRT'
   metadata2Id = 'ENSG00000180806'
   geneId = '';

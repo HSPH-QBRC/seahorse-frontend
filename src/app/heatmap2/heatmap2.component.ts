@@ -71,6 +71,7 @@ export class Heatmap2Component implements OnInit, OnChanges {
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${categorical1}&category_b=${categorical2}&comparison=m2m`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
+        this.isLoading = false;
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
         throw message

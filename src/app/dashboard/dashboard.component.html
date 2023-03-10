@@ -40,10 +40,11 @@
             {{this.metadataId.startsWith("ENSG") ? "gene" : "metadata"}}</h1>
         <br>
         <div class=" row justify-content-center">
-            <!-- <app-histogram [metadataId]="metadataId" [geneId]="geneId" [comparisonType]="typeOfLookUp">
-            </app-histogram> -->
-            <div class="testBackgroundSummaryPlot">
-                <h1>Summary Plot</h1>
+            <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="testBackgroundSummaryPlot" >
+                <app-barchart [metadataId]="metadataId"></app-barchart>
+            </div>
+            <div *ngIf="checkPlotType(metadataId) === 'numeric'" class="testBackgroundSummaryPlot">
+                <app-histogram [metadataId]="metadataId" [comparisonType]="this.metadataId.startsWith('ENSG') ? 'g2m' : 'm2m'"></app-histogram>
             </div>
         </div>
 

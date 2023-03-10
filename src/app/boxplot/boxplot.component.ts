@@ -67,6 +67,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numericId}&category_b=${categoricalId}&comparison=m2m`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
+        this.isLoading = false;
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
         throw message

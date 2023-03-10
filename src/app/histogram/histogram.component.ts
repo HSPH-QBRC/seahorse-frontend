@@ -30,8 +30,8 @@ export class HistogramComponent implements OnChanges {
     let numeric = this.metadataId;
     let geneNum = this.geneId;
     this.isLoading = true;
-    
-    if (this.comparisonType === 'mcc') {
+
+    if (this.comparisonType === 'm2m') {
       this.getData(numeric);
     } else if (this.comparisonType === 'g2g' || this.comparisonType === 'm2g') {
       this.getG2GGeneData(geneNum)
@@ -39,9 +39,10 @@ export class HistogramComponent implements OnChanges {
   }
 
   getData(numeric) {
-    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numeric}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numeric}+is+not+%22%22`
-    let queryURL = `${apiUrl}${annotationUrl}`;
+    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numeric}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numeric}+is+not+%22%22`
+    // let queryURL = `${apiUrl}${annotationUrl}`;
+    let queryURL = `https://api.seahorse.tm4.org/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         console.log("Error: ", error);
@@ -50,26 +51,32 @@ export class HistogramComponent implements OnChanges {
       }))
       .subscribe(res => {
         this.isLoading = false;
-        this.dataSize = res['rows'].length;
-        for (let i = 0; i < res['rows'].length; i++) {
-          let num = res['rows'][i][1];
-          this.min = Math.min(num, this.min);
-          this.max = Math.max(num, this.max);
-          this.histogramData.push(num);
-        }
+        console.log("histo res: ", res)
+        // this.dataSize = res['rows'].length;
+        // for (let i = 0; i < res['rows'].length; i++) {
+        //   let num = res['rows'][i][1];
+        //   this.min = Math.min(num, this.min);
+        //   this.max = Math.max(num, this.max);
+        //   this.histogramData.push(num);
+        // }
+        let numberOfBins = 20;
+        this.min = res["data"][0]["x0"];
+        this.max = res["data"][numberOfBins - 1]["x1"]
+        this.histogramData = res["data"]
         if (this.histogramData.length === 0) {
           this.hideHistogram = true
         } else {
-          this.createBoxPlot()
+          this.createHistogram()
         }
 
       })
   }
 
   getG2GGeneData(numeric) {
-    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++GENE_EXPRESSION%0D%0Afrom%0D%0A++expression%0D%0Awhere%0D%0A++ENSG+is+"${numeric}"`
-    let queryURL = `${apiUrl}${annotationUrl}`;
+    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++GENE_EXPRESSION%0D%0Afrom%0D%0A++expression%0D%0Awhere%0D%0A++ENSG+is+"${numeric}"`
+    // let queryURL = `${apiUrl}${annotationUrl}`;
+    let queryURL = `https://api.seahorse.tm4.org/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         console.log("Error: ", error);
@@ -78,22 +85,26 @@ export class HistogramComponent implements OnChanges {
       }))
       .subscribe(res => {
         this.isLoading = false;
-        this.dataSize = res['rows'].length;
-        for (let i = 0; i < res['rows'].length; i++) {
-          let num = res['rows'][i][1];
-          this.min = Math.min(num, this.min);
-          this.max = Math.max(num, this.max);
-          this.histogramData.push(num);
-        }
+        // this.dataSize = res['rows'].length;
+        // for (let i = 0; i < res['rows'].length; i++) {
+        //   let num = res['rows'][i][1];
+        //   this.min = Math.min(num, this.min);
+        //   this.max = Math.max(num, this.max);
+        //   this.histogramData.push(num);
+        // }
+        let numberOfBins = 20;
+        this.min = res["data"][0]["x0"];
+        this.max = res["data"][numberOfBins - 1]["x1"]
+        this.histogramData = res["data"]
         if (this.histogramData.length === 0) {
           this.hideHistogram = true
         } else {
-          this.createBoxPlot()
+          this.createHistogram()
         }
       })
   }
 
-  createBoxPlot() {
+  createHistogram() {
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 100, left: 100 },
       width = 800 - margin.left - margin.right,
@@ -104,7 +115,7 @@ export class HistogramComponent implements OnChanges {
       .offset([-10, 0])
       .html((event, d) => {
         let tipBox = `<div><div class="category">Interval: ${d.x0} - ${d.x1}</div></div>
-    <div><div class="category">Count: </div> ${d.length}</div>`
+    <div><div class="category">Count: </div> ${d.count}</div>`
         return tipBox
       });
 
@@ -147,21 +158,23 @@ export class HistogramComponent implements OnChanges {
       .range([height, 0]);
 
     //check this value later
-    y.domain([0, d3.max(bins, function (d) {
-      return d.length;
+    y.domain([0, d3.max(this.histogramData, function (d) {
+      return d.count;
     })]);   // d3.hist has to be called before the Y axis obviously
     svg.append("g")
       .call(d3.axisLeft(y));
 
+    console.log("bins: ", bins)
+
     // append the bar rectangles to the svg element
     svg.selectAll("rect")
-      .data(bins)
+      .data(this.histogramData)
       .enter()
       .append("rect")
       .attr("x", 1)
-      .attr("transform", function (d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+      .attr("transform", function (d) { return "translate(" + x(d.x0) + "," + y(d.count) + ")"; })
       .attr("width", function (d) { return Math.abs(x(d.x1) - x(d.x0) - 1); })
-      .attr("height", function (d) { return height - y(d.length); })
+      .attr("height", function (d) { return height - y(d.count); })
       .style("fill", "#69b3a2")
       .on('mouseover', function (mouseEvent: any, d) {
         pointTip.show(mouseEvent, d, this);
@@ -190,6 +203,6 @@ export class HistogramComponent implements OnChanges {
       .style('fill', 'rgba(0,0,0,.8)')
       .style('text-anchor', 'middle')
       .style('font-size', '12px')
-      .text(this.comparisonType === 'mcc' ? 'Intervals' : 'Gene Expression');
+      .text(this.comparisonType === 'm2m' ? 'Intervals' : 'Gene Expression');
   }
 }

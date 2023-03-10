@@ -63,9 +63,9 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numerical1}&category_b=${numerical2}&comparison=${this.typeOfLookUp}`
     this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
+        this.isLoading = false;
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
-        this.isLoading = false;
         throw message
       }))
       .subscribe(dataUrl => {
@@ -82,9 +82,9 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numMetadata}&category_b=${numGene}&comparison=${this.typeOfLookUp}`
     this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
+        this.isLoading = false;
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
-        this.isLoading = false;
         throw message
       }))
       .subscribe(dataUrl => {
@@ -135,9 +135,9 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numerical1}&category_b=${numerical2}&comparison=${this.typeOfLookUp}`
     this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
+        this.isLoading = false;
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
-        this.isLoading = false;
         throw message
       }))
       .subscribe(dataUrl => {
