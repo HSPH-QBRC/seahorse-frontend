@@ -14,11 +14,6 @@ import tissuesJson from './tissueList.json';
 })
 
 export class DashboardComponent implements OnInit {
-  //for m2g test ids
-  test_id1 = "ENSG00000188976"
-  test_id2 = "SME2MPRT"
-  // test_id1 ="ENSG00000188976"
-  // test_id2 ="ENSG00000000457"
   searchValue = '';
   // metadataId = 'SMUBRID';
   metadataId = 'SMNTRART';
@@ -69,11 +64,11 @@ export class DashboardComponent implements OnInit {
 
   showPhenotype = true;
   showLibraryMetadata = false;
-  showGene = true;
+  showGene = false;
   m2mTableReady = false;
   g2mTableReady = false;
   m2gTableReady = false;
-  layoutType = ""
+  layoutType = "gene"
 
   constructor(private httpClient: HttpClient) { }
 
@@ -84,13 +79,9 @@ export class DashboardComponent implements OnInit {
     this.searchValue = '';
     this.tableFromSearch = false;
     this.isLoading = true;
-
-    this.getAutoCompleteData();
-
-
     this.getListOfMetadata();
+    this.getAutoCompleteData();
     this.getListOfGeneToSymbol();
-    // this.getG2GComparisonStats();
     if (this.layoutType === "metadata") {
       this.typeOfLookUp = "m2m"
       this.getM2MComparisonStats();
@@ -116,7 +107,6 @@ export class DashboardComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        // window.scrollTo(0, 500)
         this.tableSizeG2G = res['count']
         this.dataSourceG2G = [];
         this.isLoading = false;
@@ -141,12 +131,12 @@ export class DashboardComponent implements OnInit {
     let queryURL = `https://api.seahorse.tm4.org/m2g/statistics?category_a=SMNTERRT&limit=10&offset=0`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
+        this.isLoading = false;
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
         throw message
       }))
       .subscribe(res => {
-        // window.scrollTo(0, 500)
         this.tableSizeM2G = res['count']
         this.dataSourceM2G = [];
         this.isLoading = false;
@@ -161,9 +151,7 @@ export class DashboardComponent implements OnInit {
         }
         this.m2gTableReady = true
       })
-
   }
-
 
   getM2MComparisonStats() {
     this.m2mTableReady = false;
@@ -192,7 +180,6 @@ export class DashboardComponent implements OnInit {
           this.dataSourceM2M.push(temp);
         }
         this.m2mTableReady = true
-        // this.metadataIdForGraph = this.metadataId;
       })
 
   }
@@ -223,7 +210,6 @@ export class DashboardComponent implements OnInit {
           this.dataSourceG2M.push(temp);
         }
         this.g2mTableReady = true
-        // this.metadataIdForGraph = this.metadataId;
       })
 
   }
@@ -236,6 +222,7 @@ export class DashboardComponent implements OnInit {
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
+        this.isLoading = false;
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
         throw message
@@ -263,6 +250,7 @@ export class DashboardComponent implements OnInit {
     let queryURL = `https://api.seahorse.tm4.org/e2s/summary`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
+        this.isLoading = false;
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
         throw message
@@ -281,10 +269,10 @@ export class DashboardComponent implements OnInit {
     // let annotationUrl = `sql=select%0D%0A++distinct+ENSEMBL%2C%0D%0A++SYMBOL%0D%0Afrom%0D%0A++e2s%0D%0Awhere%0D%0A++ENSEMBL+is+not+""%0D%0Aorder+by%0D%0A++SYMBOL`
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `e2s/summary`;
-
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
+        this.isLoading = false;
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
         throw message
@@ -312,7 +300,6 @@ export class DashboardComponent implements OnInit {
     this.currPage = details.pageIndex
     this.limit = details.pageSize
     this.getG2GComparisonStats();
-    // window.scrollTo(0, 500)
   }
 
   geneSearch() {
@@ -324,6 +311,8 @@ export class DashboardComponent implements OnInit {
       .selectAll('svg')
       .remove();
 
+    this.layoutType = "gene"
+
     this.tableFromSearch = true
     this.tableSizeG2G = 0;
 
@@ -331,7 +320,6 @@ export class DashboardComponent implements OnInit {
     // this.getTableSize()
     this.getG2MComparisonStats();
     this.getG2GComparisonStats()
-
   }
 
   onDropDownChange(value) {
@@ -356,33 +344,31 @@ export class DashboardComponent implements OnInit {
       this.searchValue = newstring;
     }
 
-    this.layoutType = "gene"
+
     this.metadataId = this.searchValue;
     this.geneSearch()
   }
 
   changeMetadata(name) {
     this.layoutType = "metadata"
-    // d3.select("#my_plotArea")
-    //   .selectAll('div')
-    //   .remove();
-
-    // this.plotTypeLookUp = {};
     this.metadataId = name;
-    // // this.getMetadataType(this.metadataId);
-    // // this.getComparisonStats();
+    this.showGene = false;
     this.getM2MComparisonStats();
     window.scrollTo(0, 0);
 
   }
 
   checkPlotType(name: string) {
-    if (name.startsWith("ENSG")) {
-      return "numeric"
-    } else if (this.metadataLookUp[name]['type'] === 'string' || this.metadataLookUp[name]['type'] === 'integer, encoded value') {
-      return "categoric"
-    } else {
-      return "numeric"
+    // console.log("metadata lookup: ", this.metadataLookUp)
+    if (Object.keys(this.metadataLookUp).length !== 0) {
+      if (name.startsWith("ENSG")) {
+        return "numeric"
+      } else if (this.metadataLookUp[name]['type'] === 'string' || this.metadataLookUp[name]['type'] === 'integer, encoded value') {
+        return "categoric"
+      } else {
+        return "numeric"
+      }
     }
+
   }
 }

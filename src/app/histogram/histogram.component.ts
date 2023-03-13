@@ -25,6 +25,7 @@ export class HistogramComponent implements OnChanges {
   constructor(private httpClient: HttpClient) { }
 
   ngOnChanges(changes: SimpleChanges): void {
+    
     this.min = 0;
     this.max = -Infinity;
     let numeric = this.metadataId;
@@ -35,6 +36,8 @@ export class HistogramComponent implements OnChanges {
       this.getData(numeric);
     } else if (this.comparisonType === 'g2g' || this.comparisonType === 'm2g') {
       this.getG2GGeneData(geneNum)
+    } else if (this.comparisonType === 'g2m') {
+      this.getData(numeric);
     }
   }
 
@@ -45,13 +48,13 @@ export class HistogramComponent implements OnChanges {
     let queryURL = `https://api.seahorse.tm4.org/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
+        this.isLoading = false;
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
         throw message
       }))
       .subscribe(res => {
         this.isLoading = false;
-        console.log("histo res: ", res)
         // this.dataSize = res['rows'].length;
         // for (let i = 0; i < res['rows'].length; i++) {
         //   let num = res['rows'][i][1];
@@ -79,6 +82,7 @@ export class HistogramComponent implements OnChanges {
     let queryURL = `https://api.seahorse.tm4.org/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
+        this.isLoading = false;
         console.log("Error: ", error);
         let message = `Error: ${error.error.error}`;
         throw message
@@ -163,8 +167,6 @@ export class HistogramComponent implements OnChanges {
     })]);   // d3.hist has to be called before the Y axis obviously
     svg.append("g")
       .call(d3.axisLeft(y));
-
-    console.log("bins: ", bins)
 
     // append the bar rectangles to the svg element
     svg.selectAll("rect")

@@ -74,16 +74,17 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       }))
       .subscribe(res => {
         this.tempBPData = res["boxplot"]["boxPlotData"]
+
         this.isLoading = false;
         if (this.tempBPData.length === 0) {
           this.noData = true
         } else {
           for (let i = 0; i < this.tempBPData.length; i++) {
-            if (this.tempBPData[i]["value"]["min"] < this.min) {
-              this.min = this.tempBPData[i]["value"]["min"];
+            if (this.tempBPData[i]["value"]["lower_whisker"] < this.min) {
+              this.min = this.tempBPData[i]["value"]["lower_whisker"];
             }
-            if (this.tempBPData[i]["value"]["max"] > this.max) {
-              this.max = this.tempBPData[i]["value"]["max"];
+            if (this.tempBPData[i]["value"]["upper_whisker"] > this.max) {
+              this.max = this.tempBPData[i]["value"]["upper_whisker"];
             }
             if (!this.xAxisArr.includes(this.tempBPData[i]["key"].toString())) {
               this.xAxisArr.push(this.tempBPData[i]["key"].toString())
@@ -97,8 +98,6 @@ export class BoxPlotComponent implements OnInit, OnChanges {
           }
           this.createBoxPlot()
         }
-
-
       })
   }
   noData = false
@@ -121,11 +120,11 @@ export class BoxPlotComponent implements OnInit, OnChanges {
           this.noData = true
         } else {
           for (let i = 0; i < this.tempBPData.length; i++) {
-            if (this.tempBPData[i]["value"]["min"] < this.min) {
-              this.min = this.tempBPData[i]["value"]["min"];
+            if (this.tempBPData[i]["value"]["lower_whisker"] < this.min) {
+              this.min = this.tempBPData[i]["value"]["lower_whisker"];
             }
-            if (this.tempBPData[i]["value"]["max"] > this.max) {
-              this.max = this.tempBPData[i]["value"]["max"];
+            if (this.tempBPData[i]["value"]["upper_whisker"] > this.max) {
+              this.max = this.tempBPData[i]["value"]["upper_whisker"];
             }
             if (!this.xAxisArr.includes(this.tempBPData[i]["key"].toString())) {
               this.xAxisArr.push(this.tempBPData[i]["key"].toString())
@@ -191,7 +190,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       });
 
     // append the svg object to the body of the page
-    var svg = d3.select(".my_boxplot_" + this.metadataCatId + "_"+ this.metadataNumId.split(".")[0])
+    var svg = d3.select(".my_boxplot_" + this.metadataCatId + "_" + this.metadataNumId.split(".")[0])
       .append("svg")
       // .attr("width", width + margin.left + margin.right)
       // .attr("height", height + margin.top + margin.bottom)
@@ -226,8 +225,8 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     //   .entries(this.boxPlotData)
     this.sumstat = this.tempBPData
 
-    this.min = tempMin > 0 ? tempMin * .8 : (tempMin != 0 ? tempMin * 1.2 : -(this.max / 4));
-
+    this.min = tempMin > 0 ? tempMin - (this.max * .2) : (tempMin != 0 ? tempMin * 1.2 : -(this.max / 4));
+    this.max = this.max * 1.2
 
     if (this.sumstat.length > 12) {
       this.sumstat.sort((b, a) => b.value.median - a.value.median)
@@ -341,7 +340,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         // .style('font-size', '12px')
         .style('font-size', '6px')
         // .text(this.metadataNumId)
-        .text(this.typeOfLookUp === 'm2g' ? '': this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "...")
+        .text(this.typeOfLookUp === 'm2g' ? '' : this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "...")
 
     }
 
