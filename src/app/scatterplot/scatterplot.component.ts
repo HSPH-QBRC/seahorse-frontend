@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -20,6 +20,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   @Input() typeOfLookUp = '';
   @Input() symbolId = '';
   @Input() symbolId2 = '';
+  @Output() selectedImageBase64 = new EventEmitter<string>();
 
   isLoading = false;
   limit = 1000;
@@ -337,6 +338,10 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       default:
         return "N/A"
     }
+  }
+
+  onImageClicked(event: Event) {
+    this.selectedImageBase64.emit(this.imageBase64)
   }
 
 }

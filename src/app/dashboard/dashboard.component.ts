@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import * as d3 from 'd3';
 // import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
 // @ts-ignore
 import tissuesJson from './tissueList.json';
+
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ImageModalComponent } from '../image-modal/image-modal.component';
 
 
 @Component({
@@ -14,6 +17,7 @@ import tissuesJson from './tissueList.json';
 })
 
 export class DashboardComponent implements OnInit {
+
   searchValue = '';
   // metadataId = 'SMUBRID';
   metadataId = 'SMNTRART';
@@ -70,7 +74,10 @@ export class DashboardComponent implements OnInit {
   m2gTableReady = false;
   layoutType = "gene"
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(
+    private httpClient: HttpClient,
+    public dialog: MatDialog
+  ) { }
 
   ngOnInit(): void {
     this.layoutType = this.metadataId.startsWith("ENSG") ? "gene" : "metadata";
@@ -91,6 +98,8 @@ export class DashboardComponent implements OnInit {
       this.getG2MComparisonStats();
       this.getG2GComparisonStats();
     }
+
+
 
   }
 
@@ -359,7 +368,6 @@ export class DashboardComponent implements OnInit {
   }
 
   checkPlotType(name: string) {
-    // console.log("metadata lookup: ", this.metadataLookUp)
     if (Object.keys(this.metadataLookUp).length !== 0) {
       if (name.startsWith("ENSG")) {
         return "numeric"
@@ -371,4 +379,49 @@ export class DashboardComponent implements OnInit {
     }
 
   }
+
+  showModal = false;
+  temp_img = ""
+
+  openDialog(imageUrl: string, plotType: string) {
+
+    this.dialog.open(ImageModalComponent, {
+      data: {
+        imageUrl: imageUrl,
+        plotType: plotType
+      },
+    });
+  }
+
+  openBPDialog(imageUrl: string, plotType: string) {
+
+    this.dialog.open(ImageModalComponent, {
+      data: {
+        imageUrl: imageUrl,
+        plotType: plotType,
+        metadata2Id: this.metadata2Id,
+        metadataId: this.dataSourceM2M[4]['category_b'],
+        metadataLookUp: this.metadataLookUp
+      },
+    });
+  }
+
+  onSelectImage(base64, plotType) {
+    // console.log("base64: ", base64)
+    this.temp_img = base64
+    if (plotType === 'scatterplot') {
+      this.openDialog(this.temp_img, plotType)
+    } else if (plotType === 'boxplot') {
+      this.openBPDialog(this.temp_img, plotType)
+    }
+
+  }
+  // onHtmlLoaded(html: Element) { // Change the type of the argument to Element
+  //   // Cast the Element to an HTMLDivElement
+  //   const htmlDiv = html as HTMLDivElement;
+
+  //   // Append the HTMLDivElement to the parent component's container
+  //   const htmlContainer = document.querySelector('#htmlContainer');
+  //   htmlContainer.appendChild(htmlDiv);
+  // }
 }

@@ -1,10 +1,12 @@
-import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
 import { nest } from 'd3-collection';
 import * as d3Collection from 'd3-collection';
+import { MatDialogRef } from '@angular/material/dialog';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-boxplot',
@@ -19,6 +21,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   @Input() metadataLookUp = {};
   @Input() typeOfLookUp = 'mcc';
   @Input() symbolId = '';
+  @Output() svgReady = new EventEmitter();
 
   isLoading = false;
   boxPlotData = [];
@@ -31,7 +34,10 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   offset = 0;
   lengthOfResult = 0;
 
-  constructor(private httpClient: HttpClient) { }
+  bpSVG
+
+  constructor(private httpClient: HttpClient,
+    private sanitizer: DomSanitizer) { }
 
   ngOnInit(): void { }
 
@@ -48,7 +54,6 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     } else if (this.typeOfLookUp === 'm2g') {
       this.getDataM2G(numeric, categorical);
     }
-
   }
 
   resetVariables() {
@@ -416,6 +421,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         }
       });
     }
+    this.bpSVG = svg
   }
 
   refreshData() {
@@ -433,5 +439,15 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       default:
         return "N/A"
     }
+  }
+  @Output() htmlLoaded = new EventEmitter();
+
+  imageBase64 = "https://cafans.b-cdn.net/images/Category_109907/subcat_186679/C5QydOjp_0711181245141gpadd.jpeg"
+
+  onImageClicked(event: Event) {
+    const divs = document.getElementsByClassName('my_boxplot_' + this.metadataCatId + '_' + this.metadataNumId.split('.')[0])
+    const firstDiv = divs[0];
+    const svg = firstDiv.querySelector('svg');
+    this.htmlLoaded.emit(svg);
   }
 }

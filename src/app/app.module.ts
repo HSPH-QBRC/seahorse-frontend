@@ -30,7 +30,9 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { AutocompleteInputComponent } from './autocomplete-input/autocomplete-input.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { FormsModule, ReactiveFormsModule  } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { ImageModalComponent } from "./image-modal/image-modal.component";
+import { MatDialogModule } from '@angular/material/dialog';
 
 
 
@@ -51,7 +53,8 @@ import { FormsModule, ReactiveFormsModule  } from "@angular/forms";
     GeneExpressionComparisonComponent,
     MetadataToGeneExpressionComparison,
     DashboardComponent,
-    AutocompleteInputComponent
+    AutocompleteInputComponent,
+    ImageModalComponent
   ],
   imports: [
     BrowserModule,
@@ -69,8 +72,8 @@ import { FormsModule, ReactiveFormsModule  } from "@angular/forms";
     MatProgressSpinnerModule,
     MatTableModule,
     MatPaginatorModule,
-    MatAutocompleteModule
-
+    MatAutocompleteModule,
+    MatDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]
