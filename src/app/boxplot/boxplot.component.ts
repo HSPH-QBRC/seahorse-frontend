@@ -15,12 +15,13 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class BoxPlotComponent implements OnInit, OnChanges {
+export class BoxPlotComponent implements OnChanges {
   @Input() metadataCatId = '';
   @Input() metadataNumId = '';
   @Input() metadataLookUp = {};
-  @Input() typeOfLookUp = 'mcc';
+  @Input() typeOfLookUp = 'm2m';
   @Input() symbolId = '';
+  @Input() size = 'small';
   @Output() svgReady = new EventEmitter();
 
   isLoading = false;
@@ -39,7 +40,6 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   constructor(private httpClient: HttpClient,
     private sanitizer: DomSanitizer) { }
 
-  ngOnInit(): void { }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.noData = false
@@ -49,8 +49,8 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     this.isLoading = true;
     let numeric = this.metadataCatId;
     let categorical = this.metadataNumId;
-    if (this.typeOfLookUp === 'mcc') {
-      this.getDataMCC(numeric, categorical);
+    if (this.typeOfLookUp === 'm2m') {
+      this.getDataM2M(numeric, categorical);
     } else if (this.typeOfLookUp === 'm2g') {
       this.getDataM2G(numeric, categorical);
     }
@@ -64,7 +64,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
   }
   tempBPData = [];
 
-  getDataMCC(numericId, categoricalId) {
+  getDataM2M(numericId, categoricalId) {
     // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numericId}%2C%0D%0A++${categoricalId}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numericId}+is+not+""%0D%0A++AND+${categoricalId}+is+not+""%0D%0A`
     // let queryURL = `${apiUrl}${annotationUrl}`;
@@ -78,8 +78,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
-        this.tempBPData = res["boxplot"]["boxPlotData"]
-
+        this.tempBPData = res["boxplot"]["boxPlotData"];
         this.isLoading = false;
         if (this.tempBPData.length === 0) {
           this.noData = true
@@ -141,16 +140,8 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       })
   }
 
-  small = true
-
   createBoxPlot() {
-    // set the dimensions and margins of the graph
-    // var margin = { top: 10, right: 30, bottom: 100, left: 100 },
-    //   width = 800 - margin.left - margin.right,
-    //   height = 500 - margin.top - margin.bottom;
-
-    //FOR SMALL SIZE
-    if (this.small = true) {
+    if (this.size === "small") {
       var margin = { top: 5, right: 15, bottom: 50, left: 50 },
         width = 300 - margin.left - margin.right,
         height = 230 - margin.top - margin.bottom;
@@ -160,8 +151,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         height = 500 - margin.top - margin.bottom;
     }
 
-
-    d3.select(".my_boxplot_" + this.metadataCatId)
+    d3.select(".my_boxplot_" + this.metadataCatId + "_" + this.metadataNumId.split(".")[0] + "_" + this.size)
       .selectAll('svg')
       .remove();
 
@@ -195,12 +185,10 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       });
 
     // append the svg object to the body of the page
-    var svg = d3.select(".my_boxplot_" + this.metadataCatId + "_" + this.metadataNumId.split(".")[0])
+    var svg = d3.select(".my_boxplot_" + this.metadataCatId + "_" + this.metadataNumId.split(".")[0] + "_" + this.size)
       .append("svg")
-      // .attr("width", width + margin.left + margin.right)
-      // .attr("height", height + margin.top + margin.bottom)
-      .attr("width", 300)
-      .attr("height", 230)
+      .attr("width", this.size === 'small' ? 300 : width + margin.left + margin.right)
+      .attr("height", this.size === 'small' ? 230 : height + margin.top + margin.bottom)
       .append("g")
       .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
@@ -254,7 +242,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .call(d3.axisBottom(x))
       .selectAll("text")
       .style("text-anchor", "middle")
-      .style("font-size", "4px") //only for small size
+      .style("font-size", this.size === 'small' ? "4px" : "12px") //only for small size
       .call(wrap, width / this.xAxisArr.length)
 
     // Show the Y scale
@@ -278,7 +266,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
 
     // // rectangle for the main box
     // var boxWidth = 20
-    var boxWidth = 10
+    var boxWidth = this.size === 'small' ? 10 : 20
     svg
       .selectAll("boxes")
       .data(this.sumstat)
@@ -309,7 +297,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
       .attr("stroke", "black")
       .style("width", 80)
 
-    if (this.typeOfLookUp === 'mcc' && this.metadataLookUp[this.metadataNumId].vardesc[0].length > 50) {
+    if (this.typeOfLookUp === 'm2m' && this.metadataLookUp[this.metadataNumId].vardesc[0].length > 50) {
       svg.append('text')
         .classed('label', true)
         .attr('transform', 'rotate(-90)')
@@ -320,7 +308,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         // .style('font-size', '8px')
-        .style('font-size', '4px')
+        .style('font-size', this.size === 'small' ? '4px' : '8px')
         // .text(this.metadataNumId)
         .text(this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 50) + "...")
         .on('mouseover', function (mouseEvent: any) {
@@ -343,7 +331,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         // .style('font-size', '12px')
-        .style('font-size', '6px')
+        .style('font-size', this.size === 'small' ? '6px' : '12px')
         // .text(this.metadataNumId)
         .text(this.typeOfLookUp === 'm2g' ? '' : this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "...")
 
@@ -361,7 +349,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
     //   .style('font-size', '12px')
     //   .text(this.metadataNumId);
 
-    if (this.typeOfLookUp === 'mcc' && this.metadataLookUp[this.metadataCatId].vardesc[0].length > 50) {
+    if (this.typeOfLookUp === 'm2m' && this.metadataLookUp[this.metadataCatId].vardesc[0].length > 50) {
       svg
         .append('text')
         .classed('label', true)
@@ -371,7 +359,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         // .style('font-size', '8px')
-        .style('font-size', '4px')
+        .style('font-size', this.size === 'small' ? '6px' : '12px')
         // .text(this.metadataCatId)
         .text(this.metadataLookUp[this.metadataCatId].vardesc[0].slice(0, 50) + "...")
         .on('mouseover', function (mouseEvent: any) {
@@ -393,9 +381,9 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         // .style('font-size', '12px')
-        .style('font-size', '6px')
+        .style('font-size', this.size === 'small' ? '6px' : '12px')
         .text(this.getXAxisLabelNames())
-      // .text(this.typeOfLookUp === 'mcc' ? this.metadataLookUp[this.metadataCatId].vardesc[0] : this.symbolId === undefined ? this.metadataCatId : this.symbolId);
+      // .text(this.typeOfLookUp === 'm2m' ? this.metadataLookUp[this.metadataCatId].vardesc[0] : this.symbolId === undefined ? this.metadataCatId : this.symbolId);
     }
 
     function wrap(text, width) {
@@ -432,7 +420,7 @@ export class BoxPlotComponent implements OnInit, OnChanges {
 
   getXAxisLabelNames() {
     switch (this.typeOfLookUp) {
-      case 'mcc':
+      case 'm2m':
         return this.metadataLookUp[this.metadataCatId].vardesc[0]
       case 'm2g':
         return this.symbolId === undefined ? this.metadataCatId : this.symbolId
@@ -440,14 +428,13 @@ export class BoxPlotComponent implements OnInit, OnChanges {
         return "N/A"
     }
   }
-  @Output() htmlLoaded = new EventEmitter();
-
-  imageBase64 = "https://cafans.b-cdn.net/images/Category_109907/subcat_186679/C5QydOjp_0711181245141gpadd.jpeg"
+  @Output() svgLoaded = new EventEmitter();
 
   onImageClicked(event: Event) {
-    const divs = document.getElementsByClassName('my_boxplot_' + this.metadataCatId + '_' + this.metadataNumId.split('.')[0])
-    const firstDiv = divs[0];
-    const svg = firstDiv.querySelector('svg');
-    this.htmlLoaded.emit(svg);
+    // const divs = document.getElementsByClassName('my_boxplot_' + this.metadataCatId + '_' + this.metadataNumId.split('.')[0] + "_" + this.size)
+    // const firstDiv = divs[0];
+    // const svg = firstDiv.querySelector('svg');
+    const svg =''
+    this.svgLoaded.emit(svg);
   }
 }

@@ -1,9 +1,5 @@
-import { AfterViewInit, Component, Inject, OnChanges, OnInit, SimpleChanges, ChangeDetectionStrategy, ViewChild, ElementRef, AfterContentInit } from '@angular/core';
+import { AfterViewInit, Component, Inject, ChangeDetectionStrategy, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import * as d3 from 'd3';
-import { MatDialogRef } from '@angular/material/dialog';
-import { BoxPlotComponent } from '../boxplot/boxplot.component'
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-image-modal',
@@ -11,25 +7,38 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
     styleUrls: ['./image-modal.component.scss'],
     changeDetection: ChangeDetectionStrategy.Default
 })
-export class ImageModalComponent implements OnInit {
+export class ImageModalComponent {
+    @ViewChild('svgContainer') svgContainerRef: ElementRef;
+    // showPlot = true
+
     constructor(@Inject(MAT_DIALOG_DATA) public data: {
         imageUrl,
         plotType: string,
         metadataId: string,
         metadata2Id: string,
-        metadataLookUp: {}
+        metadataLookUp: {},
+        comparisonType: string,
+        size: string
     },
-    private sanitizer: DomSanitizer
+        // private renderer: Renderer2
     ) { }
-    dataUrl
 
-    ngOnInit(): void {
-        if(this.data.plotType !== "scatterplot"){
-            const serializer = new XMLSerializer();
-            const svgString = serializer.serializeToString(this.data.imageUrl);
-            const dataUrl = 'data:image/svg+xml;base64,' + btoa(svgString);
-            this.dataUrl = this.sanitizer.bypassSecurityTrustUrl(dataUrl);
-        }
-        
-    }
+    // ngAfterViewInit(): void {
+    //     if (this.data.plotType !== "scatterplot") {
+    //         let svg = this.data.imageUrl
+    //         // const serializer = new XMLSerializer();
+    //         // const svgString = serializer.serializeToString(this.data.imageUrl);
+    //         // const dataUrl = 'data:image/svg+xml;base64,' + btoa(svgString);
+    //         // this.dataUrl = this.sanitizer.bypassSecurityTrustUrl(dataUrl);
+
+    //         // Get the HTML element by its reference
+
+    //         const container = this.svgContainerRef.nativeElement;
+
+    //         // Append the SVG element to the HTML element
+    //         // this.renderer.appendChild(container, svg);
+    //         // this.showPlot = false
+
+    //     }
+    // }
 }

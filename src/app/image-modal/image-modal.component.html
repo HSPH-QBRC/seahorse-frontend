@@ -1,11 +1,13 @@
-<div *ngIf="data.plotType ==='scatterplot'" mat-dialog-content style="max-width: 100%; max-height: 100%;">
+<div *ngIf="data.plotType ==='scatterplot'" mat-dialog-content>
     <img [src]="data.imageUrl" alt="image" style="max-width: 100%; max-height: 100%;">
 </div>
-<div *ngIf="data.plotType ==='boxplot'" mat-dialog-content
-    style="max-width: 100%; max-height: 100%; width: 700px; height: 600px;">
-    <!-- <app-boxplot #bpComponent [metadataCatId]="'SMUBRID'" [metadataNumId]="'SMNTRART'"
-        [metadataLookUp]="data.metadataLookUp" [typeOfLookUp]="'mcc'" (htmlLoaded)="onHtmlLoaded($event)">
-    </app-boxplot> -->
-    <img [src]="dataUrl" alt="image" >
-    <!-- <img [src]="dataUrl" alt="image" style="width: 100%; height: 100%;"> -->
+<div *ngIf="data.plotType ==='boxplot'" mat-dialog-content>
+    <app-boxplot [metadataCatId]="data.metadata2Id" [metadataNumId]="data.metadataId"
+        [metadataLookUp]="data.metadataLookUp" [typeOfLookUp]="data.comparisonType" [size]="data.size">
+    </app-boxplot>
 </div>
+<div *ngIf="data.plotType ==='heatmap'" mat-dialog-content>
+    <app-heatmap2 [metadataId]="data.metadataId" [metadata2Id]='data.metadata2Id'
+        [metadataLookUp]="data.metadataLookUp" [typeOfLookUp]="data.comparisonType" [size]="data.size"></app-heatmap2>
+</div>
+<div #svgContainer></div>

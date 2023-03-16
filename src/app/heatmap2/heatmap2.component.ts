@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
@@ -11,10 +11,13 @@ import { catchError } from "rxjs/operators";
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class Heatmap2Component implements OnInit, OnChanges {
+export class Heatmap2Component implements OnChanges {
   @Input() metadataId = '';
   @Input() metadata2Id = '';
   @Input() metadataLookUp = {};
+  @Input() typeOfLookUp = 'm2m';
+  @Input() size = 'small';
+  @Output() svg2Loaded = new EventEmitter();
 
   xAxisArr = [];
   yAxisArr = [];
@@ -29,17 +32,12 @@ export class Heatmap2Component implements OnInit, OnChanges {
   maxCount = 1;
   isLoading = false;
   noData = false;
+  showSmallSize = true;
 
   constructor(private httpClient: HttpClient) { }
 
-  ngOnInit(): void {
-    // this.isLoading = true;
-    // let categorical1 = this.metadataId;
-    // let categorical2 = this.metadata2Id;
-    // this.getData(categorical1, categorical2);
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
+    this.showSmallSize = this.size === 'small' ? true : false;
     this.noData = false;
     this.resetVariables()
 
@@ -124,17 +122,17 @@ export class Heatmap2Component implements OnInit, OnChanges {
         this.countDict = res["count_obj"]
         this.annotationsDict = res["rows"]
         this.heatMapData = res["rows"]
-        for(let row of this.heatMapData){
+        for (let row of this.heatMapData) {
           let xValue = row["xValue"]
           let yValue = row["yValue"]
-            if (!this.xAxisArr.includes(xValue)) {
+          if (!this.xAxisArr.includes(xValue)) {
             this.xAxisArr.push(xValue)
           }
           if (!this.yAxisArr.includes(yValue)) {
             this.yAxisArr.push(yValue)
           }
         }
-        for(let index in this.countDict){
+        for (let index in this.countDict) {
           this.maxCount = Math.max(this.maxCount, this.countDict[index]);
         }
 
@@ -151,7 +149,7 @@ export class Heatmap2Component implements OnInit, OnChanges {
 
   createHeatMap() {
     // set the dimensions and margins of the graph
-    var margin = { top: 30, right: 200, bottom: 100, left: 100 },
+    var margin = { top: 30, right: 150, bottom: 100, left: 100 },
       width = 800 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
@@ -183,22 +181,19 @@ export class Heatmap2Component implements OnInit, OnChanges {
         return tipBox
       });
 
-    // d3.select("#my_heatmap2")
-    //   .selectAll('svg')
-    //   .remove();
-    d3.select(".my_heatmap_" + this.metadata2Id)
+    d3.select('.my_heatmap_' + this.metadataId + '_' + this.metadata2Id + '_' + this.size)
       .selectAll('svg')
       .remove();
 
     // append the svg object to the body of the page
-    var svg = d3.select(".my_heatmap_" + this.metadata2Id)
+    var svg = d3.select('.my_heatmap_' + this.metadataId + '_' + this.metadata2Id + '_' + this.size)
       .append("svg")
       .attr("preserveAspectRatio", "xMinYMin meet")
       .attr("viewBox", "0 0 460 600")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .attr("width", 300)
-      .attr("height", 230)
+      .attr("width", this.showSmallSize ? 300 : width + margin.left + margin.right)
+      .attr("height", this.showSmallSize ? 230 : height + margin.top + margin.bottom)
+      // .attr("width", 300)
+      // .attr("height", 230)
       .append("g")
       .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
@@ -213,17 +208,17 @@ export class Heatmap2Component implements OnInit, OnChanges {
       .domain(this.xAxisArr)
       .padding(-0.02)
 
-    let rotateText = (this.xAxisArr[0].length > 5) ? "translate(0,0)rotate(-65)" : "translate(10,10)rotate(0)";
+    let rotateText = (this.xAxisArr[0].length > 5) ? "translate(-20,0)rotate(-65)" : "translate(10,10)rotate(0)";
     let xAxisLabels = (this.xAxisArr.length > 50) ? d3.axisBottom(x).tickFormat((d) => '').tickSize(0) : d3.axisBottom(x)
     svg.append("g")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxisLabels)
       .selectAll("text")
-      .style("text-anchor", "middle")
+      .style("text-anchor", "end")
       .call(wrap, width / this.xAxisArr.length)
-    // .attr("dx", "-.8em")
-    // .attr("dy", ".15em")
-    // .attr("transform", rotateText);
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .attr("transform", rotateText);
 
     // Build X scales and axis:
     var y = d3.scaleBand()
@@ -354,7 +349,7 @@ export class Heatmap2Component implements OnInit, OnChanges {
       .tickSize(barHeight * 2)
       .tickValues(xTicksCorr);
 
-    var countLegend = d3.select(".my_heatmap_" + this.metadata2Id).select("svg")
+    var countLegend = d3.select('.my_heatmap_' + this.metadataId + '_' + this.metadata2Id + '_' + this.size).select("svg")
       .append("svg")
       .attr("width", widthGradient)
       .attr("height", heightGradient)
@@ -416,5 +411,15 @@ export class Heatmap2Component implements OnInit, OnChanges {
         }
       });
     }
+  }
+
+
+
+  onImageClicked(event: Event) {
+    // const divs = document.getElementsByClassName('my_heatmap_' + this.metadataId + '_' + this.metadata2Id + '_' + this.size)
+    // const firstDiv = divs[0];
+    // const svg = firstDiv.querySelector('svg');
+    const svg = "";
+    this.svg2Loaded.emit(svg);
   }
 }

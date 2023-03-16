@@ -19,9 +19,8 @@ import { ImageModalComponent } from '../image-modal/image-modal.component';
 export class DashboardComponent implements OnInit {
 
   searchValue = '';
-  // metadataId = 'SMUBRID';
-  metadataId = 'SMNTRART';
-  // metadataId = 'SME2MPRT'
+  metadataId = 'SMUBRID';
+  // metadataId = 'SMNTRART';
   metadata2Id = 'ENSG00000180806'
   geneId = '';
   symbolId = '';
@@ -383,7 +382,7 @@ export class DashboardComponent implements OnInit {
   showModal = false;
   temp_img = ""
 
-  openDialog(imageUrl: string, plotType: string) {
+  openSPDialog(imageUrl: string, plotType: string) {
 
     this.dialog.open(ImageModalComponent, {
       data: {
@@ -393,35 +392,44 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  openBPDialog(imageUrl: string, plotType: string) {
-
+  openBPDialog(imageUrl: string, plotType: string, num, cat, typeOfLookUp) {
     this.dialog.open(ImageModalComponent, {
       data: {
         imageUrl: imageUrl,
         plotType: plotType,
-        metadata2Id: this.metadata2Id,
-        metadataId: this.dataSourceM2M[4]['category_b'],
-        metadataLookUp: this.metadataLookUp
+        metadataId: num,
+        metadata2Id: cat,
+        metadataLookUp: this.metadataLookUp,
+        comparisonType: typeOfLookUp,
+        size: "large"
+      },
+    });
+  }
+  openHMDialog(imageUrl: string, plotType: string, num, cat, typeOfLookUp) {
+    this.dialog.open(ImageModalComponent, {
+      data: {
+        imageUrl: imageUrl,
+        plotType: plotType,
+        metadataId: num,
+        metadata2Id: cat,
+        metadataLookUp: this.metadataLookUp,
+        comparisonType: typeOfLookUp,
+        size: "large"
       },
     });
   }
 
-  onSelectImage(base64, plotType) {
-    // console.log("base64: ", base64)
-    this.temp_img = base64
-    if (plotType === 'scatterplot') {
-      this.openDialog(this.temp_img, plotType)
-    } else if (plotType === 'boxplot') {
-      this.openBPDialog(this.temp_img, plotType)
+  onSelectImage(base64, plotType, meta1, meta2, typeOfLookUp) {
+    // this.temp_img = base64
+    if (plotType === 'boxplot') {
+      this.openBPDialog(this.temp_img, plotType, meta1, meta2, typeOfLookUp)
+    } else if (plotType === 'heatmap') {
+      this.openHMDialog(this.temp_img, plotType, meta1, meta2, typeOfLookUp)
     }
-
   }
-  // onHtmlLoaded(html: Element) { // Change the type of the argument to Element
-  //   // Cast the Element to an HTMLDivElement
-  //   const htmlDiv = html as HTMLDivElement;
 
-  //   // Append the HTMLDivElement to the parent component's container
-  //   const htmlContainer = document.querySelector('#htmlContainer');
-  //   htmlContainer.appendChild(htmlDiv);
-  // }
+  onSelectScatterplotImage(base64, plotType) {
+    this.temp_img = base64;
+    this.openSPDialog(this.temp_img, plotType)
+  }
 }

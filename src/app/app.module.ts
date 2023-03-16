@@ -9,7 +9,6 @@ import { MetadataCrossComparisonComponent } from './metadataCrossComparison/meta
 import { GeneExpressionComparisonComponent } from './geneExpressionComparison/geneExpressionComparison.component';
 import { MetadataToGeneExpressionComparison } from './metadataToGeneExpressionComparison/metadataToGeneExpressionComparison.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { HeatmapComponent } from './heatmap/heatmap.component';
 import { Heatmap2Component } from './heatmap2/heatmap2.component';
 import { BoxPlotComponent } from './boxplot/boxplot.component';
 import { ScatterPlotComponent } from './scatterplot/scatterplot.component';
@@ -41,7 +40,6 @@ import { MatDialogModule } from '@angular/material/dialog';
     AppComponent,
     NavbarComponent,
     MetadataCrossComparisonComponent,
-    HeatmapComponent,
     Heatmap2Component,
     BoxPlotComponent,
     ScatterPlotComponent,
