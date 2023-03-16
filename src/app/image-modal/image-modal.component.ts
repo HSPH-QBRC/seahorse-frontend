@@ -24,9 +24,12 @@ export class ImageModalComponent implements OnInit {
     dataUrl
 
     ngOnInit(): void {
-        const serializer = new XMLSerializer();
-        const svgString = serializer.serializeToString(this.data.imageUrl);
-        const dataUrl = 'data:image/svg+xml;base64,' + btoa(svgString);
-        this.dataUrl = this.sanitizer.bypassSecurityTrustUrl(dataUrl);
+        if(this.data.plotType !== "scatterplot"){
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(this.data.imageUrl);
+            const dataUrl = 'data:image/svg+xml;base64,' + btoa(svgString);
+            this.dataUrl = this.sanitizer.bypassSecurityTrustUrl(dataUrl);
+        }
+        
     }
 }
