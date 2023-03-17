@@ -23,6 +23,8 @@ export class ImageModalComponent {
         // private renderer: Renderer2
     ) { }
 
+    
+
     // ngAfterViewInit(): void {
     //     if (this.data.plotType !== "scatterplot") {
     //         let svg = this.data.imageUrl

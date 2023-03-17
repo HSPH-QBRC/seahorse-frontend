@@ -149,7 +149,7 @@ export class Heatmap2Component implements OnChanges {
 
   createHeatMap() {
     // set the dimensions and margins of the graph
-    var margin = { top: 30, right: 150, bottom: 100, left: 100 },
+    var margin = { top: 30, right: 150, bottom: 50, left: 100 },
       width = 800 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
@@ -190,10 +190,8 @@ export class Heatmap2Component implements OnChanges {
       .append("svg")
       .attr("preserveAspectRatio", "xMinYMin meet")
       .attr("viewBox", "0 0 460 600")
-      .attr("width", this.showSmallSize ? 300 : width + margin.left + margin.right)
-      .attr("height", this.showSmallSize ? 230 : height + margin.top + margin.bottom)
-      // .attr("width", 300)
-      // .attr("height", 230)
+      .attr("width", this.showSmallSize ? 300 : width)
+      .attr("height", this.showSmallSize ? 230 : height)
       .append("g")
       .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
@@ -298,7 +296,7 @@ export class Heatmap2Component implements OnChanges {
         .classed('label', true)
         .attr("font-weight", "bold")
         .attr('x', width / 2)
-        .attr('y', height + margin.bottom - 10)
+        .attr('y', height + margin.bottom + 20)
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         .style('font-size', '8px')
@@ -416,9 +414,6 @@ export class Heatmap2Component implements OnChanges {
 
 
   onImageClicked(event: Event) {
-    // const divs = document.getElementsByClassName('my_heatmap_' + this.metadataId + '_' + this.metadata2Id + '_' + this.size)
-    // const firstDiv = divs[0];
-    // const svg = firstDiv.querySelector('svg');
     const svg = "";
     this.svg2Loaded.emit(svg);
   }

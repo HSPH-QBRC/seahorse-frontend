@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import * as d3 from 'd3';
-// import d3Tip from 'd3-tip';
+import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
 // @ts-ignore
@@ -319,6 +319,10 @@ export class DashboardComponent implements OnInit {
       .selectAll('svg')
       .remove();
 
+    this.showGene = false;
+    this.showLibraryMetadata = false;
+    this.showPhenotype = true;
+
     this.layoutType = "gene"
 
     this.tableFromSearch = true
@@ -419,6 +423,19 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  openMLDialog(plotType: string, meta1, meta2, typeOfLookUp) {
+    this.dialog.open(ImageModalComponent, {
+      data: {
+        plotType: plotType,
+        metadataId: meta1,
+        metadata2Id: meta2,
+        metadataLookUp: this.metadataLookUp,
+        comparisonType: typeOfLookUp,
+        size: "large"
+      },
+    });
+  }
+
   onSelectImage(base64, plotType, meta1, meta2, typeOfLookUp) {
     // this.temp_img = base64
     if (plotType === 'boxplot') {
@@ -431,5 +448,26 @@ export class DashboardComponent implements OnInit {
   onSelectScatterplotImage(base64, plotType) {
     this.temp_img = base64;
     this.openSPDialog(this.temp_img, plotType)
+  }
+
+  
+
+  onSelectMetadataLink(meta1, meta2, typeOfLookUp){
+    let plotType = '';
+    if(this.checkPlotType(meta1) === 'categoric' && this.checkPlotType(meta2) === 'categoric'){
+      plotType = 'heatmap';
+      this.openMLDialog(plotType, meta1, meta2, typeOfLookUp)
+    }else if(this.checkPlotType(meta1) === 'numeric' && this.checkPlotType(meta2) === 'numeric'){
+      plotType = 'scatterplot';
+      if(meta2.startsWith("ENSG")){
+        let temp = meta1;
+        meta1 = meta2;
+        meta2 = temp;
+      }
+      this.openMLDialog(plotType, meta1, meta2, typeOfLookUp)
+    }else{
+      plotType = 'boxplot';
+      this.openMLDialog(plotType, meta1, meta2, typeOfLookUp)
+    }
   }
 }
