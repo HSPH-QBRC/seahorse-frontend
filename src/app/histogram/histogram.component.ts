@@ -54,6 +54,7 @@ export class HistogramComponent implements OnChanges {
         throw message
       }))
       .subscribe(res => {
+        console.log("histogram res: ", res)
         this.isLoading = false;
         // this.dataSize = res['rows'].length;
         // for (let i = 0; i < res['rows'].length; i++) {

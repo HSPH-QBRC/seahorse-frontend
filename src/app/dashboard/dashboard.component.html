@@ -1,5 +1,4 @@
 <app-progress-spinner *ngIf="isLoading"></app-progress-spinner>
-
 <div class="row flexContainer">
     <div class="col-md-3 sideBar">
         <div class="row">
@@ -10,12 +9,11 @@
             </a>
         </div>
         <hr>
-        <app-autocomplete-input [autoFillData]="autoFillData" (onSearch)="fromChild($event)">
+        <app-autocomplete-input [autoFillData]="autoFillData" (onSearch)="onSearch($event)">
         </app-autocomplete-input>
         <hr>
         <div class="container sideBarContainer">
             <ul>
-                <!-- <div class="pageTitle">Phenotype:</div> -->
                 <div class="pageTitle" (click)="showPhenoList = !showPhenoList">
                     <span class="expandObj">{{showPhenoList ? "-":"+"}}</span> Phenotype
                 </div>
@@ -230,7 +228,7 @@
         </h4>
         <br>
         <div *ngIf="layoutType === 'metadata'">
-            <div *ngIf="showLibraryMetadata">
+            <div *ngIf="showLibraryMetadata && m2mLibraryTableReady && !isLoading">
                 <div>library m2m</div>
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceM2MLibrary.length > 0">
                     <div class="testBackground" *ngFor="let i of [0,1,2]">
@@ -314,7 +312,7 @@
                 <div class="d-flex justify-content-center paginator" *ngIf="tableSizeM2MLibrary > 0">
                     <mat-paginator [length]="tableSizeM2MLibrary" [pageSize]="limit"
                         [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page"
-                        (page)="getPageDetails($event, 'm2m')">
+                        (page)="getPageDetails($event, 'm2mlib')">
                     </mat-paginator>
                 </div>
 
@@ -323,7 +321,7 @@
         </div>
 
         <div *ngIf="layoutType === 'gene'">
-            <div *ngIf="showLibraryMetadata">
+            <div *ngIf="showLibraryMetadata && g2mLibraryTableReady && !isLoading">
                 <div>library g2m</div>
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceG2MLibrary.length > 0">
                     <!-- <div class="testBackground" *ngFor="let i of [0,1,2]">
@@ -407,7 +405,7 @@
                 <div class="d-flex justify-content-center paginator" *ngIf="tableSizeG2MLibrary > 0">
                     <mat-paginator [length]="tableSizeG2MLibrary" [pageSize]="limit"
                         [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page"
-                        (page)="getPageDetails($event, 'g2m')">
+                        (page)="getPageDetails($event, 'g2mlib')">
                     </mat-paginator>
                 </div>
 
