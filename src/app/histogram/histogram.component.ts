@@ -15,6 +15,7 @@ export class HistogramComponent implements OnChanges {
   @Input() metadataId: string = '';
   @Input() geneId: string = '';
   @Input() comparisonType: string = '';
+  @Input() meta: string = '';
   dataSize = 0;
   isLoading = false;
   histogramData = [];
@@ -32,20 +33,21 @@ export class HistogramComponent implements OnChanges {
     let geneNum = this.geneId;
     this.isLoading = true;
 
-    if (this.comparisonType === 'm2m') {
+    if (this.comparisonType === 'm2m' || this.comparisonType === 'g2m') {
       this.getData(numeric);
     } else if (this.comparisonType === 'g2g' || this.comparisonType === 'm2g') {
       this.getG2GGeneData(geneNum)
-    } else if (this.comparisonType === 'g2m') {
-      this.getData(numeric);
-    }
+    } 
+    // else if (this.comparisonType === 'g2m') {
+    //   this.getData(numeric);
+    // }
   }
 
   getData(numeric) {
-    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numeric}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numeric}+is+not+%22%22`
-    // let queryURL = `${apiUrl}${annotationUrl}`;
-    let queryURL = `https://api.seahorse.tm4.org/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}`
+    let apiUrl = "https://api.seahorse.tm4.org";
+    let annotationUrl = `/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}&meta=${this.meta}`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    // let queryURL = `https://api.seahorse.tm4.org/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}&meta=${this.meta}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -54,15 +56,8 @@ export class HistogramComponent implements OnChanges {
         throw message
       }))
       .subscribe(res => {
-        console.log("histogram res: ", res)
+        console.log("getDATA histogram res: ", res)
         this.isLoading = false;
-        // this.dataSize = res['rows'].length;
-        // for (let i = 0; i < res['rows'].length; i++) {
-        //   let num = res['rows'][i][1];
-        //   this.min = Math.min(num, this.min);
-        //   this.max = Math.max(num, this.max);
-        //   this.histogramData.push(num);
-        // }
         let numberOfBins = 20;
         this.min = res["data"][0]["x0"];
         this.max = res["data"][numberOfBins - 1]["x1"]
@@ -72,10 +67,9 @@ export class HistogramComponent implements OnChanges {
         } else {
           this.createHistogram()
         }
-
       })
   }
-
+// REMOVE??
   getG2GGeneData(numeric) {
     // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++GENE_EXPRESSION%0D%0Afrom%0D%0A++expression%0D%0Awhere%0D%0A++ENSG+is+"${numeric}"`
@@ -89,14 +83,8 @@ export class HistogramComponent implements OnChanges {
         throw message
       }))
       .subscribe(res => {
+        console.log("g2g histogram (is this ever used??): ", res)
         this.isLoading = false;
-        // this.dataSize = res['rows'].length;
-        // for (let i = 0; i < res['rows'].length; i++) {
-        //   let num = res['rows'][i][1];
-        //   this.min = Math.min(num, this.min);
-        //   this.max = Math.max(num, this.max);
-        //   this.histogramData.push(num);
-        // }
         let numberOfBins = 20;
         this.min = res["data"][0]["x0"];
         this.max = res["data"][numberOfBins - 1]["x1"]
@@ -124,12 +112,12 @@ export class HistogramComponent implements OnChanges {
         return tipBox
       });
 
-    d3.select("#my_histogram")
+    d3.select(`.my_histogram_${this.metadataId}`)
       .selectAll('svg')
       .remove();
 
     // append the svg object to the body of the page
-    var svg = d3.select("#my_histogram")
+    var svg = d3.select(`.my_histogram_${this.metadataId}`)
       .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)

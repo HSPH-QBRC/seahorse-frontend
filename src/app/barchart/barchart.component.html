@@ -1,2 +1,4 @@
 <app-progress-spinner *ngIf="isLoading"></app-progress-spinner>
-<div id="my_barchart"></div>
+<div class="my_barchart">
+    <div [class]="'my_barchart_' + metadataId"></div>
+</div>

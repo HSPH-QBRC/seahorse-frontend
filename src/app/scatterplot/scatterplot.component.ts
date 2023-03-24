@@ -44,6 +44,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   ngOnInit(): void { }
 
   ngOnChanges(changes: SimpleChanges): void {
+    // console.log("scatter meta Types: ",this.metadataLookUp[this.metadataId]["meta"], this.metadataLookUp[this.metadataId]["meta"])
     this.offset = 0;
     this.lengthOfResult = 0;
     this.isLoading = true;
@@ -70,6 +71,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(dataUrl => {
+        // console.log("m2m dataUrl: ", dataUrl)
         this.isLoading = false;
         this.imageBase64 = `data:image/png;base64,${dataUrl}`
       });

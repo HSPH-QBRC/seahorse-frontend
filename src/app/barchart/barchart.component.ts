@@ -13,22 +13,9 @@ import { catchError } from "rxjs/operators";
 
 export class BarChartComponent implements OnInit, OnChanges {
   @Input() metadataId: string = '';
+  @Input() meta: string = '';
   dataSize = 0;
   isLoading = false;
-
-  constructor(private httpClient: HttpClient) { }
-
-  ngOnInit(): void {
-    // let categorical = this.metadataId
-    // this.isLoading = true;
-    // this.getData(categorical);
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    let categorical = this.metadataId
-    this.isLoading = true;
-    this.getData(categorical);
-  }
 
   barChartData = [];
   categoryArr = [];
@@ -39,11 +26,32 @@ export class BarChartComponent implements OnInit, OnChanges {
   max = -Infinity;
   sumstat = [];
 
+  maxXaxisLabelLength = 0;
+
+  constructor(private httpClient: HttpClient) { }
+
+  ngOnInit(): void { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.barChartData = [];
+    this.categoryArr = [];
+    this.categoryCount = {}
+    this.countArr = [];
+    this.maxCount = 1;
+    this.min = Infinity;
+    this.max = -Infinity;
+    this.sumstat = [];
+    this.maxXaxisLabelLength = 0;
+
+    let categorical = this.metadataId
+    this.isLoading = true;
+    this.getData(categorical);
+  }
+
   getData(categoric) {
-    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categoric}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categoric}+is+not+""`
-    // let queryURL = `${apiUrl}${annotationUrl}`;
-    let queryURL = `https://api.seahorse.tm4.org/metadata2/metadata-summary-plot?category_a=${categoric}`
+    let apiUrl = "https://api.seahorse.tm4.org";
+    let annotationUrl = `/metadata2/metadata-summary-plot?category_a=${categoric}&meta=${this.meta}`;
+    let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -61,8 +69,6 @@ export class BarChartComponent implements OnInit, OnChanges {
       })
   }
 
-  maxXaxisLabelLength = 0;
-
   createBarChart() {
     // set the dimensions and margins of the graph
     var margin = { top: 30, right: 30, bottom: 150, left: 100 },
@@ -78,12 +84,12 @@ export class BarChartComponent implements OnInit, OnChanges {
         return tipBox
       });
 
-    d3.select("#my_barchart")
+    d3.select(`.my_barchart_${this.metadataId}`)
       .selectAll('svg')
       .remove();
 
     // append the svg object to the body of the page
-    var svg = d3.select("#my_barchart")
+    var svg = d3.select(`.my_barchart_${this.metadataId}`)
       .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)

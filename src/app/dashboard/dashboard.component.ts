@@ -80,8 +80,10 @@ export class DashboardComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    
     this.layoutType = this.metadataId.startsWith("ENSG") ? "gene" : "metadata";
     this.m2mTableReady = false;
+    this.g2mTableReady = false;
     this.tissueList = tissuesJson;
     this.searchValue = '';
     this.tableFromSearch = false;
@@ -89,16 +91,17 @@ export class DashboardComponent implements OnInit {
     this.getListOfMetadata();
     this.getAutoCompleteData();
     this.getListOfGeneToSymbol();
+    console.log("metadata look: ", this.metadataLookUp)
     if (this.layoutType === "metadata") {
       this.typeOfLookUp = "m2m";
       this.getM2MComparisonStats();
-      this.getM2MLibraryComparisonStats();
-      this.getM2GComparisonStats();
+      // this.getM2MLibraryComparisonStats();
+      // this.getM2GComparisonStats();
     } else if (this.layoutType === "gene") {
       this.typeOfLookUp = "g2m"
       this.getG2MComparisonStats();
-      this.getG2MLibraryComparisonStats()
-      this.getG2GComparisonStats();
+      // this.getG2MLibraryComparisonStats()
+      // this.getG2GComparisonStats();
     }
   }
 
@@ -115,6 +118,7 @@ export class DashboardComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        console.log("g2g table: ", res, queryURL)
         this.isLoading = false;
         this.tableSizeG2G = res['count']
         this.dataSourceG2G = [];
@@ -227,6 +231,7 @@ export class DashboardComponent implements OnInit {
       })
   }
 
+  
 
   getG2MComparisonStats() {
     this.isLoading = true;
@@ -294,7 +299,7 @@ export class DashboardComponent implements OnInit {
           }
           this.dataSourceG2MLibrary.push(temp);
         }
-        console.log("g2m lib: ", this.dataSourceG2MLibrary)
+        // console.log("g2m lib: ", this.dataSourceG2MLibrary)
         this.g2mLibraryTableReady = true
         
       })
@@ -318,13 +323,6 @@ export class DashboardComponent implements OnInit {
       }))
       .subscribe(res => {
         for (let i in res) {
-          // let temp = {
-          //   "varname": res[i][0],
-          //   "vardesc": res[i][1].split(":"),
-          //   "vardescFull": res[i][1],
-          //   "type": res[i][2],
-          //   "comment": res[i][3]
-          // }
           let temp = {
             "varname": res[i][0],
             "vardesc": res[i][1].split(":"),
@@ -425,27 +423,20 @@ export class DashboardComponent implements OnInit {
     this.showPhenotype = true;
     this.showLibraryMetadata = false;
     this.showGene = false;
-
+    
     this.layoutType = "gene"
     this.currPage = 0;
 
-    this.tableFromSearch = true
-    // this.tableSizeG2G = 0;
-    // this.tableSizeM2G = 0;
-    // this.tableSizeG2M = 0;
-    // this.tableSizeM2M = 0;
+    this.tableFromSearch = true;
 
     this.geneId = this.searchValue !== '' ? this.searchValue : this.geneId;
-    this.typeOfLookUp = "m2g"
+    this.typeOfLookUp = "m2g";
     this.getG2MComparisonStats();
-    // setTimeout(() => {
-    //   this.getG2MLibraryComparisonStats();
-    // }, 2000);
     // this.getG2MLibraryComparisonStats();
-    this.getG2GComparisonStats()
+    // this.getG2GComparisonStats()
   }
 
-  onDropDownChange(value) {
+  onTissueChange(value) {
     this.selectedTissue = value;
     this.geneSearch()
   }
@@ -480,10 +471,13 @@ export class DashboardComponent implements OnInit {
   checkPlotType(name: string) {
     if (Object.keys(this.metadataLookUp).length !== 0) {
       if (name.startsWith("ENSG")) {
+        console.log(name, "numeric")
         return "numeric"
       } else if (this.metadataLookUp[name]['type'] === 'string' || this.metadataLookUp[name]['type'] === 'integer, encoded value') {
+        // console.log(name, "categoric")
         return "categoric"
       } else {
+        // console.log(name, "numeric")
         return "numeric"
       }
     }
