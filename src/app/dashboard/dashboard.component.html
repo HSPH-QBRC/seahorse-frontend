@@ -92,7 +92,7 @@
                         </div>
                         <div *ngIf="checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric'"
                             class="plotPreview">
-                            <div>heatmap</div>
+                            <!-- <div>heatmap</div> -->
                             <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[i]["category_b"]'
                                 [metadataLookUp]="metadataLookUp"
                                 (svg2Loaded)="onSelectImage($event, 'heatmap', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
@@ -100,7 +100,7 @@
                         </div>
                         <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric') || (checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric')"
                             class="plotPreview">
-                            <div>boxplot</div>
+                            <!-- <div>boxplot</div> -->
                             <app-boxplot [metadataCatId]="dataSourceM2M[i]['category_b']" [metadataNumId]="metadataId"
                                 [metadataLookUp]="metadataLookUp"
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
@@ -122,7 +122,7 @@
                         </div>
                         <div *ngIf="checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric'"
                             class="plotPreview">
-                            <div>heatmap</div>
+                            <!-- <div>heatmap</div> -->
                             <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[i]["category_b"]'
                                 [metadataLookUp]="metadataLookUp"
                                 (svg2Loaded)="onSelectImage($event, 'heatmap', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
@@ -130,7 +130,7 @@
                         </div>
                         <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric')"
                             class="plotPreview">
-                            <div>boxplot1</div>
+                            <!-- <div>boxplot1</div> -->
                             <app-boxplot [metadataCatId]="dataSourceM2M[i]['category_b']" [metadataNumId]="metadataId"
                                 [metadataLookUp]="metadataLookUp"
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
@@ -138,7 +138,7 @@
                         </div>
                         <div *ngIf="(checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric')"
                             class="plotPreview">
-                            <div>boxplot2</div>
+                            <!-- <div>boxplot2</div> -->
                             <app-boxplot [metadataCatId]="metadataId" [metadataNumId]="dataSourceM2M[i]['category_b']"
                                 [metadataLookUp]="metadataLookUp"
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
