@@ -36,7 +36,8 @@ export class HistogramComponent implements OnChanges {
     if (this.comparisonType === 'm2m' || this.comparisonType === 'g2m') {
       this.getData(numeric);
     } else if (this.comparisonType === 'g2g' || this.comparisonType === 'm2g') {
-      this.getG2GGeneData(geneNum)
+      // this.getG2GGeneData(geneNum)
+      this.getData(numeric);
     } 
     // else if (this.comparisonType === 'g2m') {
     //   this.getData(numeric);
