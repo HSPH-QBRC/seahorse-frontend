@@ -277,10 +277,26 @@
                                 (svg2Loaded)="onSelectImage($event, 'heatmap', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
                             </app-heatmap2>
                         </div>
-                        <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'categoric') || (checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'numeric')"
+                        <!-- <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'categoric') || (checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'numeric')"
                             class="plotPreview">
                             <app-boxplot [metadataCatId]="dataSourceM2MLibrary[i]['category_b']"
                                 [metadataNumId]="metadataId" [metadataLookUp]="metadataLookUp"
+                                (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
+                            </app-boxplot>
+                        </div> -->
+                        <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'categoric')"
+                            class="plotPreview">
+                            <!-- <div>boxplot1</div> -->
+                            <app-boxplot [metadataCatId]="dataSourceM2MLibrary[i]['category_b']" [metadataNumId]="metadataId"
+                                [metadataLookUp]="metadataLookUp"
+                                (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
+                            </app-boxplot>
+                        </div>
+                        <div *ngIf="(checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'numeric')"
+                            class="plotPreview">
+                            <!-- <div>boxplot2 {{dataSourceM2MLibrary[i]['category_b']}}</div> -->
+                            <app-boxplot [metadataCatId]="metadataId" [metadataNumId]="dataSourceM2MLibrary[i]['category_b']"
+                                [metadataLookUp]="metadataLookUp"
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
                             </app-boxplot>
                         </div>
@@ -313,7 +329,7 @@
                         </div> -->
                         <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'categoric')"
                             class="plotPreview">
-                            <div>boxplot1</div>
+                            <!-- <div>boxplot1</div> -->
                             <app-boxplot [metadataCatId]="dataSourceM2MLibrary[i]['category_b']" [metadataNumId]="metadataId"
                                 [metadataLookUp]="metadataLookUp"
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
@@ -321,7 +337,7 @@
                         </div>
                         <div *ngIf="(checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'numeric')"
                             class="plotPreview">
-                            <div>boxplot2 {{dataSourceM2MLibrary[i]['category_b']}}</div>
+                            <!-- <div>boxplot2 {{dataSourceM2MLibrary[i]['category_b']}}</div> -->
                             <app-boxplot [metadataCatId]="metadataId" [metadataNumId]="dataSourceM2MLibrary[i]['category_b']"
                                 [metadataLookUp]="metadataLookUp"
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
