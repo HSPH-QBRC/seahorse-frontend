@@ -11,21 +11,25 @@ const routes: Routes = [
     path: '',
     component: HomepageComponent
   },
-  {
-    path: 'metadatacrosscomparison',
-    component: MetadataCrossComparisonComponent
-  },
-  {
-    path: 'metadatatogenecomparison',
-    component: MetadataToGeneExpressionComparison
-  },
-  {
-    path: 'geneexpressioncomparison',
-    component: GeneExpressionComparisonComponent
-  },
+  // {
+  //   path: 'metadatacrosscomparison',
+  //   component: MetadataCrossComparisonComponent
+  // },
+  // {
+  //   path: 'metadatatogenecomparison',
+  //   component: MetadataToGeneExpressionComparison
+  // },
+  // {
+  //   path: 'geneexpressioncomparison',
+  //   component: GeneExpressionComparisonComponent
+  // },
   {
     path: 'dashboard',
     component: DashboardComponent
+  },
+  {
+    path: 'dashboard/**',
+    redirectTo: '/'
   },
   {
     path: '**',

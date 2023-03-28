@@ -24,7 +24,6 @@
                         </li>
                     </div>
                 </div>
-
             </ul>
             <ul>
                 <div class="pageTitle" (click)="showLibraryList = !showLibraryList">
@@ -65,25 +64,16 @@
                 <app-histogram [metadataId]="metadataId" [comparisonType]="'g2m'" [meta]="''"></app-histogram>
             </div>
         </div>
-
-        <!-- <h4 (click)="showPhenotype = !showPhenotype">
-            <span class="expandObj">{{showPhenotype ? "-":"+"}}</span> Phenotype
-        </h4> -->
-        <h4 (click)="expandSection('phenotype')">
+        <h4 (click)="expandSection('phenotype')" #myPhenotype>
             <span class="expandObj">{{showPhenotype ? "-":"+"}}</span> Phenotype
         </h4>
         <div *ngIf="layoutType === 'metadata'">
             <div *ngIf="showPhenotype && m2mTableReady && !isLoading">
                 <!-- <div>M2M</div> -->
-
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceM2M.length > 0">
-                    <!-- <app-scatterplot [metadataId]="'SMEXNCRT'" [metadata2Id]="'AGE'" [metadataLookUp]="metadataLookUp"
-                        [typeOfLookUp]="'m2m'" (selectedImageBase64)="onSelectScatterplotImage($event, 'scatterplot')">
-                    </app-scatterplot> -->
                     <div class="testBackground" *ngFor="let i of [0,1,2]">
                         <div *ngIf="checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric'"
                             class="plotPreview">
-                            <!-- <div>scatterplot</div> -->
                             <app-scatterplot [metadataId]="metadataId"
                                 [metadata2Id]='this.dataSourceM2M[i]["category_b"]' [metadataLookUp]="metadataLookUp"
                                 [typeOfLookUp]="typeOfLookUp"
@@ -92,37 +82,6 @@
                         </div>
                         <div *ngIf="checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric'"
                             class="plotPreview">
-                            <!-- <div>heatmap</div> -->
-                            <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[i]["category_b"]'
-                                [metadataLookUp]="metadataLookUp"
-                                (svg2Loaded)="onSelectImage($event, 'heatmap', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
-                            </app-heatmap2>
-                        </div>
-                        <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric') || (checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric')"
-                            class="plotPreview">
-                            <!-- <div>boxplot</div> -->
-                            <app-boxplot [metadataCatId]="dataSourceM2M[i]['category_b']" [metadataNumId]="metadataId"
-                                [metadataLookUp]="metadataLookUp"
-                                (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
-                            </app-boxplot>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="row justify-content-center">
-                    <div class="testBackground" *ngFor="let i of [3,4,5]">
-                        <div *ngIf="checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric'"
-                            class="plotPreview">
-                            <!-- <div>scatterplot</div> -->
-                            <app-scatterplot [metadataId]="metadataId"
-                                [metadata2Id]='this.dataSourceM2M[i]["category_b"]' [metadataLookUp]="metadataLookUp"
-                                [typeOfLookUp]="typeOfLookUp"
-                                (selectedImageBase64)="onSelectScatterplotImage($event, 'scatterplot')">
-                            </app-scatterplot>
-                        </div>
-                        <div *ngIf="checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric'"
-                            class="plotPreview">
-                            <!-- <div>heatmap</div> -->
                             <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[i]["category_b"]'
                                 [metadataLookUp]="metadataLookUp"
                                 (svg2Loaded)="onSelectImage($event, 'heatmap', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
@@ -130,7 +89,6 @@
                         </div>
                         <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric')"
                             class="plotPreview">
-                            <!-- <div>boxplot1</div> -->
                             <app-boxplot [metadataCatId]="dataSourceM2M[i]['category_b']" [metadataNumId]="metadataId"
                                 [metadataLookUp]="metadataLookUp"
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
@@ -138,7 +96,39 @@
                         </div>
                         <div *ngIf="(checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric')"
                             class="plotPreview">
-                            <!-- <div>boxplot2</div> -->
+                            <app-boxplot [metadataCatId]="metadataId" [metadataNumId]="dataSourceM2M[i]['category_b']"
+                                [metadataLookUp]="metadataLookUp"
+                                (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
+                            </app-boxplot>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="testBackground" *ngFor="let i of [3,4,5]">
+                        <div *ngIf="checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric'"
+                            class="plotPreview">
+                            <app-scatterplot [metadataId]="metadataId"
+                                [metadata2Id]='this.dataSourceM2M[i]["category_b"]' [metadataLookUp]="metadataLookUp"
+                                [typeOfLookUp]="typeOfLookUp"
+                                (selectedImageBase64)="onSelectScatterplotImage($event, 'scatterplot')">
+                            </app-scatterplot>
+                        </div>
+                        <div *ngIf="checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric'"
+                            class="plotPreview">
+                            <app-heatmap2 [metadataId]="metadataId" [metadata2Id]='this.dataSourceM2M[i]["category_b"]'
+                                [metadataLookUp]="metadataLookUp"
+                                (svg2Loaded)="onSelectImage($event, 'heatmap', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
+                            </app-heatmap2>
+                        </div>
+                        <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'categoric')"
+                            class="plotPreview">
+                            <app-boxplot [metadataCatId]="dataSourceM2M[i]['category_b']" [metadataNumId]="metadataId"
+                                [metadataLookUp]="metadataLookUp"
+                                (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
+                            </app-boxplot>
+                        </div>
+                        <div *ngIf="(checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric')"
+                            class="plotPreview">
                             <app-boxplot [metadataCatId]="metadataId" [metadataNumId]="dataSourceM2M[i]['category_b']"
                                 [metadataLookUp]="metadataLookUp"
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2M[i]['category_b'], 'm2m')">
@@ -182,7 +172,7 @@
             <div *ngIf="showPhenotype && g2mTableReady && !isLoading">
                 <!-- <div>g2m</div> -->
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceG2M.length > 0">
-                    <!-- <div class="testBackground" *ngFor="let i of [0,1,2]">
+                    <div class="testBackground" *ngFor="let i of [0,1,2]">
                         <div *ngIf="checkPlotType(dataSourceG2M[i]['category_b']) === 'numeric'" class="plotPreview">
                             <app-scatterplot [metadataId]="metadataId"
                                 [metadata2Id]='this.dataSourceG2M[i]["category_b"]' [metadataLookUp]="metadataLookUp"
@@ -196,10 +186,10 @@
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceG2M[i]['category_b'], 'm2g')">
                             </app-boxplot>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
                 <div class="row justify-content-center" *ngIf="metadataLookUp">
-                    <!-- <div class="testBackground" *ngFor="let i of [3,4,5]">
+                    <div class="testBackground" *ngFor="let i of [3,4,5]">
                         <div *ngIf="dataSourceG2M[i] && checkPlotType(dataSourceG2M[i]['category_b']) === 'numeric'"
                             class="plotPreview">
                             <app-scatterplot [metadataId]="metadataId"
@@ -215,7 +205,7 @@
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceG2M[i]['category_b'], 'm2g')">
                             </app-boxplot>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
                 <br>
                 <div class="d-flex justify-content-center">
@@ -249,10 +239,8 @@
                 </div>
             </div>
         </div>
-
-
         <br>
-        <h4 (click)="expandSection('library')">
+        <h4 (click)="expandSection('library')" #myLibrary>
             <span class="expandObj">{{showLibraryMetadata ? "-":"+"}}</span> Library Metadata
         </h4>
         <br>
@@ -277,25 +265,17 @@
                                 (svg2Loaded)="onSelectImage($event, 'heatmap', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
                             </app-heatmap2>
                         </div>
-                        <!-- <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'categoric') || (checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'numeric')"
+                        <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'categoric')"
                             class="plotPreview">
                             <app-boxplot [metadataCatId]="dataSourceM2MLibrary[i]['category_b']"
                                 [metadataNumId]="metadataId" [metadataLookUp]="metadataLookUp"
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
                             </app-boxplot>
-                        </div> -->
-                        <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'categoric')"
-                            class="plotPreview">
-                            <!-- <div>boxplot1</div> -->
-                            <app-boxplot [metadataCatId]="dataSourceM2MLibrary[i]['category_b']" [metadataNumId]="metadataId"
-                                [metadataLookUp]="metadataLookUp"
-                                (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
-                            </app-boxplot>
                         </div>
                         <div *ngIf="(checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'numeric')"
                             class="plotPreview">
-                            <!-- <div>boxplot2 {{dataSourceM2MLibrary[i]['category_b']}}</div> -->
-                            <app-boxplot [metadataCatId]="metadataId" [metadataNumId]="dataSourceM2MLibrary[i]['category_b']"
+                            <app-boxplot [metadataCatId]="metadataId"
+                                [metadataNumId]="dataSourceM2MLibrary[i]['category_b']"
                                 [metadataLookUp]="metadataLookUp"
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
                             </app-boxplot>
@@ -320,25 +300,17 @@
                                 (svg2Loaded)="onSelectImage($event, 'heatmap', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
                             </app-heatmap2>
                         </div>
-                        <!-- <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'categoric') || (checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'numeric')"
+                        <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'categoric')"
                             class="plotPreview">
                             <app-boxplot [metadataCatId]="dataSourceM2MLibrary[i]['category_b']"
                                 [metadataNumId]="metadataId" [metadataLookUp]="metadataLookUp"
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
                             </app-boxplot>
-                        </div> -->
-                        <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'categoric')"
-                            class="plotPreview">
-                            <!-- <div>boxplot1</div> -->
-                            <app-boxplot [metadataCatId]="dataSourceM2MLibrary[i]['category_b']" [metadataNumId]="metadataId"
-                                [metadataLookUp]="metadataLookUp"
-                                (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
-                            </app-boxplot>
                         </div>
                         <div *ngIf="(checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'numeric')"
                             class="plotPreview">
-                            <!-- <div>boxplot2 {{dataSourceM2MLibrary[i]['category_b']}}</div> -->
-                            <app-boxplot [metadataCatId]="metadataId" [metadataNumId]="dataSourceM2MLibrary[i]['category_b']"
+                            <app-boxplot [metadataCatId]="metadataId"
+                                [metadataNumId]="dataSourceM2MLibrary[i]['category_b']"
                                 [metadataLookUp]="metadataLookUp"
                                 (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2MLibrary[i]['category_b'], 'm2m')">
                             </app-boxplot>
@@ -385,58 +357,42 @@
             <div *ngIf="showLibraryMetadata && g2mLibraryTableReady && !isLoading">
                 <!-- <div>library g2m</div> -->
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceG2MLibrary.length > 0">
-                    <!-- <div class="testBackground" *ngFor="let i of [0,1,2]">
-                        <div *ngIf="checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceG2MLibrary[i]['category_b']) === 'numeric'"
+                    <div class="testBackground" *ngFor="let i of [0,1,2]">
+                        <div *ngIf="checkPlotType(dataSourceG2MLibrary[i]['category_b']) === 'numeric'"
                             class="plotPreview">
                             <app-scatterplot [metadataId]="metadataId"
                                 [metadata2Id]='this.dataSourceG2MLibrary[i]["category_b"]'
-                                [metadataLookUp]="metadataLookUp" [typeOfLookUp]="typeOfLookUp"
+                                [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'"
                                 (selectedImageBase64)="onSelectScatterplotImage($event, 'scatterplot')">
                             </app-scatterplot>
                         </div>
-                        <div *ngIf="checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceG2MLibrary[i]['category_b']) === 'categoric'"
-                            class="plotPreview">
-                            <app-heatmap2 [metadataId]="metadataId"
-                                [metadata2Id]='this.dataSourceG2MLibrary[i]["category_b"]'
-                                [metadataLookUp]="metadataLookUp"
-                                (svg2Loaded)="onSelectImage($event, 'heatmap', metadataId, dataSourceG2MLibrary[i]['category_b'], 'm2m')">
-                            </app-heatmap2>
-                        </div>
-                        <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'categoric') || (checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceM2MLibrary[i]['category_b']) === 'numeric')"
+                        <div *ngIf="checkPlotType(dataSourceG2MLibrary[i]['category_b']) === 'categoric'"
                             class="plotPreview">
                             <app-boxplot [metadataCatId]="dataSourceG2MLibrary[i]['category_b']"
-                                [metadataNumId]="metadataId" [metadataLookUp]="metadataLookUp"
-                                (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceG2MLibrary[i]['category_b'], 'm2m')">
+                                [metadataNumId]="metadataId" [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'"
+                                (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceG2MLibrary[i]['category_b'], 'm2g')">
                             </app-boxplot>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
                 <div class="row justify-content-center">
-                    <!-- <div class="testBackground" *ngFor="let i of [3,4,5]">
-                        <div *ngIf="checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceG2MLibrary[i]['category_b']) === 'numeric'"
+                    <div class="testBackground" *ngFor="let i of [3,4,5]">
+                        <div *ngIf="checkPlotType(dataSourceG2MLibrary[i]['category_b']) === 'numeric'"
                             class="plotPreview">
                             <app-scatterplot [metadataId]="metadataId"
                                 [metadata2Id]='this.dataSourceG2MLibrary[i]["category_b"]'
-                                [metadataLookUp]="metadataLookUp" [typeOfLookUp]="typeOfLookUp"
+                                [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'"
                                 (selectedImageBase64)="onSelectScatterplotImage($event, 'scatterplot')">
                             </app-scatterplot>
                         </div>
-                        <div *ngIf="checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceG2MLibrary[i]['category_b']) === 'categoric'"
-                            class="plotPreview">
-                            <app-heatmap2 [metadataId]="metadataId"
-                                [metadata2Id]='this.dataSourceG2MLibrary[i]["category_b"]'
-                                [metadataLookUp]="metadataLookUp"
-                                (svg2Loaded)="onSelectImage($event, 'heatmap', metadataId, dataSourceG2MLibrary[i]['category_b'], 'm2m')">
-                            </app-heatmap2>
-                        </div>
-                        <div *ngIf="(checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceG2MLibrary[i]['category_b']) === 'categoric') || (checkPlotType(metadataId) === 'categoric' && checkPlotType(dataSourceG2MLibrary[i]['category_b']) === 'numeric')"
+                        <div *ngIf="checkPlotType(dataSourceG2MLibrary[i]['category_b']) === 'categoric'"
                             class="plotPreview">
                             <app-boxplot [metadataCatId]="dataSourceG2MLibrary[i]['category_b']"
-                                [metadataNumId]="metadataId" [metadataLookUp]="metadataLookUp"
-                                (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceG2MLibrary[i]['category_b'], 'm2m')">
+                                [metadataNumId]="metadataId" [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'"
+                                (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceG2MLibrary[i]['category_b'], 'm2g')">
                             </app-boxplot>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
                 <br>
                 <div class="d-flex justify-content-center">
@@ -444,7 +400,7 @@
                         <ng-container matColumnDef="category_b">
                             <th mat-header-cell *matHeaderCellDef> Metadata2 </th>
                             <td class="metaColumn" mat-cell *matCellDef="let element"
-                                (click)="onSelectMetadataLink(metadataId, element.category_b, 'g2m')">
+                                (click)="onSelectMetadataLink(metadataId, element.category_b, 'm2g')">
                                 {{element.category_b}} </td>
                         </ng-container>
                         <ng-container matColumnDef="test">
@@ -469,13 +425,9 @@
                         (page)="getPageDetails($event, 'g2mlib')">
                     </mat-paginator>
                 </div>
-
             </div>
-
         </div>
-
-
-        <h4 (click)="expandSection('gene')">
+        <h4 (click)="expandSection('gene')" #myGene>
             <span class="expandObj">{{showGene ? "-":"+"}}</span> Gene
         </h4>
         <br>
@@ -491,7 +443,6 @@
                                     (selectedImageBase64)="onSelectScatterplotImage($event, 'scatterplot')">
                                 </app-scatterplot>
                             </div>
-
                             <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="plotPreview">
                                 <app-boxplot [metadataNumId]="dataSourceM2G[i]['gene']" [metadataCatId]="metadataId"
                                     [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'"
@@ -503,12 +454,12 @@
                     <div class="row justify-content-center" *ngIf="metadataLookUp">
                         <div class="testBackground" *ngFor="let i of [3,4,5]">
                             <div *ngIf="checkPlotType(metadataId) === 'numeric'" class="plotPreview">
+                                <div>scatter</div>
                                 <app-scatterplot [metadata2Id]="metadataId" [metadataId]='this.dataSourceM2G[i]["gene"]'
                                     [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'"
                                     (selectedImageBase64)="onSelectScatterplotImage($event, 'scatterplot')">
                                 </app-scatterplot>
                             </div>
-
                             <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="plotPreview">
                                 <app-boxplot [metadataNumId]="dataSourceM2G[i]['gene']" [metadataCatId]="metadataId"
                                     [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'"
@@ -517,15 +468,11 @@
                             </div>
                         </div>
                     </div>
-
-
-
                     <p *ngIf="this.dataSourceM2G.length === 0 && this.searchValue !== '' && this.selectedTissue !== ''"
                         class="hideMessage text-center">
                         There is no data to be displayed.</p>
                     <br>
                     <br>
-
                     <div class="d-flex justify-content-center">
                         <table mat-table [dataSource]="dataSourceM2G" class="mat-elevation-z8"
                             *ngIf="dataSourceM2G.length > 0">
@@ -549,7 +496,6 @@
                             <tr mat-header-row *matHeaderRowDef="displayedColumnsM2G"></tr>
                             <tr mat-row *matRowDef="let row; columns: displayedColumnsM2G"></tr>
                         </table>
-
                     </div>
                     <div class="d-flex justify-content-center paginator" *ngIf="tableSizeM2G > 0">
                         <mat-paginator [length]="tableSizeM2G" [pageSize]="limit" [pageSizeOptions]="[5, 10, 25, 100]"
@@ -557,8 +503,6 @@
                         </mat-paginator>
                     </div>
                 </div>
-
-
             </div>
         </div>
         <div *ngIf="layoutType === 'gene'">
@@ -576,14 +520,13 @@
                 </div>
 
                 <div class=" row justify-content-center">
-                    <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="testBackgroundSummaryPlot" >
+                    <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="testBackgroundSummaryPlot">
                         <app-barchart [metadataId]="metadataId"></app-barchart>
                     </div>
                     <div class="testBackgroundSummaryPlot">
                         <app-histogram [metadataId]="metadataId" [comparisonType]="'g2g'"></app-histogram>
                     </div>
                 </div>
-
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceG2G.length > 0">
                     <div class="testBackground" *ngFor="let i of [0,1,2]">
                         <div>
@@ -604,14 +547,11 @@
                         </div>
                     </div>
                 </div>
-
                 <p *ngIf="this.dataSourceG2G.length === 0 && this.searchValue !== '' && this.selectedTissue !== ''"
                     class="hideMessage text-center">
                     There is no data to be displayed.</p>
-
                 <br>
                 <br>
-
                 <div class="d-flex justify-content-center">
                     <table mat-table [dataSource]="dataSourceG2G" class="mat-elevation-z8"
                         *ngIf="dataSourceG2G.length > 0">
@@ -634,17 +574,13 @@
                         <tr mat-header-row *matHeaderRowDef="displayedColumnsG2G"></tr>
                         <tr mat-row *matRowDef="let row; columns: displayedColumnsG2G"></tr>
                     </table>
-
                 </div>
                 <div class="d-flex justify-content-center paginator" *ngIf="tableSizeG2G > 0">
                     <mat-paginator [length]="tableSizeG2G" [pageSize]="limit" [pageSizeOptions]="[5, 10, 25, 100]"
                         aria-label="Select page" (page)="getPageDetails($event, 'g2g')">
                     </mat-paginator>
                 </div>
-
             </div>
         </div>
-
-
     </div>
 </div>
