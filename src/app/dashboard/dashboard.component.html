@@ -44,10 +44,8 @@
     <div class="col-md-9 content" *ngIf="metadataId">
         <br>
         <br>
-        <h1 *ngIf="layoutType === 'metadata' && this.metadataLookUp[this.metadataId] !== undefined">{{this.metadataId}}
-            ({{this.metadataLookUp[this.metadataId]['type']}}) -
-            {{this.metadataId.startsWith("ENSG") ? "gene" : "metadata"}}</h1>
-        <h1 *ngIf="layoutType === 'gene'">{{this.metadataId}} (numeric)</h1>
+        <h1 class="title" *ngIf="layoutType === 'metadata' && this.metadataLookUp[this.metadataId] !== undefined">{{this.metadataId}}</h1>
+        <h1 class="title" *ngIf="layoutType === 'gene'">{{geneToSym[this.metadataId]}}</h1>
         <br>
         <div *ngIf="this.metadataLookUp[this.metadataId] !== undefined" class="row justify-content-center">
             <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="testBackgroundSummaryPlot">
@@ -163,7 +161,7 @@
                 </div>
                 <div class="d-flex justify-content-center paginator" *ngIf="tableSizeM2M > 0">
                     <mat-paginator [length]="tableSizeM2M" [pageSize]="limit" [pageSizeOptions]="[5, 10, 25, 100]"
-                        aria-label="Select page" (page)="getPageDetails($event, 'm2m')">
+                        [pageIndex]="currPage" aria-label="Select page" (page)="getPageDetails($event, 'm2m')">
                     </mat-paginator>
                 </div>
             </div>
@@ -234,7 +232,7 @@
                 </div>
                 <div class="d-flex justify-content-center paginator" *ngIf="tableSizeG2M > 0">
                     <mat-paginator [length]="tableSizeG2M" [pageSize]="limit" [pageSizeOptions]="[5, 10, 25, 100]"
-                        aria-label="Select page" (page)="getPageDetails($event, 'g2m')">
+                        [pageIndex]="currPage" aria-label="Select page" (page)="getPageDetails($event, 'g2m')">
                     </mat-paginator>
                 </div>
             </div>
@@ -344,7 +342,7 @@
                 </div>
                 <div class="d-flex justify-content-center paginator" *ngIf="tableSizeM2MLibrary > 0">
                     <mat-paginator [length]="tableSizeM2MLibrary" [pageSize]="limit"
-                        [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page"
+                        [pageSizeOptions]="[5, 10, 25, 100]" [pageIndex]="currPage" aria-label="Select page"
                         (page)="getPageDetails($event, 'm2mlib')">
                     </mat-paginator>
                 </div>
@@ -421,7 +419,7 @@
                 </div>
                 <div class="d-flex justify-content-center paginator" *ngIf="tableSizeG2MLibrary > 0">
                     <mat-paginator [length]="tableSizeG2MLibrary" [pageSize]="limit"
-                        [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page"
+                        [pageSizeOptions]="[5, 10, 25, 100]" [pageIndex]="currPage" aria-label="Select page"
                         (page)="getPageDetails($event, 'g2mlib')">
                     </mat-paginator>
                 </div>
@@ -499,7 +497,7 @@
                     </div>
                     <div class="d-flex justify-content-center paginator" *ngIf="tableSizeM2G > 0">
                         <mat-paginator [length]="tableSizeM2G" [pageSize]="limit" [pageSizeOptions]="[5, 10, 25, 100]"
-                            aria-label="Select page" (page)="getPageDetails($event, 'm2g')">
+                            [pageIndex]="currPage" aria-label="Select page" (page)="getPageDetails($event, 'm2g')">
                         </mat-paginator>
                     </div>
                 </div>
@@ -515,9 +513,9 @@
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="searchTitle col-md-12 d-flex justify-content-center">{{symbolId}} </div>
-                </div>
+                </div> -->
 
                 <div class=" row justify-content-center">
                     <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="testBackgroundSummaryPlot">
@@ -577,7 +575,7 @@
                 </div>
                 <div class="d-flex justify-content-center paginator" *ngIf="tableSizeG2G > 0">
                     <mat-paginator [length]="tableSizeG2G" [pageSize]="limit" [pageSizeOptions]="[5, 10, 25, 100]"
-                        aria-label="Select page" (page)="getPageDetails($event, 'g2g')">
+                        [pageIndex]="currPage" aria-label="Select page" (page)="getPageDetails($event, 'g2g')">
                     </mat-paginator>
                 </div>
             </div>

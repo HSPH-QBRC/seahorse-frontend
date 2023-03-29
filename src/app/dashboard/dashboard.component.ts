@@ -84,14 +84,14 @@ export class DashboardComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-
     this.layoutType = this.metadataId.startsWith("ENSG") ? "gene" : "metadata";
     this.m2mTableReady = false;
     this.g2mTableReady = false;
     this.tissueList = tissuesJson;
     this.searchValue = '';
     this.tableFromSearch = false;
-    this.isLoading = true;
+    // this.isLoading = true;
+    this.currPage = 0;
     this.getListOfMetadata();
     this.getAutoCompleteData();
     this.getListOfGeneToSymbol();
@@ -106,10 +106,10 @@ export class DashboardComponent implements OnInit {
 
   getG2GComparisonStats() {
     this.isLoading = true;
-    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    // let annotationUrl = `sql=select%0D%0A++distinct+g2g.GeneB%2C%0D%0A++e2s.SYMBOL%2C%0D%0A++e2s.ENTREZID%2C%0D%0A++g2g.correlation%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue === '' ? this.geneId : this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"%0D%0Aorder+by%0D%0A++g2g.correlation+desc%0D%0Alimit+${this.limit}+offset+${this.currPage * this.limit}`
-    // let queryURL = `${apiUrl}${annotationUrl}`;
-    let queryURL = `https://api.seahorse.tm4.org/g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
+    let apiUrl = "https://api.seahorse.tm4.org/";
+    let annotationUrl = `g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    // let queryURL = `https://api.seahorse.tm4.org/g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -132,16 +132,15 @@ export class DashboardComponent implements OnInit {
           this.dataSourceG2G.push(temp);
         }
       })
-
   }
 
   getM2GComparisonStats() {
     this.isLoading = true;
-    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    // let annotationUrl = `sql=select%0D%0A++distinct+g2g.GeneB%2C%0D%0A++e2s.SYMBOL%2C%0D%0A++e2s.ENTREZID%2C%0D%0A++g2g.correlation%0D%0Afrom%0D%0A++g2g%0D%0A++join+e2s+on+g2g.GeneB+%3D+e2s.ENSEMBL%0D%0Awhere%0D%0A++g2g.GeneA+is+"${this.searchValue === '' ? this.geneId : this.searchValue}"%0D%0A++AND+g2g.Tissue+is+"${this.selectedTissue}"%0D%0Aorder+by%0D%0A++g2g.correlation+desc%0D%0Alimit+${this.limit}+offset+${this.currPage * this.limit}`
-    // let queryURL = `${apiUrl}${annotationUrl}`;
+    let apiUrl = "https://api.seahorse.tm4.org/";
+    let annotationUrl = `m2g/statistics?category_a=${this.metadataId.split('.')[0]}&limit=${this.limit}&offset=${this.currPage * this.limit}`
+    let queryURL = `${apiUrl}${annotationUrl}`;
     // let queryURL = `https://api.seahorse.tm4.org/g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
-    let queryURL = `https://api.seahorse.tm4.org/m2g/statistics?category_a=${this.metadataId.split('.')[0]}&limit=${this.limit}&offset=${this.currPage * this.limit}`
+    // let queryURL = `https://api.seahorse.tm4.org/m2g/statistics?category_a=${this.metadataId.split('.')[0]}&limit=${this.limit}&offset=${this.currPage * this.limit}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -264,7 +263,6 @@ export class DashboardComponent implements OnInit {
         this.g2mTableReady = true
         this.getG2MLibraryComparisonStats();
       })
-
   }
 
   tableSizeG2MLibrary = 0
@@ -388,6 +386,7 @@ export class DashboardComponent implements OnInit {
     this.displayScatterPlot = true;
     this.metadataId = name;
     this.symbolId2 = symbol;
+    this.currPage = 0;
   }
 
   getPageDetails(details, comparison) {
@@ -561,6 +560,7 @@ export class DashboardComponent implements OnInit {
   }
 
   expandSection(name) {
+    this.currPage = 0;
     if (name === 'phenotype') {
       this.showPhenotype = !this.showPhenotype;
       if(this.showPhenotype){
