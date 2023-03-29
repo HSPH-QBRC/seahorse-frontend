@@ -2,3 +2,4 @@
 <div class="my_barchart">
     <div [class]="'my_barchart_' + metadataId"></div>
 </div>
+<p *ngIf="hideBarchart" class="hideMessage text-center">There is no data to be displayed.</p>

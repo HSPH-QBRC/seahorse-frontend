@@ -27,6 +27,7 @@ export class BarChartComponent implements OnInit, OnChanges {
   sumstat = [];
 
   maxXaxisLabelLength = 0;
+  hideBarchart = false;
 
   constructor(private httpClient: HttpClient) { }
 
@@ -61,11 +62,17 @@ export class BarChartComponent implements OnInit, OnChanges {
       }))
       .subscribe(res => {
         this.isLoading = false;
+
         for (let index in res) {
           this.countArr.push(res[index])
           this.maxCount = Math.max(res[index]["count"], this.maxCount);
         }
-        this.createBarChart()
+        if (this.countArr.length === 0) {
+          this.hideBarchart = true
+        } else {
+          this.createBarChart()
+        }
+
       })
   }
 

@@ -57,7 +57,6 @@ export class HistogramComponent implements OnChanges {
         throw message
       }))
       .subscribe(res => {
-        console.log("getDATA histogram res: ", res)
         this.isLoading = false;
         let numberOfBins = 20;
         this.min = res["data"][0]["x0"];
@@ -84,7 +83,6 @@ export class HistogramComponent implements OnChanges {
         throw message
       }))
       .subscribe(res => {
-        console.log("g2g histogram (is this ever used??): ", res)
         this.isLoading = false;
         let numberOfBins = 20;
         this.min = res["data"][0]["x0"];

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef  } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
@@ -8,6 +8,7 @@ import tissuesJson from './tissueList.json';
 
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ImageModalComponent } from '../image-modal/image-modal.component';
+
 
 
 @Component({
@@ -21,9 +22,11 @@ export class DashboardComponent implements OnInit {
   @ViewChild('myLibrary') myLibrary: ElementRef;
   @ViewChild('myGene') myGene: ElementRef;
 
+
+
   searchValue = '';
-  metadataId = 'SMUBRID';
-  // metadataId = 'SMNTRART';
+  // metadataId = 'SMUBRID';
+  metadataId = 'SMNTRART';
   metadata2Id = 'ENSG00000180806'
   geneId = '';
   symbolId = '';
@@ -65,8 +68,8 @@ export class DashboardComponent implements OnInit {
   // PhenotypeArr = ["Sex", "Age", "Smoking History", "Etc"]
   // LibraryMetadataArr = ["RIN Number", "Source"]
 
-  displayedColumnsM2M: string[] = ['category_b', 'test', 'test_statistics', 'pvalue'];
-  displayedColumnsG2M: string[] = ['category_b', 'test', 'test_statistics', 'pvalue'];
+  displayedColumnsM2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
+  displayedColumnsG2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
 
   showPhenotype = true;
   showLibraryMetadata = false;
@@ -90,6 +93,7 @@ export class DashboardComponent implements OnInit {
     this.tissueList = tissuesJson;
     this.searchValue = '';
     this.tableFromSearch = false;
+    this.metadataListReady = false;
     // this.isLoading = true;
     this.currPage = 0;
     this.getListOfMetadata();
@@ -231,8 +235,6 @@ export class DashboardComponent implements OnInit {
       })
   }
 
-
-
   getG2MComparisonStats() {
     this.isLoading = true;
     let metaType = "phenotype"
@@ -304,8 +306,10 @@ export class DashboardComponent implements OnInit {
   metadataArr = [];
   phenotypeArr = [];
   libraryMetadataArr = [];
+  metadataListReady = false;
 
   getListOfMetadata() {
+    this.isLoading = true;
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `metadata/desc`;
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -317,6 +321,7 @@ export class DashboardComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        this.isLoading = false;
         for (let i in res) {
           let temp = {
             "varname": res[i][0],
@@ -334,6 +339,10 @@ export class DashboardComponent implements OnInit {
           this.metadataLookUp[res[i][0]] = temp
         }
 
+        //Find a better way to handle metadataLookUp not being ready yet. Maybe use an Observerable??
+        setTimeout(() => {
+          this.metadataListReady = true;
+        }, 500)
       })
   }
   geneToSym = {}
@@ -563,7 +572,7 @@ export class DashboardComponent implements OnInit {
     this.currPage = 0;
     if (name === 'phenotype') {
       this.showPhenotype = !this.showPhenotype;
-      if(this.showPhenotype){
+      if (this.showPhenotype) {
         this.showLibraryMetadata = false;
         this.showGene = false;
         this.layoutType === 'metadata' ? this.getM2MComparisonStats() : this.getG2MComparisonStats();
@@ -571,7 +580,7 @@ export class DashboardComponent implements OnInit {
       this.myPhenotype.nativeElement.scrollIntoView({ behavior: 'smooth' });
     } else if (name === 'library') {
       this.showLibraryMetadata = !this.showLibraryMetadata;
-      if(this.showLibraryMetadata){
+      if (this.showLibraryMetadata) {
         this.showPhenotype = false;
         this.showGene = false;
         this.layoutType === 'metadata' ? this.getM2MLibraryComparisonStats() : this.getG2MLibraryComparisonStats();
@@ -579,7 +588,7 @@ export class DashboardComponent implements OnInit {
       this.myLibrary.nativeElement.scrollIntoView({ behavior: 'smooth' });
     } else if (name === 'gene') {
       this.showGene = !this.showGene;
-      if(this.showGene){
+      if (this.showGene) {
         this.showPhenotype = false;
         this.showLibraryMetadata = false;
         this.layoutType === 'metadata' ? this.getM2GComparisonStats() : this.getG2GComparisonStats();

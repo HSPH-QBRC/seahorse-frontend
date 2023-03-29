@@ -44,7 +44,7 @@
     <div class="col-md-9 content" *ngIf="metadataId">
         <br>
         <br>
-        <h1 class="title" *ngIf="layoutType === 'metadata' && this.metadataLookUp[this.metadataId] !== undefined">{{this.metadataId}}</h1>
+        <h1 class="title" *ngIf="layoutType === 'metadata'">{{metadataListReady ? this.metadataLookUp[this.metadataId]['vardescFull'] : ""}}</h1>
         <h1 class="title" *ngIf="layoutType === 'gene'">{{geneToSym[this.metadataId]}}</h1>
         <br>
         <div *ngIf="this.metadataLookUp[this.metadataId] !== undefined" class="row justify-content-center">
@@ -67,7 +67,7 @@
         </h4>
         <div *ngIf="layoutType === 'metadata'">
             <div *ngIf="showPhenotype && m2mTableReady && !isLoading">
-                <!-- <div>M2M</div> -->
+                <div>M2M</div>
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceM2M.length > 0">
                     <div class="testBackground" *ngFor="let i of [0,1,2]">
                         <div *ngIf="checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric'"
@@ -143,6 +143,10 @@
                                 (click)="onSelectMetadataLink(metadataId, element.category_b, 'm2m')">
                                 {{element.category_b}} </td>
                         </ng-container>
+                        <ng-container matColumnDef="description">
+                            <th mat-header-cell *matHeaderCellDef> Description </th>
+                            <td mat-cell *matCellDef="let element"> {{metadataListReady ? metadataLookUp[element.category_b]["vardescFull"]: ""}} </td>
+                        </ng-container>
                         <ng-container matColumnDef="test">
                             <th mat-header-cell *matHeaderCellDef> Test </th>
                             <td mat-cell *matCellDef="let element"> {{element.test}} </td>
@@ -213,6 +217,10 @@
                             <td class="metaColumn" mat-cell *matCellDef="let element"
                                 (click)="onSelectMetadataLink(metadataId, element.category_b, 'm2g')">
                                 {{element.category_b}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="description">
+                            <th mat-header-cell *matHeaderCellDef> Description </th>
+                            <td mat-cell *matCellDef="let element">{{metadataLookUp[element.category_b]["vardescFull"] !== undefined ? metadataLookUp[element.category_b]["vardescFull"]: ""}}Test test</td>
                         </ng-container>
                         <ng-container matColumnDef="test">
                             <th mat-header-cell *matHeaderCellDef> Test </th>
@@ -324,6 +332,10 @@
                                 (click)="onSelectMetadataLink(metadataId, element.category_b, 'm2m')">
                                 {{element.category_b}} </td>
                         </ng-container>
+                        <ng-container matColumnDef="description">
+                            <th mat-header-cell *matHeaderCellDef> Description </th>
+                            <td mat-cell *matCellDef="let element"> {{metadataLookUp[element.category_b]["vardescFull"]}} </td>
+                        </ng-container>
                         <ng-container matColumnDef="test">
                             <th mat-header-cell *matHeaderCellDef> Test </th>
                             <td mat-cell *matCellDef="let element"> {{element.test}} </td>
@@ -401,6 +413,10 @@
                                 (click)="onSelectMetadataLink(metadataId, element.category_b, 'm2g')">
                                 {{element.category_b}} </td>
                         </ng-container>
+                        <ng-container matColumnDef="description">
+                            <th mat-header-cell *matHeaderCellDef> Description </th>
+                            <td mat-cell *matCellDef="let element"> {{metadataLookUp[element.category_b]["vardescFull"]}} </td>
+                        </ng-container>
                         <ng-container matColumnDef="test">
                             <th mat-header-cell *matHeaderCellDef> Test </th>
                             <td mat-cell *matCellDef="let element"> {{element.test}} </td>
@@ -444,7 +460,7 @@
                             <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="plotPreview">
                                 <app-boxplot [metadataNumId]="dataSourceM2G[i]['gene']" [metadataCatId]="metadataId"
                                     [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'"
-                                    (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2G[i]['gene'].split('.')[0], 'm2g')">
+                                    (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2G[i]['gene'], 'm2g')">
                                 </app-boxplot>
                             </div>
                         </div>
@@ -461,7 +477,7 @@
                             <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="plotPreview">
                                 <app-boxplot [metadataNumId]="dataSourceM2G[i]['gene']" [metadataCatId]="metadataId"
                                     [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'"
-                                    (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2G[i]['gene'].split('.')[0], 'm2g')">
+                                    (svgLoaded)="onSelectImage($event, 'boxplot', metadataId, dataSourceM2G[i]['gene'], 'm2g')">
                                 </app-boxplot>
                             </div>
                         </div>
@@ -477,9 +493,9 @@
                             <ng-container matColumnDef="symbol">
                                 <th mat-header-cell *matHeaderCellDef> Symbol </th>
                                 <td class="metaColumn" mat-cell *matCellDef="let element"
-                                    (click)="onSelectMetadataLink(metadataId, element.gene.split('.')[0], 'm2g')">
-                                    {{geneToSym[element.gene.split(".")[0]] !== undefined ?
-                                    geneToSym[element.gene.split(".")[0]] : element.gene}} </td>
+                                    (click)="onSelectMetadataLink(metadataId, element.gene, 'm2g')">
+                                    {{geneToSym[element.gene] !== undefined ?
+                                    geneToSym[element.gene] : element.gene}} </td>
                             </ng-container>
                             <ng-container matColumnDef="correlation">
                                 <th mat-header-cell *matHeaderCellDef> Correlation </th>
@@ -556,7 +572,7 @@
                         <ng-container matColumnDef="symbol">
                             <th mat-header-cell *matHeaderCellDef> Symbol </th>
                             <td class="metaColumn" mat-cell *matCellDef="let element"
-                                (click)="onSelectMetadataLink(metadataId, element.gene.split('.')[0], 'g2g')">
+                                (click)="onSelectMetadataLink(metadataId, element.gene, 'g2g')">
                                 {{element.symbol}} </td>
                         </ng-container>
                         <ng-container matColumnDef="correlation">
