@@ -26,7 +26,8 @@ export class DashboardComponent implements OnInit {
 
   searchValue = '';
   // metadataId = 'SMUBRID';
-  metadataId = 'SMNTRART';
+  // metadataId = 'SMNTRART';
+  metadataId = 'MHARTHTS';
   metadata2Id = 'ENSG00000180806'
   geneId = '';
   symbolId = '';

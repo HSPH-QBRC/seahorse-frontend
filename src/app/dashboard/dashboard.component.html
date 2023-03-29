@@ -67,7 +67,7 @@
         </h4>
         <div *ngIf="layoutType === 'metadata'">
             <div *ngIf="showPhenotype && m2mTableReady && !isLoading">
-                <div>M2M</div>
+                <!-- <div>M2M</div> -->
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceM2M.length > 0">
                     <div class="testBackground" *ngFor="let i of [0,1,2]">
                         <div *ngIf="checkPlotType(metadataId) === 'numeric' && checkPlotType(dataSourceM2M[i]['category_b']) === 'numeric'"
@@ -468,7 +468,7 @@
                     <div class="row justify-content-center" *ngIf="metadataLookUp">
                         <div class="testBackground" *ngFor="let i of [3,4,5]">
                             <div *ngIf="checkPlotType(metadataId) === 'numeric'" class="plotPreview">
-                                <div>scatter</div>
+                                <!-- <div>scatter</div> -->
                                 <app-scatterplot [metadata2Id]="metadataId" [metadataId]='this.dataSourceM2G[i]["gene"]'
                                     [metadataLookUp]="metadataLookUp" [typeOfLookUp]="'m2g'"
                                     (selectedImageBase64)="onSelectScatterplotImage($event, 'scatterplot')">
