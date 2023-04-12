@@ -1,5 +1,5 @@
 <app-progress-spinner *ngIf="isLoading"></app-progress-spinner>
-<div class="my_histogram">
+<div class="my_histogram" *ngIf="!hideHistogram">
     <div [class]="'my_histogram_' + metadataId"></div>
 </div>
 

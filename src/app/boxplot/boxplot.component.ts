@@ -70,6 +70,7 @@ export class BoxPlotComponent implements OnChanges {
     // let queryURL = `${apiUrl}${annotationUrl}`;
     // let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=SMTS&category_b=SMEXPEFF&comparison=m2m`
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numericId}&category_b=${categoricalId}&comparison=m2m`
+    
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -126,6 +127,7 @@ export class BoxPlotComponent implements OnChanges {
           for (let i = 0; i < this.tempBPData.length; i++) {
             if (this.tempBPData[i]["value"]["lower_whisker"] < this.min) {
               this.min = this.tempBPData[i]["value"]["lower_whisker"];
+              
             }
             if (this.tempBPData[i]["value"]["upper_whisker"] > this.max) {
               this.max = this.tempBPData[i]["value"]["upper_whisker"];

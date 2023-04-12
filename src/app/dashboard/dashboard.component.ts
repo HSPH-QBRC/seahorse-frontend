@@ -463,7 +463,19 @@ export class DashboardComponent implements OnInit {
     this.geneSearch()
   }
 
+  dataSourceReset() {
+    this.dataSourceM2M = [];
+    this.dataSourceM2MLibrary = [];
+    this.dataSourceM2G = [];
+    this.dataSourceG2M = [];
+    this.dataSourceG2MLibrary = [];
+    this.dataSourceG2G = [];
+    
+  }
+
   changeMetadata(name) {
+    this.dataSourceReset();
+    
     this.layoutType = "metadata"
     this.metadataId = name;
     this.showPhenotype = true;

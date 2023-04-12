@@ -44,7 +44,7 @@
     <div class="col-md-9 content" *ngIf="metadataId">
         <br>
         <br>
-        <h1 class="title" *ngIf="layoutType === 'metadata'">{{metadataListReady ? this.metadataLookUp[this.metadataId]['vardescFull'] : ""}}</h1>
+        <h1 class="title" *ngIf="layoutType === 'metadata'">{{metadataListReady ? this.metadataLookUp[this.metadataId]['vardescFull'] : ""}} ({{this.metadataLookUp[this.metadataId]['varname']}})</h1>
         <h1 class="title" *ngIf="layoutType === 'gene'">{{geneToSym[this.metadataId]}}</h1>
         <br>
         <div *ngIf="this.metadataLookUp[this.metadataId] !== undefined" class="row justify-content-center">
@@ -66,7 +66,7 @@
             <span class="expandObj">{{showPhenotype ? "-":"+"}}</span> Phenotype
         </h4>
         <div *ngIf="layoutType === 'metadata'">
-            <div *ngIf="showPhenotype && m2mTableReady && !isLoading">
+            <div *ngIf="showPhenotype && m2mTableReady && !isLoading && dataSourceM2M.length > 0">
                 <!-- <div>M2M</div> -->
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceM2M.length > 0">
                     <div class="testBackground" *ngFor="let i of [0,1,2]">
@@ -171,7 +171,7 @@
             </div>
         </div>
         <div *ngIf="layoutType === 'gene'">
-            <div *ngIf="showPhenotype && g2mTableReady && !isLoading">
+            <div *ngIf="showPhenotype && g2mTableReady && !isLoading && dataSourceG2M.length > 0">
                 <!-- <div>g2m</div> -->
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceG2M.length > 0">
                     <div class="testBackground" *ngFor="let i of [0,1,2]">
@@ -251,7 +251,7 @@
         </h4>
         <br>
         <div *ngIf="layoutType === 'metadata'">
-            <div *ngIf="showLibraryMetadata && m2mLibraryTableReady && !isLoading">
+            <div *ngIf="showLibraryMetadata && m2mLibraryTableReady && !isLoading && dataSourceM2MLibrary.length > 0">
                 <!-- <div>library m2m</div> -->
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceM2MLibrary.length > 0">
                     <div class="testBackground" *ngFor="let i of [0,1,2]">
@@ -364,7 +364,7 @@
         </div>
 
         <div *ngIf="layoutType === 'gene'">
-            <div *ngIf="showLibraryMetadata && g2mLibraryTableReady && !isLoading">
+            <div *ngIf="showLibraryMetadata && g2mLibraryTableReady && !isLoading && dataSourceG2MLibrary.length > 0">
                 <!-- <div>library g2m</div> -->
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceG2MLibrary.length > 0">
                     <div class="testBackground" *ngFor="let i of [0,1,2]">
@@ -446,7 +446,7 @@
         </h4>
         <br>
         <div *ngIf="layoutType === 'metadata'">
-            <div *ngIf="showGene && m2gTableReady && !isLoading">
+            <div *ngIf="showGene && m2gTableReady && !isLoading && dataSourceM2G.length > 0">
                 <div *ngIf="showGene">
                     <!-- <div>M2G</div> -->
                     <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceM2G.length > 0">
