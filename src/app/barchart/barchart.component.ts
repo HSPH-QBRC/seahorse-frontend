@@ -50,6 +50,7 @@ export class BarChartComponent implements OnInit, OnChanges {
   }
 
   getData(categoric) {
+    this.hideBarchart = false;
     let apiUrl = "https://api.seahorse.tm4.org";
     let annotationUrl = `/metadata2/metadata-summary-plot?category_a=${categoric}&meta=${this.meta}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -70,6 +71,7 @@ export class BarChartComponent implements OnInit, OnChanges {
         if (this.countArr.length === 0) {
           this.hideBarchart = true
         } else {
+          this.hideBarchart = false;
           this.createBarChart()
         }
 

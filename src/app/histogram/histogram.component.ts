@@ -45,6 +45,7 @@ export class HistogramComponent implements OnChanges {
   }
 
   getData(numeric) {
+    this.hideHistogram = true;
     let apiUrl = "https://api.seahorse.tm4.org";
     let annotationUrl = `/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}&meta=${this.meta}`
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -63,14 +64,16 @@ export class HistogramComponent implements OnChanges {
         this.max = res["data"][numberOfBins - 1]["x1"]
         this.histogramData = res["data"]
         if (this.histogramData.length === 0) {
-          this.hideHistogram = true
+          this.hideHistogram = true;
         } else {
+          this.hideHistogram = false;
           this.createHistogram()
         }
       })
   }
 // REMOVE??
   getG2GGeneData(numeric) {
+    this.hideHistogram = true;
     // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++GENE_EXPRESSION%0D%0Afrom%0D%0A++expression%0D%0Awhere%0D%0A++ENSG+is+"${numeric}"`
     // let queryURL = `${apiUrl}${annotationUrl}`;
@@ -89,8 +92,9 @@ export class HistogramComponent implements OnChanges {
         this.max = res["data"][numberOfBins - 1]["x1"]
         this.histogramData = res["data"]
         if (this.histogramData.length === 0) {
-          this.hideHistogram = true
+          this.hideHistogram = true;
         } else {
+          this.hideHistogram = false;
           this.createHistogram()
         }
       })
