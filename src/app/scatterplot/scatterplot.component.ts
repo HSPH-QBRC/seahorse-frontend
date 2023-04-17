@@ -82,6 +82,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
     // let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${numMetadata}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+is+"${numGene}"%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
     // let queryURL = `${apiUrl}${annotationUrl}`;
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numMetadata.split('.')[0]}&category_b=${numGene.split('.')[0]}&comparison=${this.typeOfLookUp}`
+    console.log("queryURL for scatter: ", queryURL)
     this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -283,6 +284,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       case 'm2m':
         return this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50)
       case 'm2g':
+        console.log("y axis labels: ", this.symbolId, this.metadata2Id)
         return this.symbolId === undefined ? this.metadata2Id : this.symbolId
       case 'g2g':
         return this.symbolId

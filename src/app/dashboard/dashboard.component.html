@@ -44,8 +44,16 @@
     <div class="col-md-9 content" *ngIf="metadataId">
         <br>
         <br>
-        <h1 class="title" *ngIf="layoutType === 'metadata'">{{metadataListReady ? this.metadataLookUp[this.metadataId]['vardescFull'] : ""}} ({{this.metadataLookUp[this.metadataId]['varname']}})</h1>
+        <h1 class="title" *ngIf="layoutType === 'metadata'">{{metadataListReady ? this.metadataLookUp[this.metadataId]['vardescFull'] : ""}} ({{metadataListReady ? this.metadataLookUp[this.metadataId]['varname'] : ""}})</h1>
         <h1 class="title" *ngIf="layoutType === 'gene'">{{geneToSym[this.metadataId]}}</h1>
+        <br>
+        <mat-form-field appearance="outline" class="d-flex container dropDown">
+            <mat-label>Tissue</mat-label>
+            <mat-select [(value)]="tissue" (selectionChange)="onTissueChange($event.value)">
+                <mat-option [value]="option.name" *ngFor="let option of tissueList">{{ option.name }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
         <br>
         <div *ngIf="this.metadataLookUp[this.metadataId] !== undefined" class="row justify-content-center">
             <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="testBackgroundSummaryPlot">
@@ -522,13 +530,13 @@
         <div *ngIf="layoutType === 'gene'">
             <div *ngIf="showGene">
                 <!-- <div>g2g</div> -->
-                <mat-form-field appearance="outline" class="d-flex container dropDown">
+                <!-- <mat-form-field appearance="outline" class="d-flex container dropDown">
                     <mat-label>Tissue</mat-label>
                     <mat-select [(value)]="tissue" (selectionChange)="onTissueChange($event.value)">
                         <mat-option [value]="option.name" *ngFor="let option of tissueList">{{ option.name }}
                         </mat-option>
                     </mat-select>
-                </mat-form-field>
+                </mat-form-field> -->
                 <!-- <div class="row">
                     <div class="searchTitle col-md-12 d-flex justify-content-center">{{symbolId}} </div>
                 </div> -->

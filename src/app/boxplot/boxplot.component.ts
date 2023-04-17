@@ -70,7 +70,7 @@ export class BoxPlotComponent implements OnChanges {
     // let queryURL = `${apiUrl}${annotationUrl}`;
     // let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=SMTS&category_b=SMEXPEFF&comparison=m2m`
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numericId}&category_b=${categoricalId}&comparison=m2m`
-    
+
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -127,7 +127,7 @@ export class BoxPlotComponent implements OnChanges {
           for (let i = 0; i < this.tempBPData.length; i++) {
             if (this.tempBPData[i]["value"]["lower_whisker"] < this.min) {
               this.min = this.tempBPData[i]["value"]["lower_whisker"];
-              
+
             }
             if (this.tempBPData[i]["value"]["upper_whisker"] > this.max) {
               this.max = this.tempBPData[i]["value"]["upper_whisker"];
@@ -309,10 +309,8 @@ export class BoxPlotComponent implements OnChanges {
         .attr('dy', '.71em')
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
-        // .style('font-size', '8px')
         .style('font-size', this.size === 'small' ? '4px' : '8px')
-        // .text(this.metadataNumId)
-        .text(this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 50) + "...")
+        .text(this.metadataLookUp[this.metadataNumId].vardesc[0].length > 50 ? this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 50) + "..." : this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 50))
         .on('mouseover', function (mouseEvent: any) {
           yAxisTip.show(mouseEvent, this);
           yAxisTip.style('left', mouseEvent.x + 10 + 'px');
@@ -332,10 +330,8 @@ export class BoxPlotComponent implements OnChanges {
         .attr('dy', '.71em')
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
-        // .style('font-size', '12px')
         .style('font-size', this.size === 'small' ? '6px' : '12px')
-        // .text(this.metadataNumId)
-        .text(this.typeOfLookUp === 'm2g' ? '' : this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "...")
+        .text(this.typeOfLookUp === 'm2g' ? '' : (this.metadataLookUp[this.metadataNumId].vardesc[0].length > 30  ? this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "..." : this.metadataLookUp[this.metadataNumId].vardesc[0]))
 
     }
 
@@ -385,7 +381,6 @@ export class BoxPlotComponent implements OnChanges {
         // .style('font-size', '12px')
         .style('font-size', this.size === 'small' ? '6px' : '12px')
         .text(this.getXAxisLabelNames())
-      // .text(this.typeOfLookUp === 'm2m' ? this.metadataLookUp[this.metadataCatId].vardesc[0] : this.symbolId === undefined ? this.metadataCatId : this.symbolId);
     }
 
     function wrap(text, width) {
@@ -436,7 +431,7 @@ export class BoxPlotComponent implements OnChanges {
     // const divs = document.getElementsByClassName('my_boxplot_' + this.metadataCatId + '_' + this.metadataNumId.split('.')[0] + "_" + this.size)
     // const firstDiv = divs[0];
     // const svg = firstDiv.querySelector('svg');
-    const svg =''
+    const svg = ''
     this.svgLoaded.emit(svg);
   }
 }

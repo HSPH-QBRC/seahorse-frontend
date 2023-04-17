@@ -442,7 +442,18 @@ export class DashboardComponent implements OnInit {
 
   onTissueChange(value) {
     this.selectedTissue = value;
-    this.geneSearch()
+    // this.geneSearch()
+    if(this.showGene){
+      this.showGene = !this.showGene
+      this.expandSection('gene')
+      // this.geneSearch()
+    }else if (this.showPhenotype){
+      // this.showPhenotype = !this.showPhenotype
+      // this.expandSection('phenotype')
+    }else if(this.showLibraryMetadata){
+      // this.showLibraryMetadata = !this.showLibraryMetadata
+      // this.expandSection('library')
+    }
   }
 
   onSearch(value) {
@@ -475,6 +486,7 @@ export class DashboardComponent implements OnInit {
 
   changeMetadata(name) {
     this.dataSourceReset();
+    this.searchValue = '';
     
     this.layoutType = "metadata"
     this.metadataId = name;

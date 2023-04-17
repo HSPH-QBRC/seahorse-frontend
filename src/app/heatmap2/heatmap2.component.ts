@@ -76,49 +76,7 @@ export class Heatmap2Component implements OnChanges {
       }))
       .subscribe(res => {
         this.isLoading = false;
-        // for (let i = 0; i < res['rows'].length; i++) {
-        //   let name = res['rows'][i][0];
-        //   let xValue = res['rows'][i][1];
-        //   let yValue = res['rows'][i][2];
-        //   let temp = {
-        //     name,
-        //     xValue,
-        //     yValue
-        //   }
-        //   if (!this.xAxisArr.includes(xValue)) {
-        //     this.xAxisArr.push(xValue)
-        //   }
-        //   if (!this.yAxisArr.includes(yValue)) {
-        //     this.yAxisArr.push(yValue)
-        //   }
-
-        //   //add counter dictionary
-        //   let tempString = xValue + '_' + yValue;
-        //   if (this.countDict[tempString] === undefined) {
-        //     this.countDict[tempString] = 1;
-        //   } else {
-        //     this.countDict[tempString] += 1;
-        //     this.maxCount = Math.max(this.maxCount, this.countDict[tempString]);
-        //   }
-        //   this.annotationsDict.push(temp)
-        // }
-
-        //Used to handle the empty spaces on the heatmap
-        // for (let i = 0; i < this.xAxisArr.length; i++) {
-        //   for (let j = 0; j < this.yAxisArr.length; j++) {
-        //     let tempString = this.xAxisArr[i] + '_' + this.yAxisArr[j];
-        //     if (this.countDict[tempString] === undefined) {
-        //       this.countDict[tempString] = 0;
-        //       let temp = {
-        //         "name": "",
-        //         "xValue": this.xAxisArr[i],
-        //         "yValue": this.yAxisArr[j]
-        //       }
-        //       this.annotationsDict.push(temp)
-        //     }
-        //   }
-        // }
-        // this.heatMapData = this.annotationsDict
+        
         this.countDict = res["count_obj"]
         this.annotationsDict = res["rows"]
         this.heatMapData = res["rows"]
