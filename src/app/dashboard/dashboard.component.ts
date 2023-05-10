@@ -1,12 +1,10 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import * as d3 from 'd3';
-import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
-// @ts-ignore
 import tissuesJson from './tissueList.json';
 
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ImageModalComponent } from '../image-modal/image-modal.component';
 
 
@@ -21,8 +19,6 @@ export class DashboardComponent implements OnInit {
   @ViewChild('myPhenotype') myPhenotype: ElementRef;
   @ViewChild('myLibrary') myLibrary: ElementRef;
   @ViewChild('myGene') myGene: ElementRef;
-
-
 
   searchValue = '';
   // metadataId = 'SMUBRID';
@@ -59,7 +55,7 @@ export class DashboardComponent implements OnInit {
   dataSourceG2M = [];
   dataSourceM2G = [];
   displayedColumnsG2G: string[] = ['symbol', 'correlation', 'entrezid'];
-  displayedColumnsM2G: string[] = ['symbol', 'correlation', 'entrezid'];
+  displayedColumnsM2G: string[] = ['symbol', 'test', 'test_statistics', 'pvalue'];
 
   tissue = 'Bladder';
   tissueList = [];
@@ -113,9 +109,7 @@ export class DashboardComponent implements OnInit {
     this.isLoading = true;
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
-    let queryURL = `${apiUrl}${annotationUrl}`;
-    // let queryURL = `https://api.seahorse.tm4.org/g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
-    this.httpClient.get(queryURL).pipe(
+    let queryURL = `${apiUrl}${annotationUrl}`;this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
         console.log("Error: ", error);
@@ -142,10 +136,8 @@ export class DashboardComponent implements OnInit {
   getM2GComparisonStats() {
     this.isLoading = true;
     let apiUrl = "https://api.seahorse.tm4.org/";
-    let annotationUrl = `m2g/statistics?category_a=${this.metadataId.split('.')[0]}&limit=${this.limit}&offset=${this.currPage * this.limit}`
+    let annotationUrl = `m2g/statistics?category_a=${this.metadataId.split('.')[0]}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
-    // let queryURL = `https://api.seahorse.tm4.org/g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
-    // let queryURL = `https://api.seahorse.tm4.org/m2g/statistics?category_a=${this.metadataId.split('.')[0]}&limit=${this.limit}&offset=${this.currPage * this.limit}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -161,9 +153,11 @@ export class DashboardComponent implements OnInit {
           let temp = {
             "metadata": res['result'][index][0],
             "gene": res['result'][index][1],
-            'entrezid': res['result'][index][2],
-            'correlation': res['result'][index][3]
+            'test': res['result'][index][2],
+            'test_statistics': res['result'][index][3],
+            'pvalue': res['result'][index][4]
           }
+          
           this.dataSourceM2G.push(temp);
         }
         this.m2gTableReady = true
@@ -174,7 +168,7 @@ export class DashboardComponent implements OnInit {
     this.isLoading = true;
     let metaType = "phenotype"
     let apiUrl = "https://api.seahorse.tm4.org/";
-    let annotationUrl = `m2m/statistics?category_a=${this.metadataId}&meta=${metaType}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
+    let annotationUrl = `m2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -209,7 +203,7 @@ export class DashboardComponent implements OnInit {
     this.isLoading = true;
     let metaType = "library"
     let apiUrl = "https://api.seahorse.tm4.org/";
-    let annotationUrl = `m2m/statistics?category_a=${this.metadataId}&meta=${metaType}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
+    let annotationUrl = `m2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -241,7 +235,7 @@ export class DashboardComponent implements OnInit {
     let metaType = "phenotype"
     // this.g2mTableReady = false;
     let apiUrl = "https://api.seahorse.tm4.org/";
-    let annotationUrl = `g2m/statistics?category_a=${this.metadataId}&meta=${metaType}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
+    let annotationUrl = `g2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -277,7 +271,7 @@ export class DashboardComponent implements OnInit {
     let metaType = "library"
     // this.g2mTableReady = false;
     let apiUrl = "https://api.seahorse.tm4.org/";
-    let annotationUrl = `g2m/statistics?category_a=${this.metadataId}&meta=${metaType}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
+    let annotationUrl = `g2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -442,17 +436,15 @@ export class DashboardComponent implements OnInit {
 
   onTissueChange(value) {
     this.selectedTissue = value;
-    // this.geneSearch()
-    if(this.showGene){
+    if (this.showGene) {
       this.showGene = !this.showGene
       this.expandSection('gene')
-      // this.geneSearch()
-    }else if (this.showPhenotype){
-      // this.showPhenotype = !this.showPhenotype
-      // this.expandSection('phenotype')
-    }else if(this.showLibraryMetadata){
-      // this.showLibraryMetadata = !this.showLibraryMetadata
-      // this.expandSection('library')
+    } else if (this.showPhenotype) {
+      this.showPhenotype = !this.showPhenotype
+      this.expandSection('phenotype')
+    } else if (this.showLibraryMetadata) {
+      this.showLibraryMetadata = !this.showLibraryMetadata
+      this.expandSection('library')
     }
   }
 
@@ -481,13 +473,13 @@ export class DashboardComponent implements OnInit {
     this.dataSourceG2M = [];
     this.dataSourceG2MLibrary = [];
     this.dataSourceG2G = [];
-    
+
   }
 
   changeMetadata(name) {
     this.dataSourceReset();
     this.searchValue = '';
-    
+
     this.layoutType = "metadata"
     this.metadataId = name;
     this.showPhenotype = true;
