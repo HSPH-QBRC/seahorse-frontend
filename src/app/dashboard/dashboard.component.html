@@ -77,6 +77,8 @@
             <span class="expandObj">{{showPhenotype ? "-":"+"}}</span> Phenotype
         </h4>
         <div *ngIf="layoutType === 'metadata'">
+            <p *ngIf="this.dataSourceM2M.length === 0 && showPhenotype" class="hideMessage text-center">
+                There is no data to be displayed.</p>
             <div *ngIf="showPhenotype && m2mTableReady && !isLoading && dataSourceM2M.length > 0">
                 <!-- <div>M2M</div> -->
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceM2M.length > 0">
@@ -180,9 +182,12 @@
                         [pageIndex]="currPage" aria-label="Select page" (page)="getPageDetails($event, 'm2m')">
                     </mat-paginator>
                 </div>
+
             </div>
         </div>
         <div *ngIf="layoutType === 'gene'">
+            <p *ngIf="this.dataSourceG2M.length === 0 && showPhenotype" class="hideMessage text-center">
+                There is no data to be displayed.</p>
             <div *ngIf="showPhenotype && g2mTableReady && !isLoading && dataSourceG2M.length > 0">
                 <!-- <div>g2m</div> -->
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceG2M.length > 0">
@@ -264,6 +269,8 @@
         </h4>
         <br>
         <div *ngIf="layoutType === 'metadata'">
+            <p *ngIf="this.dataSourceM2MLibrary.length === 0 && showLibraryMetadata" class="hideMessage text-center">
+                There is no data to be displayed.</p>
             <div *ngIf="showLibraryMetadata && m2mLibraryTableReady && !isLoading && dataSourceM2MLibrary.length > 0">
                 <!-- <div>library m2m</div> -->
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceM2MLibrary.length > 0">
@@ -378,6 +385,8 @@
         </div>
 
         <div *ngIf="layoutType === 'gene'">
+            <p *ngIf="this.dataSourceG2MLibrary.length === 0 && showLibraryMetadata" class="hideMessage text-center">
+                There is no data to be displayed.</p>
             <div *ngIf="showLibraryMetadata && g2mLibraryTableReady && !isLoading && dataSourceG2MLibrary.length > 0">
                 <!-- <div>library g2m</div> -->
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceG2MLibrary.length > 0">
@@ -461,6 +470,8 @@
         </h4>
         <br>
         <div *ngIf="layoutType === 'metadata'">
+            <p *ngIf="this.dataSourceM2G.length === 0 && showGene" class="hideMessage text-center">
+                There is no data to be displayed.</p>
             <div *ngIf="showGene && m2gTableReady && !isLoading && dataSourceM2G.length > 0">
                 <div *ngIf="showGene">
                     <!-- <div>M2G</div> -->

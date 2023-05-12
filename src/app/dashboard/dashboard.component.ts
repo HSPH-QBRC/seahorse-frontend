@@ -74,7 +74,7 @@ export class DashboardComponent implements OnInit {
   m2mTableReady = false;
   g2mTableReady = false;
   m2gTableReady = false;
-  layoutType = "gene"
+  layoutType = "metadata"
   showPhenoList = false;
   showLibraryList = false;
 
@@ -96,12 +96,14 @@ export class DashboardComponent implements OnInit {
     this.getListOfMetadata();
     this.getAutoCompleteData();
     this.getListOfGeneToSymbol();
+    console.log("layout type: ", this.layoutType)
     if (this.layoutType === "metadata") {
       this.typeOfLookUp = "m2m";
       this.getM2MComparisonStats();
-    } else if (this.layoutType === "gene") {
-      this.typeOfLookUp = "g2m"
-      this.getG2MComparisonStats();
+    } 
+    else if (this.layoutType === "gene") {
+      this.typeOfLookUp = "g2g"
+      this.getG2GComparisonStats();
     }
   }
 
@@ -191,7 +193,9 @@ export class DashboardComponent implements OnInit {
           }
           this.dataSourceM2M.push(temp);
         }
-        this.m2mTableReady = true
+        this.m2mTableReady = true;
+
+        console.log("m2m: ", this.dataSourceM2M)
       })
   }
 
