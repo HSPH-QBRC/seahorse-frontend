@@ -20,6 +20,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   @Input() typeOfLookUp = '';
   @Input() symbolId = '';
   @Input() symbolId2 = '';
+  @Input() tissue = '';
   @Output() selectedImageBase64 = new EventEmitter<string>();
 
   isLoading = false;
@@ -44,10 +45,8 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   ngOnInit(): void { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // console.log("scatter meta Types: ",this.metadataLookUp[this.metadataId]["meta"], this.metadataLookUp[this.metadataId]["meta"])
     this.offset = 0;
     this.lengthOfResult = 0;
-    this.isLoading = true;
     let numerical1 = this.metadataId;
     let numerical2 = this.metadata2Id;
     this.refreshData();
@@ -61,8 +60,9 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   }
 
   getDataM2M(numerical1, numerical2) {
+    this.isLoading = true;
     const headers = new HttpHeaders().set('Accept', 'image/png');
-    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numerical1}&category_b=${numerical2}&comparison=${this.typeOfLookUp}`
+    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numerical1}&category_b=${numerical2}&comparison=${this.typeOfLookUp}&tissue=${this.tissue}`
     this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -71,18 +71,17 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(dataUrl => {
-        // console.log("m2m dataUrl: ", dataUrl)
         this.isLoading = false;
         this.imageBase64 = `data:image/png;base64,${dataUrl}`
       });
   }
 
   getDataM2G(numGene, numMetadata) {
+    this.isLoading = true;
     // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
     // let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${numMetadata}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+is+"${numGene}"%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
     // let queryURL = `${apiUrl}${annotationUrl}`;
-    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numMetadata.split('.')[0]}&category_b=${numGene.split('.')[0]}&comparison=${this.typeOfLookUp}`
-    console.log("queryURL for scatter: ", queryURL)
+    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numMetadata.split('.')[0]}&category_b=${numGene.split('.')[0]}&comparison=${this.typeOfLookUp}&tissue=${this.tissue}`
     this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -98,7 +97,8 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   }
 
   getDataG2G(numerical1, numerical2) {
-    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numerical1}&category_b=${numerical2}&comparison=${this.typeOfLookUp}`
+    this.isLoading = true;
+    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numerical1}&category_b=${numerical2}&comparison=${this.typeOfLookUp}&tissue=${this.tissue}`
     this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -284,7 +284,6 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
       case 'm2m':
         return this.metadataLookUp[this.metadata2Id].vardesc[0].slice(0, 50)
       case 'm2g':
-        console.log("y axis labels: ", this.symbolId, this.metadata2Id)
         return this.symbolId === undefined ? this.metadata2Id : this.symbolId
       case 'g2g':
         return this.symbolId

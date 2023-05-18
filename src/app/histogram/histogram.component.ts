@@ -13,6 +13,7 @@ import { catchError } from "rxjs/operators";
 
 export class HistogramComponent implements OnChanges {
   @Input() metadataId: string = '';
+  @Input() tissue: string = '';
   @Input() geneId: string = '';
   @Input() comparisonType: string = '';
   @Input() meta: string = '';
@@ -46,7 +47,7 @@ export class HistogramComponent implements OnChanges {
 
   getData(numeric) {
     let apiUrl = "https://api.seahorse.tm4.org";
-    let annotationUrl = `/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}&meta=${this.meta}`
+    let annotationUrl = `/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}&meta=${this.meta}&tissue=${this.tissue}`
     let queryURL = `${apiUrl}${annotationUrl}`;
     // let queryURL = `https://api.seahorse.tm4.org/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}&meta=${this.meta}`
     this.httpClient.get(queryURL).pipe(

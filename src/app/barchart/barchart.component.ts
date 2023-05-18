@@ -13,6 +13,7 @@ import { catchError } from "rxjs/operators";
 
 export class BarChartComponent implements OnInit, OnChanges {
   @Input() metadataId: string = '';
+  @Input() tissue: string = '';
   @Input() meta: string = '';
   dataSize = 0;
   isLoading = false;
@@ -45,6 +46,7 @@ export class BarChartComponent implements OnInit, OnChanges {
     this.maxXaxisLabelLength = 0;
 
     let categorical = this.metadataId
+    console.log("tissue: ", this.tissue)
     this.isLoading = true;
     this.getData(categorical);
   }
@@ -52,7 +54,7 @@ export class BarChartComponent implements OnInit, OnChanges {
   getData(categoric) {
     this.hideBarchart = false;
     let apiUrl = "https://api.seahorse.tm4.org";
-    let annotationUrl = `/metadata2/metadata-summary-plot?category_a=${categoric}&meta=${this.meta}`;
+    let annotationUrl = `/metadata2/metadata-summary-plot?category_a=${categoric}&meta=${this.meta}&tissue=${this.tissue}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -62,6 +64,8 @@ export class BarChartComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
+        console.log("barchart res: ", res, categoric, this.meta, this.tissue) 
+
         this.isLoading = false;
 
         for (let index in res) {

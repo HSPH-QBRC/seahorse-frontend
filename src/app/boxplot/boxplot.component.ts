@@ -22,6 +22,7 @@ export class BoxPlotComponent implements OnChanges {
   @Input() typeOfLookUp = 'm2m';
   @Input() symbolId = '';
   @Input() size = 'small';
+  @Input() tissue = '';
   @Output() svgReady = new EventEmitter();
 
   isLoading = false;
@@ -69,7 +70,7 @@ export class BoxPlotComponent implements OnChanges {
     // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numericId}%2C%0D%0A++${categoricalId}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numericId}+is+not+""%0D%0A++AND+${categoricalId}+is+not+""%0D%0A`
     // let queryURL = `${apiUrl}${annotationUrl}`;
     // let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=SMTS&category_b=SMEXPEFF&comparison=m2m`
-    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numericId}&category_b=${categoricalId}&comparison=m2m`
+    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numericId}&category_b=${categoricalId}&comparison=m2m&tissue=${this.tissue}`
 
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -107,11 +108,11 @@ export class BoxPlotComponent implements OnChanges {
   }
   noData = false
   getDataM2G(numericId, categoricalId) {
-    let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${categoricalId}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+like+"${numericId}%"%0D%0A++AND+"${categoricalId}"+is+not+""%0D%0A++AND+"GENE_EXPRESSION"+is+not+""%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
+    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
+    // let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${categoricalId}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+like+"${numericId}%"%0D%0A++AND+"${categoricalId}"+is+not+""%0D%0A++AND+"GENE_EXPRESSION"+is+not+""%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
     // let queryURL = `${apiUrl}${annotationUrl}`;
     // let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=SMTS&category_b=ENSG00000180806&comparison=m2g`
-    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${categoricalId}&category_b=${numericId}&comparison=m2g`
+    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${categoricalId}&category_b=${numericId}&comparison=m2g&tissue=${this.tissue}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;

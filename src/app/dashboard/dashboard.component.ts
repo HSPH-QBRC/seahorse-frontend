@@ -3,11 +3,9 @@ import * as d3 from 'd3';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
 import tissuesJson from './tissueList.json';
-
 import { MatDialog } from '@angular/material/dialog';
 import { ImageModalComponent } from '../image-modal/image-modal.component';
-
-
+import { image } from 'd3';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,8 +20,8 @@ export class DashboardComponent implements OnInit {
 
   searchValue = '';
   // metadataId = 'SMUBRID';
-  // metadataId = 'SMNTRART';
-  metadataId = 'MHARTHTS';
+  metadataId = 'SMNTRART';
+  // metadataId = 'MHARTHTS';
   metadata2Id = 'ENSG00000180806'
   geneId = '';
   symbolId = '';
@@ -33,8 +31,6 @@ export class DashboardComponent implements OnInit {
   displayHeatmap = false;
   currMetadataType = ''
   metadataLookUp = {};
-
-  // notIncludeList = ["SUBJID", "AGE", "SAMPID", "SMRIN"]
   isLoading = false;
   typeOfLookUp = 'm2g'
   currPage = 0;
@@ -56,27 +52,35 @@ export class DashboardComponent implements OnInit {
   dataSourceM2G = [];
   displayedColumnsG2G: string[] = ['symbol', 'correlation', 'entrezid'];
   displayedColumnsM2G: string[] = ['symbol', 'test', 'test_statistics', 'pvalue'];
-
-  tissue = 'Bladder';
-  tissueList = [];
-  selectedTissue = 'Bladder';
-  autoFillData = [];
-
-  // PhenotypeArr = ["Sex", "Age", "Smoking History", "Etc"]
-  // LibraryMetadataArr = ["RIN Number", "Source"]
-
   displayedColumnsM2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
   displayedColumnsG2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
-
+  tissue = 'Brain - cluster 1';
+  tissueList = [];
+  selectedTissue = 'Brain - cluster 1';
+  autoFillData = [];
   showPhenotype = true;
   showLibraryMetadata = false;
   showGene = false;
   m2mTableReady = false;
   g2mTableReady = false;
   m2gTableReady = false;
+  g2gTableReady = false
   layoutType = "metadata"
   showPhenoList = false;
   showLibraryList = false;
+  tableSizeM2MLibrary = 0;
+  dataSourceM2MLibrary = [];
+  m2mLibraryTableReady = false;
+  tableSizeG2MLibrary = 0;
+  dataSourceG2MLibrary = [];
+  g2mLibraryTableReady = false;
+  metadataArr = [];
+  phenotypeArr = [];
+  libraryMetadataArr = [];
+  metadataListReady = false;
+  showModal = false;
+  temp_img = "";
+  geneToSym = {};
 
   constructor(
     private httpClient: HttpClient,
@@ -91,27 +95,26 @@ export class DashboardComponent implements OnInit {
     this.searchValue = '';
     this.tableFromSearch = false;
     this.metadataListReady = false;
-    // this.isLoading = true;
     this.currPage = 0;
     this.getListOfMetadata();
     this.getAutoCompleteData();
     this.getListOfGeneToSymbol();
-    console.log("layout type: ", this.layoutType)
     if (this.layoutType === "metadata") {
       this.typeOfLookUp = "m2m";
       this.getM2MComparisonStats();
-    } 
-    else if (this.layoutType === "gene") {
-      this.typeOfLookUp = "g2g"
+    } else if (this.layoutType === "gene") {
+      this.typeOfLookUp = "g2g";
       this.getG2GComparisonStats();
     }
   }
 
   getG2GComparisonStats() {
     this.isLoading = true;
+    this.g2gTableReady = false;
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
-    let queryURL = `${apiUrl}${annotationUrl}`;this.httpClient.get(queryURL).pipe(
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
         console.log("Error: ", error);
@@ -120,9 +123,8 @@ export class DashboardComponent implements OnInit {
       }))
       .subscribe(res => {
         this.isLoading = false;
-        this.tableSizeG2G = res['count']
+        this.tableSizeG2G = res['count'];
         this.dataSourceG2G = [];
-
         for (let index in res['result']) {
           let temp = {
             "gene": res['result'][index][0],
@@ -132,11 +134,13 @@ export class DashboardComponent implements OnInit {
           }
           this.dataSourceG2G.push(temp);
         }
+        this.g2gTableReady = true;
       })
   }
 
   getM2GComparisonStats() {
     this.isLoading = true;
+    this.m2gTableReady = false;
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `m2g/statistics?category_a=${this.metadataId.split('.')[0]}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -148,7 +152,7 @@ export class DashboardComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        this.tableSizeM2G = res['count']
+        this.tableSizeM2G = res['count'];
         this.dataSourceM2G = [];
         this.isLoading = false;
         for (let index in res['result']) {
@@ -159,15 +163,15 @@ export class DashboardComponent implements OnInit {
             'test_statistics': res['result'][index][3],
             'pvalue': res['result'][index][4]
           }
-          
           this.dataSourceM2G.push(temp);
         }
-        this.m2gTableReady = true
+        this.m2gTableReady = true;
       })
   }
 
   getM2MComparisonStats() {
     this.isLoading = true;
+    this.m2mTableReady = false;
     let metaType = "phenotype"
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `m2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
@@ -183,7 +187,6 @@ export class DashboardComponent implements OnInit {
         this.isLoading = false;
         this.tableSizeM2M = res['count']
         this.dataSourceM2M = [];
-
         for (let index in res['result']) {
           let temp = {
             "category_b": res['result'][index][1],
@@ -194,18 +197,13 @@ export class DashboardComponent implements OnInit {
           this.dataSourceM2M.push(temp);
         }
         this.m2mTableReady = true;
-
-        console.log("m2m: ", this.dataSourceM2M)
       })
   }
 
-  tableSizeM2MLibrary = 0;
-  dataSourceM2MLibrary = [];
-  m2mLibraryTableReady = false;
-
   getM2MLibraryComparisonStats() {
     this.isLoading = true;
-    let metaType = "library"
+    this.m2mLibraryTableReady = false;
+    let metaType = "library";
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `m2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -237,7 +235,7 @@ export class DashboardComponent implements OnInit {
   getG2MComparisonStats() {
     this.isLoading = true;
     let metaType = "phenotype"
-    // this.g2mTableReady = false;
+    this.g2mTableReady = false;
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `g2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -249,6 +247,7 @@ export class DashboardComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
+        console.log("g2m: ", res)
         this.isLoading = false;
         this.tableSizeG2M = res['count']
         this.dataSourceG2M = [];
@@ -262,18 +261,14 @@ export class DashboardComponent implements OnInit {
           this.dataSourceG2M.push(temp);
         }
         this.g2mTableReady = true
-        this.getG2MLibraryComparisonStats();
+        // this.getG2MLibraryComparisonStats();
       })
   }
 
-  tableSizeG2MLibrary = 0
-  dataSourceG2MLibrary = []
-  g2mLibraryTableReady = false
-
   getG2MLibraryComparisonStats() {
     this.isLoading = true;
-    let metaType = "library"
-    // this.g2mTableReady = false;
+    let metaType = "library";
+    this.g2mLibraryTableReady = false;
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `g2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -301,11 +296,6 @@ export class DashboardComponent implements OnInit {
         this.g2mLibraryTableReady = true
       })
   }
-
-  metadataArr = [];
-  phenotypeArr = [];
-  libraryMetadataArr = [];
-  metadataListReady = false;
 
   getListOfMetadata() {
     this.isLoading = true;
@@ -344,7 +334,6 @@ export class DashboardComponent implements OnInit {
         }, 500)
       })
   }
-  geneToSym = {}
 
   getListOfGeneToSymbol() {
     let apiUrl = "https://api.seahorse.tm4.org";
@@ -442,6 +431,7 @@ export class DashboardComponent implements OnInit {
     this.selectedTissue = value;
     if (this.showGene) {
       this.showGene = !this.showGene
+      this.g2gTableReady = false;
       this.expandSection('gene')
     } else if (this.showPhenotype) {
       this.showPhenotype = !this.showPhenotype
@@ -477,7 +467,6 @@ export class DashboardComponent implements OnInit {
     this.dataSourceG2M = [];
     this.dataSourceG2MLibrary = [];
     this.dataSourceG2G = [];
-
   }
 
   changeMetadata(name) {
@@ -505,19 +494,17 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  showModal = false;
-  temp_img = ""
-
-  openSPDialog(imageUrl: string, plotType: string) {
+  openSPDialog(imageUrl: string, plotType: string, tissue: string) {
     this.dialog.open(ImageModalComponent, {
       data: {
         imageUrl: imageUrl,
-        plotType: plotType
+        plotType: plotType,
+        tissue: tissue
       },
     });
   }
 
-  openBPDialog(imageUrl: string, plotType: string, num, cat, typeOfLookUp) {
+  openBPDialog(imageUrl: string, plotType: string, num, cat, typeOfLookUp, tissue) {
     this.dialog.open(ImageModalComponent, {
       data: {
         imageUrl: imageUrl,
@@ -526,11 +513,13 @@ export class DashboardComponent implements OnInit {
         metadata2Id: cat,
         metadataLookUp: this.metadataLookUp,
         comparisonType: typeOfLookUp,
-        size: "large"
+        size: "large",
+        tissue: tissue
       },
     });
   }
-  openHMDialog(imageUrl: string, plotType: string, num, cat, typeOfLookUp) {
+
+  openHMDialog(imageUrl: string, plotType: string, num, cat, typeOfLookUp, tissue) {
     this.dialog.open(ImageModalComponent, {
       data: {
         imageUrl: imageUrl,
@@ -539,7 +528,8 @@ export class DashboardComponent implements OnInit {
         metadata2Id: cat,
         metadataLookUp: this.metadataLookUp,
         comparisonType: typeOfLookUp,
-        size: "large"
+        size: "large",
+        tissue: tissue
       },
     });
   }
@@ -552,29 +542,32 @@ export class DashboardComponent implements OnInit {
         metadata2Id: meta2,
         metadataLookUp: this.metadataLookUp,
         comparisonType: typeOfLookUp,
-        size: "large"
+        size: "large",
+        tissue: this.selectedTissue
       },
     });
   }
 
-  onSelectImage(base64, plotType, meta1, meta2, typeOfLookUp) {
+  onSelectImage(base64, plotType, meta1, meta2, typeOfLookUp, tissue) {
     if (plotType === 'boxplot') {
-      this.openBPDialog(this.temp_img, plotType, meta1, meta2, typeOfLookUp)
+      this.openBPDialog(this.temp_img, plotType, meta1, meta2, typeOfLookUp, tissue)
     } else if (plotType === 'heatmap') {
-      this.openHMDialog(this.temp_img, plotType, meta1, meta2, typeOfLookUp)
+      this.openHMDialog(this.temp_img, plotType, meta1, meta2, typeOfLookUp, tissue)
     }
   }
 
   onSelectScatterplotImage(base64, plotType) {
+    console.log("plottype: ", plotType, this.selectedTissue)
     this.temp_img = base64;
-    this.openSPDialog(this.temp_img, plotType)
+    this.openSPDialog(this.temp_img, plotType, this.selectedTissue)
   }
 
   onSelectMetadataLink(meta1, meta2, typeOfLookUp) {
     let plotType = '';
     if (this.checkPlotType(meta1) === 'categoric' && this.checkPlotType(meta2) === 'categoric') {
       plotType = 'heatmap';
-      this.openMLDialog(plotType, meta1, meta2, typeOfLookUp)
+      // this.openMLDialog(plotType, meta1, meta2, typeOfLookUp)
+      this.openHMDialog(this.temp_img, plotType, meta1, meta2, typeOfLookUp, this.selectedTissue)
     } else if (this.checkPlotType(meta1) === 'numeric' && this.checkPlotType(meta2) === 'numeric') {
       plotType = 'scatterplot';
       if (meta2.startsWith("ENSG")) {
@@ -585,7 +578,8 @@ export class DashboardComponent implements OnInit {
       this.openMLDialog(plotType, meta1, meta2, typeOfLookUp)
     } else {
       plotType = 'boxplot';
-      this.openMLDialog(plotType, meta1, meta2, typeOfLookUp)
+      // this.openMLDialog(plotType, meta1, meta2, typeOfLookUp)
+      this.openBPDialog(this.temp_img, plotType, meta1, meta2, typeOfLookUp, this.selectedTissue)
     }
   }
 
@@ -618,3 +612,4 @@ export class DashboardComponent implements OnInit {
     }
   }
 }
+
