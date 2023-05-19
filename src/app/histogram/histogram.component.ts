@@ -58,7 +58,6 @@ export class HistogramComponent implements OnChanges {
         throw message
       }))
       .subscribe(res => {
-        // console.log("histogram: ", res)
         this.isLoading = false;
         let numberOfBins = 20;
         this.min = res["data"][0]["x0"];
@@ -67,7 +66,6 @@ export class HistogramComponent implements OnChanges {
         if (this.histogramData.length === 0) {
           this.hideHistogram = true;
         } else {
-          // console.log("start create histo")
           this.hideHistogram = false;
           this.createHistogram()
         }
@@ -157,7 +155,7 @@ export class HistogramComponent implements OnChanges {
 
     //check this value later
     y.domain([0, d3.max(this.histogramData, function (d) {
-      return d.count;
+      return (d.count+1);
     })]);   // d3.hist has to be called before the Y axis obviously
     svg.append("g")
       .call(d3.axisLeft(y));
@@ -171,6 +169,9 @@ export class HistogramComponent implements OnChanges {
       .attr("transform", function (d) { return "translate(" + x(d.x0) + "," + y(d.count) + ")"; })
       .attr("width", function (d) { return Math.abs(x(d.x1) - x(d.x0) - 1); })
       .attr("height", function (d) { return height - y(d.count); })
+      // .attr("height", function (d) { 
+      //   return d.count === 0 ? 0 : height - y(d.count);
+      // })
       .style("fill", "#69b3a2")
       .on('mouseover', function (mouseEvent: any, d) {
         pointTip.show(mouseEvent, d, this);

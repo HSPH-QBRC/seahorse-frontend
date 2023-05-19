@@ -22,7 +22,7 @@ export class DashboardComponent implements OnInit {
   // metadataId = 'SMUBRID';
   metadataId = 'SMNTRART';
   // metadataId = 'MHARTHTS';
-  metadata2Id = 'ENSG00000180806'
+  metadata2Id = 'ENSG00000108405'
   geneId = '';
   symbolId = '';
   symbolId2 = '';
@@ -54,9 +54,9 @@ export class DashboardComponent implements OnInit {
   displayedColumnsM2G: string[] = ['symbol', 'test', 'test_statistics', 'pvalue'];
   displayedColumnsM2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
   displayedColumnsG2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
-  tissue = 'Brain - cluster 1';
+  tissue = 'Bladder';
   tissueList = [];
-  selectedTissue = 'Brain - cluster 1';
+  selectedTissue = 'Bladder';
   autoFillData = [];
   showPhenotype = true;
   showLibraryMetadata = false;
@@ -247,7 +247,6 @@ export class DashboardComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        console.log("g2m: ", res)
         this.isLoading = false;
         this.tableSizeG2M = res['count']
         this.dataSourceG2M = [];
@@ -557,7 +556,6 @@ export class DashboardComponent implements OnInit {
   }
 
   onSelectScatterplotImage(base64, plotType) {
-    console.log("plottype: ", plotType, this.selectedTissue)
     this.temp_img = base64;
     this.openSPDialog(this.temp_img, plotType, this.selectedTissue)
   }

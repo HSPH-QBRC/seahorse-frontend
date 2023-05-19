@@ -71,7 +71,7 @@
         </div>
         <div *ngIf="metadataId.startsWith('ENSG')" class="row justify-content-center">
             <div class="testBackgroundSummaryPlot">
-                <app-histogram [metadataId]="metadataId" [comparisonType]="'g2m'" [meta]="''"></app-histogram>
+                <app-histogram [metadataId]="metadataId" [tissue]="selectedTissue" [comparisonType]="'g2g'" [meta]="''"></app-histogram>
             </div>
         </div>
         <h4 (click)="expandSection('phenotype')" #myPhenotype>
@@ -599,14 +599,15 @@
             <p *ngIf="this.dataSourceG2G.length === 0 && showGene" class="hideMessage text-center">
                 There is no data to be displayed.</p>
             <div *ngIf="showGene && !isLoading && dataSourceG2G.length > 0">
+
                 <div class=" row justify-content-center">
                     <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="testBackgroundSummaryPlot">
                         <app-barchart [metadataId]="metadataId" [tissue]="selectedTissue"></app-barchart>
                     </div>
-                    <div class="testBackgroundSummaryPlot">
+                    <!-- <div class="testBackgroundSummaryPlot">
                         <app-histogram [metadataId]="metadataId" [comparisonType]="'g2g'" [tissue]="selectedTissue">
                         </app-histogram>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="row justify-content-center"
