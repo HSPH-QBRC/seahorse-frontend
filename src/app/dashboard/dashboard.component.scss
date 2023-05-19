@@ -173,3 +173,19 @@ table {
     justify-content: center;
     align-items: center;
 }
+
+.mat-column-description {
+    max-width: 200px;
+}
+
+td {
+    padding-right: 20px !important;
+}
+
+.mat-row {
+    height: auto;
+}
+
+.mat-cell {
+    padding: 7px 7px 7px 0;
+}

@@ -1,12 +1,8 @@
-import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
-import { nest } from 'd3-collection';
-import * as d3Collection from 'd3-collection';
-import { MatDialogRef } from '@angular/material/dialog';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-boxplot',
@@ -38,9 +34,7 @@ export class BoxPlotComponent implements OnChanges {
 
   bpSVG
 
-  constructor(private httpClient: HttpClient,
-    private sanitizer: DomSanitizer) { }
-
+  constructor(private httpClient: HttpClient) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.noData = false
@@ -201,28 +195,10 @@ export class BoxPlotComponent implements OnChanges {
     svg.call(xAxisTip);
 
     let tempMin = this.min
-    let tempMax = this.max
-
-    // Compute quartiles, median, inter quantile range min and max --> these info are then used to draw the box.
-    // this.sumstat = d3Collection.nest() // nest function allows to group the calculation per level of a factor
-    //   .key(function (d) { return d.key; })
-    //   .rollup(function (d) {
-    //     let q1 = d3.quantile(d.map(function (g) { return g.value; }).sort(d3.ascending), .25)
-    //     let median = d3.quantile(d.map(function (g) { return g.value; }).sort(d3.ascending), .5)
-    //     let q3 = d3.quantile(d.map(function (g) { return g.value; }).sort(d3.ascending), .75)
-    //     let interQuantileRange = q3 - q1
-    //     let min = q1 - 1.5 * interQuantileRange
-    //     let max = q3 + 1.5 * interQuantileRange
-
-    //     tempMin = Math.min(min, tempMin)
-    //     tempMax = Math.max(max, tempMax)
-    //     return ({ q1: q1, median: median, q3: q3, interQuantileRange: interQuantileRange, min: min, max: max })
-    //   })
-    //   .entries(this.boxPlotData)
     this.sumstat = this.tempBPData
 
-    this.min = tempMin > 0 ? tempMin - (this.max * .2) : (tempMin != 0 ? tempMin * 1.2 : -(this.max / 4));
-    this.max = this.max * 1.2
+    this.min = tempMin > 0 ? tempMin - (this.max * .03) : (tempMin != 0 ? tempMin * 1.03 : -(this.max / 30));
+    this.max = this.max * 1.03
 
     if (this.sumstat.length > 12) {
       this.sumstat.sort((b, a) => b.value.median - a.value.median)
@@ -268,7 +244,6 @@ export class BoxPlotComponent implements OnChanges {
       .style("width", 40)
 
     // // rectangle for the main box
-    // var boxWidth = 20
     var boxWidth = this.size === 'small' ? 10 : 20
     svg
       .selectAll("boxes")
@@ -332,7 +307,7 @@ export class BoxPlotComponent implements OnChanges {
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         .style('font-size', this.size === 'small' ? '6px' : '12px')
-        .text(this.typeOfLookUp === 'm2g' ? '' : (this.metadataLookUp[this.metadataNumId].vardesc[0].length > 30  ? this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "..." : this.metadataLookUp[this.metadataNumId].vardesc[0]))
+        .text(this.typeOfLookUp === 'm2g' ? '' : (this.metadataLookUp[this.metadataNumId].vardesc[0].length > 30 ? this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "..." : this.metadataLookUp[this.metadataNumId].vardesc[0]))
 
     }
 
@@ -429,9 +404,6 @@ export class BoxPlotComponent implements OnChanges {
   @Output() svgLoaded = new EventEmitter();
 
   onImageClicked(event: Event) {
-    // const divs = document.getElementsByClassName('my_boxplot_' + this.metadataCatId + '_' + this.metadataNumId.split('.')[0] + "_" + this.size)
-    // const firstDiv = divs[0];
-    // const svg = firstDiv.querySelector('svg');
     const svg = ''
     this.svgLoaded.emit(svg);
   }
