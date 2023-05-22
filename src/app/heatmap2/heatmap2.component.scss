@@ -22,12 +22,19 @@
     font-weight: 500;
     color: rgba(0, 0, 0, 0.9);
   }
-  
 }
 
-.noData_description{
+.noData_description {
   padding: 70px 0;
   text-align: center;
   color: grey;
 }
 
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 300px;
+  height: 200px;
+}

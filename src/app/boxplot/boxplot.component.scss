@@ -3,3 +3,12 @@
     text-align: center;
     color: grey;
 }
+
+.loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 300px;
+    height: 200px;
+}

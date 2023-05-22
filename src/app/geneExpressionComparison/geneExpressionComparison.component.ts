@@ -88,7 +88,6 @@ export class GeneExpressionComparisonComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        console.log("g2g res: ", res)
         window.scrollTo(0, 500)
         this.dataSource = [];
         this.isLoading = false;

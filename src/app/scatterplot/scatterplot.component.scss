@@ -1,8 +1,13 @@
-// .imgDiv{
-//     width: 300px;
-//     height: 200px;
-// }
 
 img {
-    max-width:100%;
+    max-width: 100%;
+}
+
+.loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 300px;
+    height: 200px;
 }

@@ -20,9 +20,11 @@ export class DashboardComponent implements OnInit {
 
   searchValue = '';
   // metadataId = 'SMUBRID';
-  metadataId = 'SMNTRART';
+  // metadataId = 'SMNTRART';
   // metadataId = 'MHARTHTS';
-  metadata2Id = 'ENSG00000108405'
+  metadataId = 'WGHT';
+  // metadata2Id = 'ENSG00000108405'
+  metadata2Id = '';
   geneId = '';
   symbolId = '';
   symbolId2 = '';
@@ -54,9 +56,9 @@ export class DashboardComponent implements OnInit {
   displayedColumnsM2G: string[] = ['symbol', 'test', 'test_statistics', 'pvalue'];
   displayedColumnsM2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
   displayedColumnsG2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
-  tissue = 'Bladder';
+  tissue = 'Brain - cluster 1';
   tissueList = [];
-  selectedTissue = 'Bladder';
+  selectedTissue = 'Brain - cluster 1';
   autoFillData = [];
   showPhenotype = true;
   showLibraryMetadata = false;

@@ -46,7 +46,6 @@ export class BarChartComponent implements OnInit, OnChanges {
     this.maxXaxisLabelLength = 0;
 
     let categorical = this.metadataId
-    console.log("tissue: ", this.tissue)
     this.isLoading = true;
     this.getData(categorical);
   }
@@ -64,8 +63,6 @@ export class BarChartComponent implements OnInit, OnChanges {
         throw message
       }))
       .subscribe(res => {
-        console.log("barchart res: ", res, categoric, this.meta, this.tissue) 
-
         this.isLoading = false;
 
         for (let index in res) {
