@@ -101,13 +101,7 @@ export class DashboardComponent implements OnInit {
     this.getListOfMetadata();
     this.getAutoCompleteData();
     this.getListOfGeneToSymbol();
-    if (this.layoutType === "metadata") {
-      this.typeOfLookUp = "m2m";
-      this.getM2MComparisonStats();
-    } else if (this.layoutType === "gene") {
-      this.typeOfLookUp = "g2g";
-      this.getG2GComparisonStats();
-    }
+
   }
 
   getG2GComparisonStats() {
@@ -333,6 +327,14 @@ export class DashboardComponent implements OnInit {
         setTimeout(() => {
           this.metadataListReady = true;
         }, 500)
+
+        if (this.layoutType === "metadata") {
+          this.typeOfLookUp = "m2m";
+          this.getM2MComparisonStats();
+        } else if (this.layoutType === "gene") {
+          this.typeOfLookUp = "g2g";
+          this.getG2GComparisonStats();
+        }
       })
   }
 
