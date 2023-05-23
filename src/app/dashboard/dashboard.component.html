@@ -19,7 +19,7 @@
                 </div>
                 <div *ngIf="showPhenoList">
                     <div *ngFor="let cat of phenotypeArr">
-                        <li>
+                        <li *ngIf="!excludeListPhenotype.includes(cat.varname)">
                             <a class="page" (click)="changeMetadata(cat.varname)">{{cat.vardesc[0]}}</a>
                         </li>
                     </div>
@@ -31,12 +31,11 @@
                 </div>
                 <div *ngIf="showLibraryList">
                     <div *ngFor="let cat of libraryMetadataArr">
-                        <li>
+                        <li *ngIf="!excludeListLibrary.includes(cat.varname)">
                             <a class="page" (click)="changeMetadata(cat.varname)">{{cat.vardesc[0]}}</a>
                         </li>
                     </div>
                 </div>
-
             </ul>
         </div>
     </div>

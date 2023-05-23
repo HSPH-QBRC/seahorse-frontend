@@ -23,11 +23,13 @@ export class DashboardComponent implements OnInit {
   // metadataId = 'SMNTRART';
   metadataId = 'MHARTHTS';
   // metadataId = 'WGHT';
-  // metadata2Id = 'ENSG00000108405'
+  // metadata2Id = 'ENSG00000108405';
   metadata2Id = '';
   geneId = '';
   symbolId = '';
   symbolId2 = '';
+  excludeListPhenotype = ['SUBJID', 'HGHTU', 'WGHTU'];
+  excludeListLibrary = ['SAMPID']
   displayScatterPlot = false;
   displayBoxPlot = false;
   displayHeatmap = false;
@@ -322,6 +324,7 @@ export class DashboardComponent implements OnInit {
           this.metadataArr.push(temp)
           this.metadataLookUp[res[i][0]] = temp
         }
+        console.log("pheno/meta: ", this.phenotypeArr, this.libraryMetadataArr)
 
         //Find a better way to handle metadataLookUp not being ready yet. Maybe use an Observerable??
         setTimeout(() => {
