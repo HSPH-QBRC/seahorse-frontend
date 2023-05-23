@@ -70,7 +70,8 @@
         </div>
         <div *ngIf="metadataId.startsWith('ENSG')" class="row justify-content-center">
             <div class="testBackgroundSummaryPlot">
-                <app-histogram [metadataId]="metadataId" [tissue]="selectedTissue" [comparisonType]="'g2g'" [meta]="''"></app-histogram>
+                <app-histogram [metadataId]="metadataId" [tissue]="selectedTissue" [comparisonType]="'g2g'" [meta]="''">
+                </app-histogram>
             </div>
         </div>
         <h4 (click)="expandSection('phenotype')" #myPhenotype>
@@ -570,6 +571,10 @@
                                     {{geneToSym[element.gene] !== undefined ?
                                     geneToSym[element.gene] : element.gene}} </td>
                             </ng-container>
+                            <ng-container matColumnDef="gene">
+                                <th mat-header-cell *matHeaderCellDef> Gene </th>
+                                <td mat-cell *matCellDef="let element"> {{element.gene}} </td>
+                            </ng-container>
                             <ng-container matColumnDef="test">
                                 <th mat-header-cell *matHeaderCellDef> Test </th>
                                 <td mat-cell *matCellDef="let element"> {{element.test}} </td>
@@ -642,6 +647,10 @@
                             <td class="metaColumn" mat-cell *matCellDef="let element"
                                 (click)="onSelectMetadataLink(metadataId, element.gene, 'g2g')">
                                 {{element.symbol}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="gene">
+                            <th mat-header-cell *matHeaderCellDef> Gene </th>
+                            <td mat-cell *matCellDef="let element"> {{element.gene}} </td>
                         </ng-container>
                         <ng-container matColumnDef="correlation">
                             <th mat-header-cell *matHeaderCellDef> Correlation </th>

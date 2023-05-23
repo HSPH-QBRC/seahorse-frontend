@@ -54,8 +54,8 @@ export class DashboardComponent implements OnInit {
   dataSourceM2M = [];
   dataSourceG2M = [];
   dataSourceM2G = [];
-  displayedColumnsG2G: string[] = ['symbol', 'correlation', 'entrezid'];
-  displayedColumnsM2G: string[] = ['symbol', 'test', 'test_statistics', 'pvalue'];
+  displayedColumnsG2G: string[] = ['symbol', 'gene', 'correlation', 'entrezid'];
+  displayedColumnsM2G: string[] = ['symbol', 'gene', 'test', 'test_statistics', 'pvalue'];
   displayedColumnsM2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
   displayedColumnsG2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
   tissue = 'Brain - cluster 1';
@@ -132,6 +132,7 @@ export class DashboardComponent implements OnInit {
           }
           this.dataSourceG2G.push(temp);
         }
+        console.log("g2g: ", this.dataSourceG2G)
         this.g2gTableReady = true;
       })
   }
@@ -324,7 +325,6 @@ export class DashboardComponent implements OnInit {
           this.metadataArr.push(temp)
           this.metadataLookUp[res[i][0]] = temp
         }
-        console.log("pheno/meta: ", this.phenotypeArr, this.libraryMetadataArr)
 
         //Find a better way to handle metadataLookUp not being ready yet. Maybe use an Observerable??
         setTimeout(() => {
