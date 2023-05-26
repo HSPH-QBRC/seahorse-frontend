@@ -5,7 +5,7 @@ import { catchError } from "rxjs/operators";
 import tissuesJson from './tissueList.json';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageModalComponent } from '../image-modal/image-modal.component';
-import { image } from 'd3';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-dashboard',
@@ -132,7 +132,6 @@ export class DashboardComponent implements OnInit {
           }
           this.dataSourceG2G.push(temp);
         }
-        console.log("g2g: ", this.dataSourceG2G)
         this.g2gTableReady = true;
       })
   }
@@ -615,6 +614,50 @@ export class DashboardComponent implements OnInit {
       }
       this.myGene.nativeElement.scrollIntoView({ behavior: 'smooth' });
     }
+  }
+
+  downloadTable(comparisonType, metaType) {
+    let limit = 1000000;
+    let offset = 0;
+    let annotationUrl = ''
+    if (comparisonType === 'm2m') {
+      annotationUrl = `m2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${limit}&offset=${offset}`;
+    } else if (comparisonType === 'm2mLibrary') {
+      annotationUrl = `m2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${limit}&offset=${offset}`;
+    } else if (comparisonType === 'm2g') {
+      annotationUrl = `m2g/statistics?category_a=${this.metadataId.split('.')[0]}&tissue=${this.selectedTissue}&limit=${limit}&offset=${offset}`;
+    } else if (comparisonType === 'g2m') {
+      annotationUrl = `g2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${limit}&offset=${offset}`;
+    } else if (comparisonType === 'g2mLibrary') {
+      annotationUrl = `g2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${limit}&offset=${offset}`;
+    } else if (comparisonType === 'g2g') {
+      annotationUrl = `g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${limit}&offset=${offset}`;
+    }
+    let apiUrl = "https://api.seahorse.tm4.org/";
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        this.isLoading = false;
+        throw message
+      }))
+      .subscribe(res => {
+        const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+        const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(res["result"]);
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+        const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        this.saveAsExcelFile(excelBuffer, 'output.xlsx');
+      })
+  }
+
+  saveAsExcelFile(buffer: any, fileName: string): void {
+    const data: Blob = new Blob([buffer], { type: 'application/octet-stream' });
+    const url: string = window.URL.createObjectURL(data);
+    const link: HTMLAnchorElement = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
   }
 }
 

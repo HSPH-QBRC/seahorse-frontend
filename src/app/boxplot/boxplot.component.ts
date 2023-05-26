@@ -115,6 +115,7 @@ export class BoxPlotComponent implements OnChanges {
         throw message
       }))
       .subscribe(res => {
+        console.log("boxplot res: ", res, numericId, categoricalId)
         this.tempBPData = res["boxplot"]["boxPlotData"];
         if (this.tempBPData.length === 0) {
           this.noData = true

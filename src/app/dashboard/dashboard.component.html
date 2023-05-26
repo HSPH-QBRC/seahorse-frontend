@@ -4,7 +4,9 @@
         <div class="row">
             <a routerLink="/" routerLinkActive="active" ariaCurrentWhenActive="page" class="titleLink">
                 <div class="text-center logo">
-                    <img width="150px" src="/assets/images/seahorse_logo3.png" alt="image">
+                    <!-- <img width="150px" src="/assets/images/seahorse_logo3.png" alt="image"> -->
+                    <img class="svg-image" src="/assets/images/seahorse.svg" alt="image">
+                    <div class="title-seahorse">SEAHORSE</div>
                 </div>
             </a>
         </div>
@@ -77,6 +79,7 @@
         <h4 (click)="expandSection('phenotype')" #myPhenotype>
             <span class="expandObj">{{showPhenotype ? "-":"+"}}</span> Phenotype
         </h4>
+
         <div *ngIf="layoutType === 'metadata'">
             <p *ngIf="this.dataSourceM2M.length === 0 && showPhenotype" class="hideMessage text-center">
                 There is no data to be displayed.</p>
@@ -160,6 +163,11 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-center">
+                    <button class="download-button" mat-stroked-button (click)="downloadTable('m2m', 'phenotype')"><i
+                            class="material-icons">cloud_download</i> Download Table</button>
                 </div>
                 <br>
                 <div class="d-flex justify-content-center">
@@ -247,6 +255,11 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-center">
+                    <button class="download-button" mat-stroked-button (click)="downloadTable('g2m', 'phenotype')"><i
+                            class="material-icons">cloud_download</i> Download Table</button>
                 </div>
                 <br>
                 <div class="d-flex justify-content-center">
@@ -377,6 +390,11 @@
                 </div>
                 <br>
                 <div class="d-flex justify-content-center">
+                    <button class="download-button" mat-stroked-button (click)="downloadTable('m2mLibrary', 'library')"><i
+                            class="material-icons">cloud_download</i> Download Table</button>
+                </div>
+                <br>
+                <div class="d-flex justify-content-center">
                     <table mat-table [dataSource]='dataSourceM2MLibrary' class="mat-elevation-z8">
                         <ng-container matColumnDef="category_b">
                             <th mat-header-cell *matHeaderCellDef> Metadata </th>
@@ -465,6 +483,11 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-center">
+                    <button class="download-button" mat-stroked-button (click)="downloadTable('g2mLibrary', 'library')"><i
+                            class="material-icons">cloud_download</i> Download Table</button>
                 </div>
                 <br>
                 <div class="d-flex justify-content-center">
@@ -560,6 +583,10 @@
                         class="hideMessage text-center">
                         There is no data to be displayed.</p> -->
                     <br>
+                    <div class="d-flex justify-content-center">
+                        <button class="download-button" mat-stroked-button (click)="downloadTable('m2g', 'phenotype')"><i
+                                class="material-icons">cloud_download</i> Download Table</button>
+                    </div>
                     <br>
                     <div class="d-flex justify-content-center">
                         <table mat-table [dataSource]="dataSourceM2G" class="mat-elevation-z8"
@@ -638,6 +665,10 @@
                 </div>
 
                 <br>
+                <div class="d-flex justify-content-center">
+                    <button class="download-button" mat-stroked-button (click)="downloadTable('g2g', 'phenotype')"><i
+                            class="material-icons">cloud_download</i> Download Table</button>
+                </div>
                 <br>
                 <div class="d-flex justify-content-center">
                     <table mat-table [dataSource]="dataSourceG2G" class="mat-elevation-z8"

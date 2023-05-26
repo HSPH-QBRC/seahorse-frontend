@@ -189,3 +189,29 @@ td {
 .mat-cell {
     padding: 7px 7px 7px 0;
 }
+
+.svg-image {
+    width: 50px;
+    height: auto; /* Maintain aspect ratio */
+    margin: 30px 0 12px;
+}
+
+.title-seahorse {
+    font-size: 36px;
+    font-weight: 800;
+    color: rgba(0, 0, 0, 0.8);
+    -webkit-text-stroke: 1px rgba(0, 0, 0);
+}
+
+.download-button {
+    color: #1da1f2;
+}
+
+// .button-container{
+//     margin-right: 25px;
+// }
+
+.material-icons {
+    vertical-align: middle; /* Align the icon vertically within the button */
+    margin-right: 5px; /* Add some spacing between the icon and text */
+}
