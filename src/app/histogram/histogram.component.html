@@ -1,5 +1,10 @@
-<app-progress-spinner *ngIf="isLoading"></app-progress-spinner>
-<div class="my_histogram" *ngIf="!hideHistogram">
-    <div [class]="'my_histogram_' + metadataId"></div>
+<!-- <app-progress-spinner *ngIf="isLoading"></app-progress-spinner> -->
+<div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="30"></mat-spinner>
 </div>
-<p *ngIf="hideHistogram" class="hideMessage text-center">There is no data to be displayed.</p>
+<div>
+    <div class="my_histogram" *ngIf="!hideHistogram">
+        <div [class]="'my_histogram_' + metadataId"></div>
+    </div>
+    <p *ngIf="hideHistogram" class="hideMessage text-center">There is no data to be displayed.</p>
+</div>
