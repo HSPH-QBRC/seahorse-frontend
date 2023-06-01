@@ -1,9 +1,19 @@
 .example-form {
-    min-width: 150px;
-    max-width: 500px;
-    width: 100%;
-  }
-  
-  .example-full-width {
-    width: 100%;
-  }
+  min-width: 150px;
+  max-width: 500px;
+  width: 90%;
+}
+
+.example-full-width {
+  width: 100%;
+}
+
+::ng-deep .mat-option {
+  font-size: 12px; /* Set the desired font size */
+}
+
+.custom-inputfield {
+  font-size: 12px;
+  max-width: 200px; 
+}
+

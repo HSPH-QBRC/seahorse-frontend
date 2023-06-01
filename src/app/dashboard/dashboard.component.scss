@@ -2,7 +2,13 @@
     background-color: #f8f6f2;
     min-height: 100vh;
     flex: 1;
+    border-right: 1px solid rgba(40, 40, 40, 0.1);
 }
+// .searchDiv {
+//     // display: flex;
+//     // justify-content: center;
+//     // align-items: center;
+// }
 
 .page {
     color: #716d66;
@@ -10,6 +16,7 @@
     font-size: 12px;
     text-transform: capitalize;
 }
+
 .page:hover {
     color: grey;
     cursor: pointer;
@@ -20,7 +27,28 @@ ul li::marker {
 }
 
 ul li {
-    margin: 10px 25px;
+    margin: 0 25px;
+}
+
+.pageList {
+    line-height: 1.2;
+    width: 80%;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+.listRow {
+    display: block;
+    width: calc(100% + 50px);
+    height: 100%;
+
+    margin-left: -35px;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+.listRow:hover {
+    color: rgba(40, 40, 40);
+    cursor: pointer;
+    background-color: rgba(226, 221, 214, 1);
 }
 
 .pageTitle {
@@ -28,7 +56,23 @@ ul li {
     color: rgba(40, 40, 40, 0.8);
     font-size: 14px;
     font-weight: 500;
+    display: block;
+    width: calc(100% + 50px);
+    height: 100%;
+    margin-left: -35px;
+    padding-left: 20px;
+    box-sizing: border-box;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
+
+.pageTitle:hover {
+    color: rgba(40, 40, 40);
+    height: 150%;
+    cursor: pointer;
+    background-color: rgba(226, 221, 214, 1);
+}
+
 .isActive {
     transition: color 0.2s ease, background-color 0.2s ease;
     background-color: #4fc9da;
@@ -41,20 +85,6 @@ ul li {
 .sideBarContainer {
     width: 100%;
 }
-
-// .title {
-//     font-size: 36px;
-//     font-weight: 800;
-//     margin: 10px 0 0 0;
-//     display: flex;
-//     justify-content: center;
-//     -webkit-text-stroke: 1px rgba(40, 40, 40, 0.5);
-//     // -webkit-text-stroke: 1px rgba(40, 40, 40, 0.9);
-//     -webkit-text-fill-color: tomato;
-// }
-// .titleLink:hover {
-//     text-decoration: none;
-// }
 
 hr {
     border: none;
@@ -214,4 +244,11 @@ td {
 .material-icons {
     vertical-align: middle; /* Align the icon vertically within the button */
     margin-right: 5px; /* Add some spacing between the icon and text */
+}
+
+.boldText {
+    font-weight: 800;
+}
+.expansionTitle:hover{
+    cursor: pointer;
 }
