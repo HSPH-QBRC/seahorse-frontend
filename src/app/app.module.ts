@@ -32,7 +32,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ImageModalComponent } from "./image-modal/image-modal.component";
 import { MatDialogModule } from '@angular/material/dialog';
-
+// import { TestComponent } from './test/test.component'
 
 
 @NgModule({
@@ -52,7 +52,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     MetadataToGeneExpressionComparison,
     DashboardComponent,
     AutocompleteInputComponent,
-    ImageModalComponent
+    ImageModalComponent,
+    // TestComponent
   ],
   imports: [
     BrowserModule,
