@@ -252,3 +252,12 @@ td {
 .expansionTitle:hover{
     cursor: pointer;
 }
+
+.loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 80vw;
+    height: 300px;
+  }

@@ -6,6 +6,7 @@ import tissuesJson from './tissueList.json';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageModalComponent } from '../image-modal/image-modal.component';
 import * as XLSX from 'xlsx';
+import { GSEAComponent } from '../gsea-dialog/gsea.component'
 
 @Component({
   selector: 'app-dashboard',
@@ -54,6 +55,7 @@ export class DashboardComponent implements OnInit {
   dataSourceM2M = [];
   dataSourceG2M = [];
   dataSourceM2G = [];
+  displayedColumnsGSEA: string[] = ['pvalue', 'pathway', 'top_tissues'];
   displayedColumnsG2G: string[] = ['symbol', 'gene', 'correlation', 'entrezid'];
   displayedColumnsM2G: string[] = ['symbol', 'gene', 'test', 'test_statistics', 'pvalue'];
   displayedColumnsM2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
@@ -100,10 +102,46 @@ export class DashboardComponent implements OnInit {
     this.tableFromSearch = false;
     this.metadataListReady = false;
     this.currPage = 0;
+
+    this.getGSEAComparisonStats();
+
     this.getListOfMetadata();
     this.getAutoCompleteData();
     this.getListOfGeneToSymbol();
+  }
 
+  tableSizeGSEA = 0;
+  dataSourceGSEA = [];
+  gseaTableReady = false;
+  isLoadingGSEA = false;
+
+  getGSEAComparisonStats() {
+    this.isLoadingGSEA = true;
+    this.g2gTableReady = false;
+    let apiUrl = "https://api.seahorse.tm4.org/";
+    let annotationUrl = `gsea/?meta=${this.metadataId}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
+    let queryURL = `${apiUrl}${annotationUrl}`;
+    this.httpClient.get(queryURL).pipe(
+      catchError(error => {
+        this.isLoading = false;
+        console.log("Error: ", error);
+        let message = `Error: ${error.error.error}`;
+        throw message
+      }))
+      .subscribe(res => {
+        console.log("gsea table: ", res)
+        this.isLoadingGSEA = false;
+        this.tableSizeGSEA = res['count'];
+        this.dataSourceGSEA = [];
+        for (let index in res['result']) {
+          let temp = {
+            "pvalue": res['result'][index][0],
+            "pathway": res['result'][index][1],
+          }
+          this.dataSourceGSEA.push(temp);
+        }
+        this.gseaTableReady = true;
+      })
   }
 
   getG2GComparisonStats() {
@@ -406,6 +444,8 @@ export class DashboardComponent implements OnInit {
       this.getG2MLibraryComparisonStats();
     } else if (comparison === 'g2g') {
       this.getG2GComparisonStats();
+    } else if (comparison === 'gsea') {
+      this.getGSEAComparisonStats();
     }
   }
 
@@ -658,6 +698,14 @@ export class DashboardComponent implements OnInit {
     link.href = url;
     link.download = fileName;
     link.click();
+  }
+
+  openGSEADialog() {
+    this.dialog.open(GSEAComponent, {
+      data: {
+        test: "hello"
+      },
+    });
   }
 }
 

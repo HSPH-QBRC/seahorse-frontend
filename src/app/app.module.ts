@@ -33,6 +33,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ImageModalComponent } from "./image-modal/image-modal.component";
 import { MatDialogModule } from '@angular/material/dialog';
 // import { TestComponent } from './test/test.component'
+import { GSEAComponent } from './gsea-dialog/gsea.component'
 
 
 @NgModule({
@@ -53,7 +54,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     DashboardComponent,
     AutocompleteInputComponent,
     ImageModalComponent,
-    // TestComponent
+    // TestComponent,
+    GSEAComponent
   ],
   imports: [
     BrowserModule,
