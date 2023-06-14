@@ -700,10 +700,11 @@ export class DashboardComponent implements OnInit {
     link.click();
   }
 
-  openGSEADialog() {
+  openGSEADialog(meta, pathway) {
     this.dialog.open(GSEAComponent, {
       data: {
-        test: "hello"
+        meta,
+        pathway
       },
     });
   }

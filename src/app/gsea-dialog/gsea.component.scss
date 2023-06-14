@@ -1,11 +1,12 @@
 .dialogContainer {
     width: 33vw;
     min-width: 450px;
+    max-height: 80vh;
 }
 
 .headerSpan {
     display: flex;
-    background-color: #1da1f2;
+    background-color: #f2b438;
     margin: -35px -30px 0 -30px;
 }
 
@@ -28,7 +29,7 @@
 
 .closeDialogButton {
     justify-content: flex-end;
-    margin: 10px 10px 0 0;
+    margin: 15px 10px 0 0;
     color: white;
     padding: 10px;
 }
@@ -40,4 +41,28 @@
 .submitBtnContainer {
     display: flex;
     justify-content: flex-end;
+}
+
+.loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    // width: 80vw;
+    // height: 300px;
+}
+
+li::marker {
+    color: #dfcfab !important;
+}
+
+li {
+    margin: 5px 10px;
+}
+
+.pageList {
+    line-height: 1.2;
+}
+.page{
+    color: rgba(0, 0, 0, 0.7) !important;
 }

@@ -11,17 +11,19 @@
     dictum, interdum tristique diam pellentesque.</div>
 
   <div class="dialogContent">
-    <div>Brain</div>
-    <div>Brain</div>
-    <div>Brain</div>
-    <div>Brain</div>
-    <div>Brain</div>
-    <div>Brain</div>
+    <div class="loading-container" *ngIf="isLoading">
+      <mat-spinner diameter="30"></mat-spinner>
+    </div>
+  </div>
+  <div *ngFor="let tissue of dataSource" class="listRow">
+    <li class="pageList">
+      <a class="page">{{tissue}}</a>
+    </li>
   </div>
 
   <div class="submitBtnContainer">
     <div mat-dialog-actions>
-      <button mat-button (click)="onNoClick()" tabindex="-1">Cancel</button>
+      <button mat-stroked-button (click)="onNoClick()" tabindex="-1" >Close</button>
     </div>
     <br>
   </div>

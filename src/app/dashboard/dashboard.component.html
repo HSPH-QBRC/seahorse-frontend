@@ -94,8 +94,8 @@
                     <td mat-cell *matCellDef="let element"> {{element.pathway}} </td>
                 </ng-container>
                 <ng-container matColumnDef="top_tissues">
-                    <th mat-header-cell *matHeaderCellDef> Button </th>
-                    <td mat-cell *matCellDef="let element"> <button (click)="openGSEADialog()">some_button</button> </td>
+                    <th mat-header-cell *matHeaderCellDef>  </th>
+                    <td mat-cell *matCellDef="let element"> <button mat-flat-button color="accent" (click)="openGSEADialog(this.metadataId, element.pathway)">Tissues</button> </td>
                 </ng-container>
                 <tr mat-header-row *matHeaderRowDef="displayedColumnsGSEA"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumnsGSEA"></tr>
