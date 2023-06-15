@@ -55,7 +55,7 @@ export class DashboardComponent implements OnInit {
   dataSourceM2M = [];
   dataSourceG2M = [];
   dataSourceM2G = [];
-  displayedColumnsGSEA: string[] = ['pvalue', 'pathway', 'top_tissues'];
+  displayedColumnsGSEA: string[] = ['rugplot','pvalue', 'pathway', 'top_tissues'];
   displayedColumnsG2G: string[] = ['symbol', 'gene', 'correlation', 'entrezid'];
   displayedColumnsM2G: string[] = ['symbol', 'gene', 'test', 'test_statistics', 'pvalue'];
   displayedColumnsM2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
@@ -135,6 +135,7 @@ export class DashboardComponent implements OnInit {
         this.dataSourceGSEA = [];
         for (let index in res['result']) {
           let temp = {
+            "rugplot": res['result'][index][2],
             "pvalue": res['result'][index][0],
             "pathway": res['result'][index][1],
           }

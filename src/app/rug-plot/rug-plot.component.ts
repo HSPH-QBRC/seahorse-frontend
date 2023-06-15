@@ -1,11 +1,4 @@
-import {
-  Component,
-  OnInit,
-  ChangeDetectionStrategy,
-  ElementRef,
-  ViewChild,
-  Input
-} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ElementRef, ViewChild, Input } from '@angular/core';
 import * as d3 from 'd3';
 
 /**
@@ -14,7 +7,7 @@ import * as d3 from 'd3';
  * Used in the GSEA table
  */
 @Component({
-  selector: 'mev-rug-plot',
+  selector: 'app-rugplot',
   templateUrl: './rug-plot.component.html',
   styleUrls: ['./rug-plot.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -38,16 +31,16 @@ export class RugPlotComponent implements OnInit {
   ngAfterViewInit() {
     this.startGraphic();
   }
-  constructor() {}
+  constructor() { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   startGraphic() {
     const plotData = this.plotData;
     //const width = 300
-    const margin = { top: 10, right: 20, bottom: 10, left: 20 }; // chart margins
+    const margin = { top: 10, right: 20, bottom: 10, left: 5 }; // chart margins
     const outerWidth = this.chart.nativeElement.offsetWidth;
-    const outerHeight = 100;
+    const outerHeight = 65;
     const width = outerWidth - margin.left - margin.right;
     const height = outerHeight - margin.top - margin.bottom;
 
@@ -80,7 +73,8 @@ export class RugPlotComponent implements OnInit {
       .attr('x', d => x(d))
       .attr('width', 1)
       .attr('y', 10)
-      .attr('height', 30);
+      .attr('height', 30)
+      .attr('fill', '#404040');
 
     const xAxis = d3.axisBottom(x).ticks(3); //.tickSize(50);
 
