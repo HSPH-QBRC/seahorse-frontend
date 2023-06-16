@@ -18,6 +18,7 @@ export class DashboardComponent implements OnInit {
   @ViewChild('myPhenotype') myPhenotype: ElementRef;
   @ViewChild('myLibrary') myLibrary: ElementRef;
   @ViewChild('myGene') myGene: ElementRef;
+  @ViewChild('myTugplot') myRugplot: ElementRef;
 
   searchValue = '';
   // metadataId = 'SMUBRID';
@@ -67,6 +68,7 @@ export class DashboardComponent implements OnInit {
   showPhenotype = true;
   showLibraryMetadata = false;
   showGene = false;
+  showRugplot = true;
   m2mTableReady = false;
   g2mTableReady = false;
   m2gTableReady = false;
@@ -117,7 +119,9 @@ export class DashboardComponent implements OnInit {
 
   getGSEAComparisonStats() {
     this.isLoadingGSEA = true;
-    this.g2gTableReady = false;
+    this.gseaTableReady = false;
+    this.dataSourceGSEA = [];
+    this.tableSizeGSEA = 0;
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `gsea/?meta=${this.metadataId}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
@@ -129,7 +133,6 @@ export class DashboardComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        console.log("gsea table: ", res)
         this.isLoadingGSEA = false;
         this.tableSizeGSEA = res['count'];
         this.dataSourceGSEA = [];
@@ -485,7 +488,7 @@ export class DashboardComponent implements OnInit {
     } else if (this.showLibraryMetadata) {
       this.showLibraryMetadata = !this.showLibraryMetadata
       this.expandSection('library')
-    }
+    } 
   }
 
   onSearch(value) {
@@ -654,6 +657,12 @@ export class DashboardComponent implements OnInit {
         this.layoutType === 'metadata' ? this.getM2GComparisonStats() : this.getG2GComparisonStats();
       }
       this.myGene.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    } else if (name === 'rugplot') {
+      this.showRugplot = !this.showRugplot;
+      if (this.showRugplot) {
+        this.getGSEAComparisonStats()
+      }
+      this.myRugplot.nativeElement.scrollIntoView({ behavior: 'smooth' });
     }
   }
 

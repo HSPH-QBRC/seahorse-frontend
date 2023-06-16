@@ -1,21 +1,21 @@
 <div class="dialogContainer">
   <span class="headerSpan">
-    <div class="dialogTitle">GSEA Tissue List</div>
+    <div class="dialogTitle">Other Significant Tissues</div>
     <div class="closeDialogButton" mat-dialog-close mat-icon-button type="button" (click)="onNoClick()">
       <mat-icon>close</mat-icon>
     </div>
   </span>
 
-  <div class="dialogContent">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse urna lacus, auctor sit
+  <!-- <div class="dialogContent">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse urna lacus, auctor sit
     amet erat id, fringilla posuere velit. Proin egestas erat sit amet egestas auctor. Nam convallis urna sit amet dolor
-    dictum, interdum tristique diam pellentesque.</div>
+    dictum, interdum tristique diam pellentesque.</div> -->
 
   <div class="dialogContent">
     <div class="loading-container" *ngIf="isLoading">
       <mat-spinner diameter="30"></mat-spinner>
     </div>
   </div>
-  <div *ngFor="let tissue of dataSource" class="listRow">
+  <div *ngFor="let tissue of dataSource" >
     <li class="pageList">
       <a class="page">{{tissue}}</a>
     </li>
