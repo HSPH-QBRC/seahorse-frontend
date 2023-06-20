@@ -6,7 +6,7 @@ import tissuesJson from './tissueList.json';
 import { MatDialog } from '@angular/material/dialog';
 import { ImageModalComponent } from '../image-modal/image-modal.component';
 import * as XLSX from 'xlsx';
-import { GSEAComponent } from '../gsea-dialog/gsea.component'
+import { PathwaysComponent } from '../gsea-dialog/gsea.component'
 
 @Component({
   selector: 'app-dashboard',
@@ -40,6 +40,7 @@ export class DashboardComponent implements OnInit {
   isLoading = false;
   typeOfLookUp = 'm2g'
   currPage = 0;
+  currPagePathways = 0;
   limit = 10;
   tableSizeG2G = 0;
   tableSizeM2M = 0;
@@ -56,7 +57,7 @@ export class DashboardComponent implements OnInit {
   dataSourceM2M = [];
   dataSourceG2M = [];
   dataSourceM2G = [];
-  displayedColumnsGSEA: string[] = ['rugplot','pvalue', 'pathway', 'top_tissues'];
+  displayedColumnsPathways: string[] = ['pathway', 'rugplot', 'pvalue', 'top_tissues'];
   displayedColumnsG2G: string[] = ['symbol', 'gene', 'correlation', 'entrezid'];
   displayedColumnsM2G: string[] = ['symbol', 'gene', 'test', 'test_statistics', 'pvalue'];
   displayedColumnsM2M: string[] = ['category_b', 'description', 'test', 'test_statistics', 'pvalue'];
@@ -104,26 +105,27 @@ export class DashboardComponent implements OnInit {
     this.tableFromSearch = false;
     this.metadataListReady = false;
     this.currPage = 0;
+    this.currPagePathways = 0;
 
-    this.getGSEAComparisonStats();
+    this.getPathwaysComparisonStats();
 
     this.getListOfMetadata();
     this.getAutoCompleteData();
     this.getListOfGeneToSymbol();
   }
 
-  tableSizeGSEA = 0;
-  dataSourceGSEA = [];
-  gseaTableReady = false;
-  isLoadingGSEA = false;
+  tableSizePathways = 0;
+  dataSourcePathways = [];
+  pathwaysTableReady = false;
+  isLoadingPathways = false;
 
-  getGSEAComparisonStats() {
-    this.isLoadingGSEA = true;
-    this.gseaTableReady = false;
-    this.dataSourceGSEA = [];
-    this.tableSizeGSEA = 0;
+  getPathwaysComparisonStats() {
+    this.isLoadingPathways = true;
+    this.pathwaysTableReady = false;
+    this.dataSourcePathways = [];
+    this.tableSizePathways = 0;
     let apiUrl = "https://api.seahorse.tm4.org/";
-    let annotationUrl = `gsea/?meta=${this.metadataId}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
+    let annotationUrl = `gsea/?meta=${this.metadataId}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPagePathways * this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -133,18 +135,18 @@ export class DashboardComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        this.isLoadingGSEA = false;
-        this.tableSizeGSEA = res['count'];
-        this.dataSourceGSEA = [];
+        this.isLoadingPathways = false;
+        this.tableSizePathways = res['count'];
+        this.dataSourcePathways = [];
         for (let index in res['result']) {
           let temp = {
             "rugplot": res['result'][index][2],
             "pvalue": res['result'][index][0],
             "pathway": res['result'][index][1],
           }
-          this.dataSourceGSEA.push(temp);
+          this.dataSourcePathways.push(temp);
         }
-        this.gseaTableReady = true;
+        this.pathwaysTableReady = true;
       })
   }
 
@@ -299,8 +301,7 @@ export class DashboardComponent implements OnInit {
           }
           this.dataSourceG2M.push(temp);
         }
-        this.g2mTableReady = true
-        // this.getG2MLibraryComparisonStats();
+        this.g2mTableReady = true;
       })
   }
 
@@ -431,10 +432,16 @@ export class DashboardComponent implements OnInit {
     this.metadataId = name;
     this.symbolId2 = symbol;
     this.currPage = 0;
+    this.currPagePathways = 0;
   }
 
   getPageDetails(details, comparison) {
-    this.currPage = details.pageIndex;
+    if (comparison === 'pathways') {
+      this.currPagePathways = details.pageIndex;
+    } else {
+      this.currPage = details.pageIndex;
+    }
+
     this.limit = details.pageSize;
     if (comparison === 'm2m') {
       this.getM2MComparisonStats();
@@ -448,8 +455,8 @@ export class DashboardComponent implements OnInit {
       this.getG2MLibraryComparisonStats();
     } else if (comparison === 'g2g') {
       this.getG2GComparisonStats();
-    } else if (comparison === 'gsea') {
-      this.getGSEAComparisonStats();
+    } else if (comparison === 'pathways') {
+      this.getPathwaysComparisonStats();
     }
   }
 
@@ -473,6 +480,7 @@ export class DashboardComponent implements OnInit {
 
     this.geneId = this.searchValue !== '' ? this.searchValue : this.geneId;
     this.typeOfLookUp = "m2g";
+
     this.getG2GComparisonStats();
   }
 
@@ -488,7 +496,7 @@ export class DashboardComponent implements OnInit {
     } else if (this.showLibraryMetadata) {
       this.showLibraryMetadata = !this.showLibraryMetadata
       this.expandSection('library')
-    } 
+    }
   }
 
   onSearch(value) {
@@ -660,7 +668,7 @@ export class DashboardComponent implements OnInit {
     } else if (name === 'rugplot') {
       this.showRugplot = !this.showRugplot;
       if (this.showRugplot) {
-        this.getGSEAComparisonStats()
+        this.getPathwaysComparisonStats()
       }
       this.myRugplot.nativeElement.scrollIntoView({ behavior: 'smooth' });
     }
@@ -710,8 +718,8 @@ export class DashboardComponent implements OnInit {
     link.click();
   }
 
-  openGSEADialog(meta, pathway) {
-    this.dialog.open(GSEAComponent, {
+  openPathwaysDialog(meta, pathway) {
+    this.dialog.open(PathwaysComponent, {
       data: {
         meta,
         pathway

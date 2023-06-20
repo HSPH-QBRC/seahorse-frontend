@@ -122,7 +122,6 @@ export class TestComponent implements OnInit {
 
   //     }
   //   }
-  //   console.log("nodes: ", this.nodesArr, this.edgeArr)
   //   this.isLoading = false;
   //   this.render()
   // }

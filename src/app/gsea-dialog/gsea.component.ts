@@ -9,7 +9,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
   templateUrl: 'gsea.component.html',
   styleUrls: ['./gsea.component.scss'],
 })
-export class GSEAComponent implements OnInit {
+export class PathwaysComponent implements OnInit {
   isLoading = false;
   dataSource = [];
 
@@ -17,7 +17,7 @@ export class GSEAComponent implements OnInit {
     meta: string,
     pathway: string
   },
-    public dialogRef: MatDialogRef<GSEAComponent>,
+    public dialogRef: MatDialogRef<PathwaysComponent>,
     private httpClient: HttpClient
   ) { }
 
@@ -42,14 +42,11 @@ export class GSEAComponent implements OnInit {
         throw message
       }))
       .subscribe(res => {
-        console.log("gsea dialog: ", res)
         this.isLoading = false;
         this.dataSource = [];
         for (let index in res) {
-          // console.log("res index: ",res[index])
           this.dataSource.push(res[index][0]);
         }
-        console.log("dialog ds: ", this.dataSource)
       })
   }
 }

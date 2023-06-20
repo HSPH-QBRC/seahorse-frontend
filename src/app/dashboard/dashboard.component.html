@@ -4,7 +4,6 @@
         <div class="row">
             <a routerLink="/" routerLinkActive="active" ariaCurrentWhenActive="page" class="titleLink">
                 <div class="text-center logo">
-                    <!-- <img width="150px" src="/assets/images/seahorse_logo3.png" alt="image"> -->
                     <img class="svg-image" src="/assets/images/seahorse.svg" alt="image">
                     <div class="title-seahorse">SEAHORSE</div>
                 </div>
@@ -60,6 +59,7 @@
             </mat-select>
         </mat-form-field>
         <br>
+        <!-- SUMMARY PLOTS -->
         <div *ngIf="this.metadataLookUp[this.metadataId] !== undefined" class="row justify-content-center">
             <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="testBackgroundSummaryPlot">
                 <app-barchart [metadataId]="metadataId" [tissue]="selectedTissue"
@@ -78,61 +78,9 @@
             </div>
         </div>
 
-        <div *ngIf="layoutType === 'metadata'">
-            <h4 (click)="expandSection('rugplot')" #myRugplot class="expansionTitle">
-                <span class="expandObj">{{showRugplot ? "-":"+"}}</span> Rug Plot
-            </h4>
-            <br>
-            <div class="loading-container" *ngIf="isLoadingGSEA">
-                <mat-spinner diameter="30"></mat-spinner>
-            </div>
-            <div *ngIf="showRugplot && gseaTableReady && !isLoading && dataSourceGSEA.length > 0">
-                <p *ngIf="this.dataSourceGSEA.length === 0 && showRugplot" class="hideMessage text-center">
-                    There is no data to be displayed.</p>
-                <div class="d-flex justify-content-center" *ngIf="gseaTableReady && dataSourceGSEA.length > 0">
-                    <table mat-table [dataSource]='dataSourceGSEA' class="mat-elevation-z8">
-                        <ng-container matColumnDef="rugplot">
-                            <th mat-header-cell *matHeaderCellDef> Rugplot </th>
-                            <td mat-cell *matCellDef="let element">
-                                <app-rugplot [plotData]="element.rugplot"></app-rugplot>
-                            </td>
-                        </ng-container>
-                        <ng-container matColumnDef="pvalue">
-                            <th mat-header-cell *matHeaderCellDef> P Value </th>
-                            <td mat-cell *matCellDef="let element"> {{(element.pvalue >= 10000 || element.pvalue <
-                                    0.001) ? element.pvalue.toExponential(3) : element.pvalue.toFixed(5)}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="pathway">
-                            <th mat-header-cell *matHeaderCellDef> Pathway </th>
-                            <td mat-cell *matCellDef="let element">
-                                <a target="_blank"
-                                    href="{{'https://www.gsea-msigdb.org/gsea/msigdb/cards/' + element.pathway}}">Pathway
-                                    Link</a>
-                            </td>
-                        </ng-container>
-                        <ng-container matColumnDef="top_tissues">
-                            <th mat-header-cell *matHeaderCellDef> Other Significant Tissues </th>
-                            <td mat-cell *matCellDef="let element"> <button mat-flat-button color="accent"
-                                    (click)="openGSEADialog(this.metadataId, element.pathway)">Tissues</button> </td>
-                        </ng-container>
-                        <tr mat-header-row *matHeaderRowDef="displayedColumnsGSEA"></tr>
-                        <tr mat-row *matRowDef="let row; columns: displayedColumnsGSEA"></tr>
-                    </table>
-                </div>
-                <div class="d-flex justify-content-center paginator" *ngIf="tableSizeGSEA > 0">
-                    <mat-paginator [length]="tableSizeGSEA" [pageSize]="limit" [pageSizeOptions]="[5, 10, 25, 100]"
-                        [pageIndex]="currPage" aria-label="Select page" (page)="getPageDetails($event, 'gsea')">
-                    </mat-paginator>
-                </div>
-            </div>
-        </div>
-
-
-
         <h4 (click)="expandSection('phenotype')" #myPhenotype class="expansionTitle">
             <span class="expandObj">{{showPhenotype ? "-":"+"}}</span> Phenotype
         </h4>
-
         <div *ngIf="layoutType === 'metadata'">
             <p *ngIf="this.dataSourceM2M.length === 0 && showPhenotype" class="hideMessage text-center">
                 There is no data to be displayed.</p>
@@ -218,49 +166,13 @@
                     </div>
                 </div>
                 <br>
-                <div class="d-flex justify-content-center">
-                    <button class="download-button" mat-stroked-button (click)="downloadTable('m2m', 'phenotype')"><i
-                            class="material-icons">cloud_download</i> Download Table</button>
-                </div>
-                <br>
-                <div class="d-flex justify-content-center">
-                    <table mat-table [dataSource]='dataSourceM2M' class="mat-elevation-z8">
-                        <ng-container matColumnDef="category_b">
-                            <th mat-header-cell *matHeaderCellDef> Metadata </th>
-                            <td class="metaColumn" mat-cell *matCellDef="let element"
-                                (click)="onSelectMetadataLink(metadataId, element.category_b, 'm2m')">
-                                {{element.category_b}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="description">
-                            <th mat-header-cell *matHeaderCellDef> Description </th>
-                            <td mat-cell *matCellDef="let element"> {{metadataListReady ?
-                                metadataLookUp[element.category_b]["vardescFull"]: ""}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="test">
-                            <th mat-header-cell *matHeaderCellDef> Test </th>
-                            <td mat-cell *matCellDef="let element"> {{element.test}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="test_statistics">
-                            <th mat-header-cell *matHeaderCellDef> Test Statistic </th>
-                            <td mat-cell *matCellDef="let element"> {{(element.test_statistics >= 10000 ||
-                                element.test_statistics < 0.001) ? element.test_statistics.toExponential(3) :
-                                    element.test_statistics.toFixed(5)}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="pvalue">
-                            <th mat-header-cell *matHeaderCellDef> P-Value </th>
-                            <td mat-cell *matCellDef="let element"> {{(element.pvalue >= 10000 || element.pvalue <
-                                    0.001) ? element.pvalue.toExponential(3) : element.pvalue.toFixed(5)}} </td>
-                        </ng-container>
-                        <tr mat-header-row *matHeaderRowDef="displayedColumnsM2M"></tr>
-                        <tr mat-row *matRowDef="let row; columns: displayedColumnsM2M"></tr>
-                    </table>
-                </div>
-                <div class="d-flex justify-content-center paginator" *ngIf="tableSizeM2M > 0">
-                    <mat-paginator [length]="tableSizeM2M" [pageSize]="limit" [pageSizeOptions]="[5, 10, 25, 100]"
-                        [pageIndex]="currPage" aria-label="Select page" (page)="getPageDetails($event, 'm2m')">
-                    </mat-paginator>
-                </div>
-
+                <app-table comparisonType="m2m" [metadataId]="metadataId" [dataSource]="dataSourceM2M"
+                    [metadataListReady]="metadataListReady" [metadataLookUp]="metadataLookUp"
+                    [displayedColumns]="displayedColumnsM2M" [tableSize]="tableSizeM2M" [limit]="limit"
+                    [currPage]="currPage" (childGetPageDetails)="getPageDetails($event[0], $event[1])"
+                    (childOnSelectMetadataLink)="onSelectMetadataLink($event[0], $event[1], $event[2])"
+                    (childDownloadTable)="downloadTable($event[0], $event[1])">
+                </app-table>
             </div>
         </div>
         <div *ngIf="layoutType === 'gene'">
@@ -313,48 +225,13 @@
                     </div>
                 </div>
                 <br>
-                <div class="d-flex justify-content-center">
-                    <button class="download-button" mat-stroked-button (click)="downloadTable('g2m', 'phenotype')"><i
-                            class="material-icons">cloud_download</i> Download Table</button>
-                </div>
-                <br>
-                <div class="d-flex justify-content-center">
-                    <table mat-table [dataSource]='dataSourceG2M' class="mat-elevation-z8">
-                        <ng-container matColumnDef="category_b">
-                            <th mat-header-cell *matHeaderCellDef> Metadata </th>
-                            <td class="metaColumn" mat-cell *matCellDef="let element"
-                                (click)="onSelectMetadataLink(metadataId, element.category_b, 'm2g')">
-                                {{element.category_b}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="description">
-                            <th mat-header-cell *matHeaderCellDef> Description </th>
-                            <td mat-cell *matCellDef="let element">{{metadataLookUp[element.category_b]["vardescFull"]
-                                !== undefined ? metadataLookUp[element.category_b]["vardescFull"]: ""}}Test test</td>
-                        </ng-container>
-                        <ng-container matColumnDef="test">
-                            <th mat-header-cell *matHeaderCellDef> Test </th>
-                            <td mat-cell *matCellDef="let element"> {{element.test}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="test_statistics">
-                            <th mat-header-cell *matHeaderCellDef> Test Statistic</th>
-                            <td mat-cell *matCellDef="let element"> {{(element.test_statistics >= 10000 ||
-                                element.test_statistics < 0.001) ? element.test_statistics.toExponential(3) :
-                                    element.test_statistics.toFixed(5)}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="pvalue">
-                            <th mat-header-cell *matHeaderCellDef> P-Value</th>
-                            <td mat-cell *matCellDef="let element"> {{(element.pvalue >= 10000 || element.pvalue <
-                                    0.001) ? element.pvalue.toExponential(3) : element.pvalue.toFixed(5)}} </td>
-                        </ng-container>
-                        <tr mat-header-row *matHeaderRowDef="displayedColumnsG2M"></tr>
-                        <tr mat-row *matRowDef="let row; columns: displayedColumnsG2M"></tr>
-                    </table>
-                </div>
-                <div class="d-flex justify-content-center paginator" *ngIf="tableSizeG2M > 0">
-                    <mat-paginator [length]="tableSizeG2M" [pageSize]="limit" [pageSizeOptions]="[5, 10, 25, 100]"
-                        [pageIndex]="currPage" aria-label="Select page" (page)="getPageDetails($event, 'g2m')">
-                    </mat-paginator>
-                </div>
+                <app-table comparisonType="g2m" [metadataId]="metadataId" [dataSource]="dataSourceG2M"
+                    [metadataListReady]="metadataListReady" [metadataLookUp]="metadataLookUp"
+                    [displayedColumns]="displayedColumnsG2M" [tableSize]="tableSizeG2M" [limit]="limit"
+                    [currPage]="currPage" (childGetPageDetails)="getPageDetails($event[0], $event[1])"
+                    (childOnSelectMetadataLink)="onSelectMetadataLink($event[0], $event[1], $event[2])"
+                    (childDownloadTable)="downloadTable($event[0], $event[1])">
+                </app-table>
             </div>
         </div>
         <br>
@@ -448,55 +325,15 @@
                     </div>
                 </div>
                 <br>
-                <div class="d-flex justify-content-center">
-                    <button class="download-button" mat-stroked-button
-                        (click)="downloadTable('m2mLibrary', 'library')"><i class="material-icons">cloud_download</i>
-                        Download Table</button>
-                </div>
-                <br>
-                <div class="d-flex justify-content-center">
-                    <table mat-table [dataSource]='dataSourceM2MLibrary' class="mat-elevation-z8">
-                        <ng-container matColumnDef="category_b">
-                            <th mat-header-cell *matHeaderCellDef> Metadata </th>
-                            <td class="metaColumn" mat-cell *matCellDef="let element"
-                                (click)="onSelectMetadataLink(metadataId, element.category_b, 'm2m')">
-                                {{element.category_b}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="description">
-                            <th mat-header-cell *matHeaderCellDef> Description </th>
-                            <td mat-cell *matCellDef="let element">
-                                {{metadataLookUp[element.category_b]["vardescFull"]}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="test">
-                            <th mat-header-cell *matHeaderCellDef> Test </th>
-                            <td mat-cell *matCellDef="let element"> {{element.test}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="test_statistics">
-                            <th mat-header-cell *matHeaderCellDef> Test Statistic</th>
-                            <td mat-cell *matCellDef="let element"> {{(element.test_statistics >= 10000 ||
-                                element.test_statistics < 0.001) ? element.test_statistics.toExponential(3) :
-                                    element.test_statistics.toFixed(5)}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="pvalue">
-                            <th mat-header-cell *matHeaderCellDef> P-Value</th>
-                            <td mat-cell *matCellDef="let element"> {{(element.pvalue >= 10000 || element.pvalue <
-                                    0.001) ? element.pvalue.toExponential(3) : element.pvalue.toFixed(5)}} </td>
-                        </ng-container>
-                        <tr mat-header-row *matHeaderRowDef="displayedColumnsM2M"></tr>
-                        <tr mat-row *matRowDef="let row; columns: displayedColumnsM2M"></tr>
-                    </table>
-                </div>
-                <div class="d-flex justify-content-center paginator" *ngIf="tableSizeM2MLibrary > 0">
-                    <mat-paginator [length]="tableSizeM2MLibrary" [pageSize]="limit"
-                        [pageSizeOptions]="[5, 10, 25, 100]" [pageIndex]="currPage" aria-label="Select page"
-                        (page)="getPageDetails($event, 'm2mlib')">
-                    </mat-paginator>
-                </div>
-
+                <app-table comparisonType="m2mLibrary" [metadataId]="metadataId" [dataSource]="dataSourceM2MLibrary"
+                    [metadataListReady]="metadataListReady" [metadataLookUp]="metadataLookUp"
+                    [displayedColumns]="displayedColumnsM2M" [tableSize]="tableSizeM2MLibrary" [limit]="limit"
+                    [currPage]="currPage" (childGetPageDetails)="getPageDetails($event[0], $event[1])"
+                    (childOnSelectMetadataLink)="onSelectMetadataLink($event[0], $event[1], $event[2])"
+                    (childDownloadTable)="downloadTable($event[0], $event[1])">
+                </app-table>
             </div>
-
         </div>
-
         <div *ngIf="layoutType === 'gene'">
             <p *ngIf="this.dataSourceG2MLibrary.length === 0 && showLibraryMetadata" class="hideMessage text-center">
                 There is no data to be displayed.</p>
@@ -548,50 +385,13 @@
                     </div>
                 </div>
                 <br>
-                <div class="d-flex justify-content-center">
-                    <button class="download-button" mat-stroked-button
-                        (click)="downloadTable('g2mLibrary', 'library')"><i class="material-icons">cloud_download</i>
-                        Download Table</button>
-                </div>
-                <br>
-                <div class="d-flex justify-content-center">
-                    <table mat-table [dataSource]='dataSourceG2MLibrary' class="mat-elevation-z8">
-                        <ng-container matColumnDef="category_b">
-                            <th mat-header-cell *matHeaderCellDef> Metadata </th>
-                            <td class="metaColumn" mat-cell *matCellDef="let element"
-                                (click)="onSelectMetadataLink(metadataId, element.category_b, 'm2g')">
-                                {{element.category_b}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="description">
-                            <th mat-header-cell *matHeaderCellDef> Description </th>
-                            <td mat-cell *matCellDef="let element">
-                                {{metadataLookUp[element.category_b]["vardescFull"]}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="test">
-                            <th mat-header-cell *matHeaderCellDef> Test </th>
-                            <td mat-cell *matCellDef="let element"> {{element.test}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="test_statistics">
-                            <th mat-header-cell *matHeaderCellDef> Test Statistic</th>
-                            <td mat-cell *matCellDef="let element"> {{(element.test_statistics >= 10000 ||
-                                element.test_statistics < 0.001) ? element.test_statistics.toExponential(3) :
-                                    element.test_statistics.toFixed(5)}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="pvalue">
-                            <th mat-header-cell *matHeaderCellDef> P-Value</th>
-                            <td mat-cell *matCellDef="let element"> {{(element.pvalue >= 10000 || element.pvalue <
-                                    0.001) ? element.pvalue.toExponential(3) : element.pvalue.toFixed(5)}} </td>
-                        </ng-container>
-                        <tr mat-header-row *matHeaderRowDef="displayedColumnsG2M"></tr>
-                        <tr mat-row *matRowDef="let row; columns: displayedColumnsG2M"></tr>
-                    </table>
-                </div>
-                <div class="d-flex justify-content-center paginator" *ngIf="tableSizeG2MLibrary > 0">
-                    <mat-paginator [length]="tableSizeG2MLibrary" [pageSize]="limit"
-                        [pageSizeOptions]="[5, 10, 25, 100]" [pageIndex]="currPage" aria-label="Select page"
-                        (page)="getPageDetails($event, 'g2mlib')">
-                    </mat-paginator>
-                </div>
+                <app-table comparisonType="g2mLibrary" [metadataId]="metadataId" [dataSource]="dataSourceG2MLibrary"
+                    [metadataListReady]="metadataListReady" [metadataLookUp]="metadataLookUp"
+                    [displayedColumns]="displayedColumnsG2M" [tableSize]="tableSizeG2MLibrary" [limit]="limit"
+                    [currPage]="currPage" (childGetPageDetails)="getPageDetails($event[0], $event[1])"
+                    (childOnSelectMetadataLink)="onSelectMetadataLink($event[0], $event[1], $event[2])"
+                    (childDownloadTable)="downloadTable($event[0], $event[1])">
+                </app-table>
             </div>
         </div>
         <h4 (click)="expandSection('gene')" #myGene class="expansionTitle">
@@ -643,57 +443,19 @@
                                     </app-boxplot>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                     <!-- <p *ngIf="this.dataSourceM2G.length === 0 && this.searchValue !== '' && this.selectedTissue !== ''"
                         class="hideMessage text-center">
                         There is no data to be displayed.</p> -->
                     <br>
-                    <div class="d-flex justify-content-center">
-                        <button class="download-button" mat-stroked-button
-                            (click)="downloadTable('m2g', 'phenotype')"><i class="material-icons">cloud_download</i>
-                            Download Table</button>
-                    </div>
-                    <br>
-                    <div class="d-flex justify-content-center">
-                        <table mat-table [dataSource]="dataSourceM2G" class="mat-elevation-z8"
-                            *ngIf="dataSourceM2G.length > 0">
-                            <ng-container matColumnDef="symbol">
-                                <th mat-header-cell *matHeaderCellDef> Symbol </th>
-                                <td class="metaColumn" mat-cell *matCellDef="let element"
-                                    (click)="onSelectMetadataLink(metadataId, element.gene, 'm2g')">
-                                    {{geneToSym[element.gene] !== undefined ?
-                                    geneToSym[element.gene] : element.gene}} </td>
-                            </ng-container>
-                            <ng-container matColumnDef="gene">
-                                <th mat-header-cell *matHeaderCellDef> Gene </th>
-                                <td mat-cell *matCellDef="let element"> {{element.gene}} </td>
-                            </ng-container>
-                            <ng-container matColumnDef="test">
-                                <th mat-header-cell *matHeaderCellDef> Test </th>
-                                <td mat-cell *matCellDef="let element"> {{element.test}} </td>
-                            </ng-container>
-                            <ng-container matColumnDef="test_statistics">
-                                <th mat-header-cell *matHeaderCellDef> Test Statistics </th>
-                                <td mat-cell *matCellDef="let element"> {{(element.test_statistics >= 10000 ||
-                                    element.test_statistics < 0.001) ? element.test_statistics.toExponential(3) :
-                                        element.test_statistics.toFixed(5)}} </td>
-                            </ng-container>
-                            <ng-container matColumnDef="pvalue">
-                                <th mat-header-cell *matHeaderCellDef> P-Value </th>
-                                <td mat-cell *matCellDef="let element"> {{(element.pvalue >= 10000 || element.pvalue <
-                                        0.001) ? element.pvalue.toExponential(3) : element.pvalue.toFixed(5)}} </td>
-                            </ng-container>
-                            <tr mat-header-row *matHeaderRowDef="displayedColumnsM2G"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumnsM2G"></tr>
-                        </table>
-                    </div>
-                    <div class="d-flex justify-content-center paginator" *ngIf="tableSizeM2G > 0">
-                        <mat-paginator [length]="tableSizeM2G" [pageSize]="limit" [pageSizeOptions]="[5, 10, 25, 100]"
-                            [pageIndex]="currPage" aria-label="Select page" (page)="getPageDetails($event, 'm2g')">
-                        </mat-paginator>
-                    </div>
+                    <app-table comparisonType="m2g" [metadataId]="metadataId" [dataSource]="dataSourceM2G"
+                        [metadataListReady]="metadataListReady" [metadataLookUp]="metadataLookUp"
+                        [displayedColumns]="displayedColumnsM2G" [tableSize]="tableSizeM2G" [limit]="limit"
+                        [currPage]="currPage" (childGetPageDetails)="getPageDetails($event[0], $event[1])"
+                        (childOnSelectMetadataLink)="onSelectMetadataLink($event[0], $event[1], $event[2])"
+                        (childDownloadTable)="downloadTable($event[0], $event[1])" [geneToSym]="geneToSym">
+                    </app-table>
                 </div>
             </div>
         </div>
@@ -706,10 +468,6 @@
                     <div *ngIf="checkPlotType(metadataId) === 'categoric'" class="testBackgroundSummaryPlot">
                         <app-barchart [metadataId]="metadataId" [tissue]="selectedTissue"></app-barchart>
                     </div>
-                    <!-- <div class="testBackgroundSummaryPlot">
-                        <app-histogram [metadataId]="metadataId" [comparisonType]="'g2g'" [tissue]="selectedTissue">
-                        </app-histogram>
-                    </div> -->
                 </div>
 
                 <div class="row justify-content-center"
@@ -734,45 +492,60 @@
                         </div>
                     </div>
                 </div>
+                <br>
+                <app-table comparisonType="g2g" [metadataId]="metadataId" [dataSource]="dataSourceG2G"
+                    [metadataListReady]="metadataListReady" [metadataLookUp]="metadataLookUp"
+                    [displayedColumns]="displayedColumnsG2G" [tableSize]="tableSizeG2G" [limit]="limit"
+                    [currPage]="currPage" (childGetPageDetails)="getPageDetails($event[0], $event[1])"
+                    (childOnSelectMetadataLink)="onSelectMetadataLink($event[0], $event[1], $event[2])"
+                    (childDownloadTable)="downloadTable($event[0], $event[1])">
+                </app-table>
+            </div>
+        </div>
 
-                <br>
-                <div class="d-flex justify-content-center">
-                    <button class="download-button" mat-stroked-button (click)="downloadTable('g2g', 'phenotype')"><i
-                            class="material-icons">cloud_download</i> Download Table</button>
-                </div>
-                <br>
-                <div class="d-flex justify-content-center">
-                    <table mat-table [dataSource]="dataSourceG2G" class="mat-elevation-z8"
-                        *ngIf="dataSourceG2G.length > 0">
-                        <ng-container matColumnDef="symbol">
-                            <th mat-header-cell *matHeaderCellDef> Symbol </th>
-                            <td class="metaColumn" mat-cell *matCellDef="let element"
-                                (click)="onSelectMetadataLink(metadataId, element.gene, 'g2g')">
-                                {{element.symbol}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="gene">
-                            <th mat-header-cell *matHeaderCellDef> Gene </th>
-                            <td mat-cell *matCellDef="let element"> {{element.gene}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="correlation">
-                            <th mat-header-cell *matHeaderCellDef> Correlation </th>
-                            <td mat-cell *matCellDef="let element"> {{(element.correlation >= 10000 ||
-                                element.correlation < 0.001) ? element.correlation.toExponential(3) :
-                                    element.correlation.toFixed(5)}} </td>
-                        </ng-container>
-                        <ng-container matColumnDef="entrezid">
-                            <th mat-header-cell *matHeaderCellDef> Link </th>
-                            <td mat-cell *matCellDef="let element"> <a target="_blank"
-                                    href="{{'https://www.ncbi.nlm.nih.gov/gene/' + element.entrezid}}">NIH Link</a>
+        <div *ngIf="layoutType === 'metadata'">
+            <h4 (click)="expandSection('rugplot')" #myRugplot class="expansionTitle">
+                <span class="expandObj">{{showRugplot ? "-":"+"}}</span> Pathways
+            </h4>
+            <br>
+            <div class="loading-container" *ngIf="isLoadingPathways">
+                <mat-spinner diameter="30"></mat-spinner>
+            </div>
+            <div *ngIf="showRugplot && pathwaysTableReady && !isLoading && dataSourcePathways.length > 0">
+                <p *ngIf="this.dataSourcePathways.length === 0 && showRugplot" class="hideMessage text-center">
+                    There is no data to be displayed.</p>
+                <div class="d-flex justify-content-center" *ngIf="pathwaysTableReady && dataSourcePathways.length > 0">
+                    <table mat-table [dataSource]='dataSourcePathways' class="mat-elevation-z8">
+                        <ng-container matColumnDef="pathway">
+                            <th mat-header-cell *matHeaderCellDef> Pathway </th>
+                            <td mat-cell *matCellDef="let element">
+                                <a target="_blank"
+                                    href="{{'https://www.gsea-msigdb.org/gsea/msigdb/cards/' + element.pathway}}">{{element.pathway}}</a>
                             </td>
                         </ng-container>
-                        <tr mat-header-row *matHeaderRowDef="displayedColumnsG2G"></tr>
-                        <tr mat-row *matRowDef="let row; columns: displayedColumnsG2G"></tr>
+                        <ng-container matColumnDef="rugplot">
+                            <th mat-header-cell *matHeaderCellDef> Rugplot </th>
+                            <td mat-cell *matCellDef="let element">
+                                <app-rugplot [plotData]="element.rugplot"></app-rugplot>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="pvalue">
+                            <th mat-header-cell *matHeaderCellDef> P Value </th>
+                            <td mat-cell *matCellDef="let element"> {{(element.pvalue >= 10000 || element.pvalue <
+                                    0.001) ? element.pvalue.toExponential(3) : element.pvalue.toFixed(5)}} </td>
+                        </ng-container>
+                        <ng-container matColumnDef="top_tissues">
+                            <th mat-header-cell *matHeaderCellDef> Other Significant Tissues </th>
+                            <td mat-cell *matCellDef="let element"> <button mat-flat-button color="accent"
+                                    (click)="openPathwaysDialog(this.metadataId, element.pathway)">Tissues</button> </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumnsPathways"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumnsPathways"></tr>
                     </table>
                 </div>
-                <div class="d-flex justify-content-center paginator" *ngIf="tableSizeG2G > 0">
-                    <mat-paginator [length]="tableSizeG2G" [pageSize]="limit" [pageSizeOptions]="[5, 10, 25, 100]"
-                        [pageIndex]="currPage" aria-label="Select page" (page)="getPageDetails($event, 'g2g')">
+                <div class="d-flex justify-content-center paginator" *ngIf="tableSizePathways > 0">
+                    <mat-paginator [length]="tableSizePathways" [pageSize]="limit" [pageSizeOptions]="[5, 10, 25, 100]"
+                        [pageIndex]="currPagePathways" aria-label="Select page" (page)="getPageDetails($event, 'pathways')">
                     </mat-paginator>
                 </div>
             </div>

@@ -4,11 +4,6 @@
     flex: 1;
     border-right: 1px solid rgba(40, 40, 40, 0.1);
 }
-// .searchDiv {
-//     // display: flex;
-//     // justify-content: center;
-//     // align-items: center;
-// }
 
 .page {
     color: #716d66;
@@ -169,6 +164,25 @@ table {
     margin: 2px;
     padding: 4px;
 }
+// .testBackground {
+//     display: flex;
+//     flex-wrap: wrap;
+//     justify-content: center;
+// }
+
+// .plot-row {
+//     display: flex;
+//     flex-wrap: wrap;
+//     justify-content: center;
+// }
+
+// .plot-col {
+//     flex: 0 0 33.33%;
+//     max-width: 33.33%;
+//     padding: 10px;
+//     box-sizing: border-box;
+// }
+
 .testBackgroundSummaryPlot {
     // background-color: royalblue;
     // width: 600px;
@@ -237,10 +251,6 @@ td {
     color: #1da1f2;
 }
 
-// .button-container{
-//     margin-right: 25px;
-// }
-
 .material-icons {
     vertical-align: middle; /* Align the icon vertically within the button */
     margin-right: 5px; /* Add some spacing between the icon and text */
@@ -262,12 +272,16 @@ td {
     height: 300px;
 }
 
-// .rugplot-column-header,
-// .rugplot-column-cell {
-//     max-width: 200px; /* Adjust the value as needed */
-//     overflow: hidden;
-//     text-overflow: ellipsis;
-// }
-.mat-column-rugplot{
+.mat-column-rugplot {
     max-width: 400px;
+}
+
+.mat-column-pathway {
+    max-width: 400px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.mat-column-pvalue {
+    min-width: 100px;
 }

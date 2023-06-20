@@ -33,8 +33,9 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ImageModalComponent } from "./image-modal/image-modal.component";
 import { MatDialogModule } from '@angular/material/dialog';
 // import { TestComponent } from './test/test.component'
-import { GSEAComponent } from './gsea-dialog/gsea.component';
-import { RugPlotComponent } from './rug-plot/rug-plot.component'
+import { PathwaysComponent } from './gsea-dialog/gsea.component';
+import { RugPlotComponent } from './rug-plot/rug-plot.component';
+import { TableComponent } from './table/table.component'
 
 
 @NgModule({
@@ -56,8 +57,9 @@ import { RugPlotComponent } from './rug-plot/rug-plot.component'
     AutocompleteInputComponent,
     ImageModalComponent,
     // TestComponent,
-    GSEAComponent,
-    RugPlotComponent
+    PathwaysComponent,
+    RugPlotComponent,
+    TableComponent
   ],
   imports: [
     BrowserModule,
