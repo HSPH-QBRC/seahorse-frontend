@@ -1,3 +1,4 @@
+<!-- M2M Table -->
 <div *ngIf="comparisonType === 'm2m'">
     <div class="d-flex justify-content-center">
         <button class="download-button" mat-stroked-button (click)="downloadTable('m2m', 'phenotype')"><i
@@ -43,7 +44,7 @@
     </div>
 </div>
 
-
+<!-- G2M Table -->
 <div *ngIf="comparisonType === 'g2m'">
     <div class="d-flex justify-content-center">
         <button class="download-button" mat-stroked-button (click)="downloadTable('g2m', 'phenotype')"><i
@@ -89,6 +90,7 @@
     </div>
 </div>
 
+<!-- M2M Library Table -->
 <div *ngIf="comparisonType === 'm2mLibrary'">
     <div class="d-flex justify-content-center">
         <button class="download-button" mat-stroked-button (click)="downloadTable('m2mLibrary', 'library')"><i
@@ -135,6 +137,7 @@
     </div>
 </div>
 
+<!-- G2M Library Table -->
 <div *ngIf="comparisonType === 'g2mLibrary'">
     <div class="d-flex justify-content-center">
         <button class="download-button" mat-stroked-button (click)="downloadTable('g2mLibrary', 'library')"><i
@@ -181,6 +184,7 @@
     </div>
 </div>
 
+<!-- M2G Table -->
 <div *ngIf="comparisonType === 'm2g'">
     <div class="d-flex justify-content-center">
         <button class="download-button" mat-stroked-button
@@ -228,6 +232,8 @@
     </div>
 </div>
 
+
+<!-- G2G Table -->
 <div *ngIf="comparisonType === 'g2g'">
     <div class="d-flex justify-content-center">
         <button class="download-button" mat-stroked-button (click)="downloadTable('g2g', 'phenotype')"><i

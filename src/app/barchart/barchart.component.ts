@@ -81,7 +81,7 @@ export class BarChartComponent implements OnInit, OnChanges {
 
   createBarChart() {
     // set the dimensions and margins of the graph
-    var margin = { top: 30, right: 30, bottom: 150, left: 100 },
+    var margin = { top: 30, right: 30, bottom: 100, left: 100 },
       width = 800 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
@@ -159,6 +159,17 @@ export class BarChartComponent implements OnInit, OnChanges {
       .style('text-anchor', 'middle')
       .style('font-size', '12px')
       .text('Counts');
+
+      svg
+      .append('text')
+      .classed('label', true)
+      .attr("font-weight", "bold")
+      .attr('x', width / 2)
+      .attr('y', height + margin.bottom - 20)
+      .style('fill', 'rgba(0,0,0,.8)')
+      .style('text-anchor', 'middle')
+      .style('font-size', '12px')
+      .text(this.metadataId);
 
     function wrap(text, width) {
       text.each(function () {

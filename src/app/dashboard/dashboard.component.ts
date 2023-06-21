@@ -91,6 +91,11 @@ export class DashboardComponent implements OnInit {
   temp_img = "";
   geneToSym = {};
 
+  tableSizePathways = 0;
+  dataSourcePathways = [];
+  pathwaysTableReady = false;
+  isLoadingPathways = false;
+
   constructor(
     private httpClient: HttpClient,
     public dialog: MatDialog
@@ -113,11 +118,6 @@ export class DashboardComponent implements OnInit {
     this.getAutoCompleteData();
     this.getListOfGeneToSymbol();
   }
-
-  tableSizePathways = 0;
-  dataSourcePathways = [];
-  pathwaysTableReady = false;
-  isLoadingPathways = false;
 
   getPathwaysComparisonStats() {
     this.isLoadingPathways = true;

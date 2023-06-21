@@ -8,13 +8,13 @@
     </ng-template>
 </div>
 <div *ngIf="data.plotType ==='boxplot'" mat-dialog-content>
-    <app-boxplot [metadataCatId]="data.metadata2Id" [metadataNumId]="data.metadataId"
+    <app-boxplot [metadataCatId]="data.metadataId" [metadataNumId]="data.metadata2Id"
         [metadataLookUp]="data.metadataLookUp" [typeOfLookUp]="data.comparisonType" [size]="data.size"
         [tissue]="data.tissue">
     </app-boxplot>
 </div>
 <div *ngIf="data.plotType ==='heatmap'" mat-dialog-content>
-    <app-heatmap2 [metadataId]="data.metadataId" [metadata2Id]='data.metadata2Id' [metadataLookUp]="data.metadataLookUp"
-        [typeOfLookUp]="data.comparisonType" [size]="data.size" [tissue]="data.tissue"></app-heatmap2>
+    <app-heatmap [metadataId]="data.metadataId" [metadata2Id]='data.metadata2Id' [metadataLookUp]="data.metadataLookUp"
+        [typeOfLookUp]="data.comparisonType" [size]="data.size" [tissue]="data.tissue"></app-heatmap>
 </div>
 <div #svgContainer></div>

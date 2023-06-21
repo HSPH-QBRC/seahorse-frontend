@@ -9,7 +9,7 @@ import { MetadataCrossComparisonComponent } from './metadataCrossComparison/meta
 import { GeneExpressionComparisonComponent } from './geneExpressionComparison/geneExpressionComparison.component';
 import { MetadataToGeneExpressionComparison } from './metadataToGeneExpressionComparison/metadataToGeneExpressionComparison.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { Heatmap2Component } from './heatmap2/heatmap2.component';
+import { HeatmapComponent } from './heatmap/heatmap.component';
 import { BoxPlotComponent } from './boxplot/boxplot.component';
 import { ScatterPlotComponent } from './scatterplot/scatterplot.component';
 import { BarChartComponent } from './barchart/barchart.component';
@@ -32,7 +32,6 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ImageModalComponent } from "./image-modal/image-modal.component";
 import { MatDialogModule } from '@angular/material/dialog';
-// import { TestComponent } from './test/test.component'
 import { PathwaysComponent } from './gsea-dialog/gsea.component';
 import { RugPlotComponent } from './rug-plot/rug-plot.component';
 import { TableComponent } from './table/table.component'
@@ -43,7 +42,7 @@ import { TableComponent } from './table/table.component'
     AppComponent,
     NavbarComponent,
     MetadataCrossComparisonComponent,
-    Heatmap2Component,
+    HeatmapComponent,
     BoxPlotComponent,
     ScatterPlotComponent,
     BarChartComponent,
@@ -56,7 +55,6 @@ import { TableComponent } from './table/table.component'
     DashboardComponent,
     AutocompleteInputComponent,
     ImageModalComponent,
-    // TestComponent,
     PathwaysComponent,
     RugPlotComponent,
     TableComponent

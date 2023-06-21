@@ -47,7 +47,7 @@ export class BoxPlotComponent implements OnChanges {
     if (this.typeOfLookUp === 'm2m') {
       this.getDataM2M(numeric, categorical);
     } else if (this.typeOfLookUp === 'm2g') {
-      this.getDataM2G(numeric, categorical);
+      this.getDataM2G(this.metadataNumId, this.metadataCatId);
     }
   }
 
@@ -307,7 +307,7 @@ export class BoxPlotComponent implements OnChanges {
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         .style('font-size', this.size === 'small' ? '6px' : '12px')
-        .text(this.typeOfLookUp === 'm2g' ? '' : (this.metadataLookUp[this.metadataNumId].vardesc[0].length > 30 ? this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "..." : this.metadataLookUp[this.metadataNumId].vardesc[0]))
+        .text(this.typeOfLookUp === 'm2g' ? this.metadataNumId : (this.metadataLookUp[this.metadataNumId].vardesc[0].length > 30 ? this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "..." : this.metadataLookUp[this.metadataNumId].vardesc[0]))
 
     }
 
@@ -351,7 +351,7 @@ export class BoxPlotComponent implements OnChanges {
         .classed('label', true)
         .attr("font-weight", "bold")
         .attr('x', width / 2)
-        .attr('y', height + margin.bottom - 10)
+        .attr('y', height + margin.bottom - 20)
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         // .style('font-size', '12px')
@@ -396,7 +396,9 @@ export class BoxPlotComponent implements OnChanges {
       case 'm2m':
         return this.metadataLookUp[this.metadataCatId].vardesc[0]
       case 'm2g':
-        return this.symbolId === undefined ? this.metadataCatId : this.symbolId
+        // return "hello"
+        // return this.symbolId === undefined ? this.metadataCatId : this.symbolId
+        return this.metadataCatId
       default:
         return "N/A"
     }

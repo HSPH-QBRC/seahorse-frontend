@@ -5,13 +5,13 @@ import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
 
 @Component({
-  selector: 'app-heatmap2',
-  templateUrl: './heatmap2.component.html',
-  styleUrls: ['./heatmap2.component.scss'],
+  selector: 'app-heatmap',
+  templateUrl: './heatmap.component.html',
+  styleUrls: ['./heatmap.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
 
-export class Heatmap2Component implements OnChanges {
+export class HeatmapComponent implements OnChanges {
   @Input() metadataId = '';
   @Input() metadata2Id = '';
   @Input() metadataLookUp = {};
@@ -108,9 +108,9 @@ export class Heatmap2Component implements OnChanges {
 
   createHeatMap() {
     // set the dimensions and margins of the graph
-    var margin = { top: 30, right: 150, bottom: 50, left: 100 },
+    var margin = { top: 30, right: 145, bottom: 35, left: 90 },
       width = 800 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom;
+      height = 525 - margin.top - margin.bottom;
 
     const pointTip = d3Tip()
       .attr('class', 'd3-tip')
@@ -275,7 +275,7 @@ export class Heatmap2Component implements OnChanges {
         .classed('label', true)
         .attr("font-weight", "bold")
         .attr('x', width / 2)
-        .attr('y', height + margin.bottom - 10)
+        .attr('y', height + margin.bottom + 25)
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
         .style('font-size', '12px')
@@ -289,8 +289,8 @@ export class Heatmap2Component implements OnChanges {
     var countColorData = [{ "color": "royalblue", "value": 0 }, { "color": "crimson", "value": this.maxCount }];
     var extent = d3.extent(countColorData, d => d.value);
 
-    var paddingGradient = 9;
-    var widthGradient = 200;
+    var paddingGradient = 15;
+    var widthGradient = 180;
     var innerWidth = widthGradient - (paddingGradient * 2);
     var barHeight = 8;
     var heightGradient = 100;
@@ -310,7 +310,7 @@ export class Heatmap2Component implements OnChanges {
       .append("svg")
       .attr("width", widthGradient)
       .attr("height", heightGradient)
-      .attr('x', width + 100)
+      .attr('x', width + 85)
       .attr('y', 100);
 
     var defs = countLegend.append("defs");
