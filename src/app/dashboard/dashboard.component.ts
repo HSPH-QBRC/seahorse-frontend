@@ -690,6 +690,8 @@ export class DashboardComponent implements OnInit {
       annotationUrl = `g2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${limit}&offset=${offset}`;
     } else if (comparisonType === 'g2g') {
       annotationUrl = `g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${limit}&offset=${offset}`;
+    } else if (comparisonType === 'pathways') {
+      annotationUrl = `gsea-dl-table/?meta=${this.metadataId}&tissue=${this.selectedTissue}&limit=${limit}&offset=${offset}`
     }
     let apiUrl = "https://api.seahorse.tm4.org/";
     let queryURL = `${apiUrl}${annotationUrl}`;

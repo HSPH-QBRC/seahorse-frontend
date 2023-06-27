@@ -508,6 +508,11 @@
                 <span class="expandObj">{{showRugplot ? "-":"+"}}</span> Pathways
             </h4>
             <br>
+            <div class="d-flex justify-content-center">
+                <button class="download-button" mat-stroked-button (click)="downloadTable('pathways', 'phenotype')"><i
+                        class="material-icons">cloud_download</i> Download Table</button>
+            </div>
+            <br>
             <div class="loading-container" *ngIf="isLoadingPathways">
                 <mat-spinner diameter="30"></mat-spinner>
             </div>
