@@ -73,6 +73,7 @@ export class BarChartComponent implements OnInit, OnChanges {
           this.hideBarchart = true
         } else {
           this.hideBarchart = false;
+          console.log("countArr: ", this.countArr)
           this.createBarChart()
         }
 

@@ -67,6 +67,7 @@ export class HistogramComponent implements OnChanges {
           this.hideHistogram = true;
         } else {
           this.hideHistogram = false;
+          console.log("histo data: ", this.histogramData)
           this.createHistogram()
         }
       })
