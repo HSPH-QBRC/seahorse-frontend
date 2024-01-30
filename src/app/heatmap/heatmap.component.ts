@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
@@ -62,11 +62,6 @@ export class HeatmapComponent implements OnChanges {
   }
 
   getData(categorical1, categorical2) {
-    //Create annotations look up table too identify metadata for genes
-    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categorical1}%2C%0D%0A++${categorical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categorical1}+is+not+%22%22%0D%0A++AND+${categorical2}+is+not+%22%22%0D%0A`
-    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${categorical1}%2C%0D%0A++${categorical2}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${categorical1}+is+not+%22%22%0D%0A++AND+${categorical2}+is+not+%22%22%0D%0A`
-    // let queryURL = `${apiUrl}${annotationUrl}`;
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${categorical1}&category_b=${categorical2}&comparison=m2m&tissue=${this.tissue}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -103,8 +98,6 @@ export class HeatmapComponent implements OnChanges {
 
       })
   }
-
-
 
   createHeatMap() {
     // set the dimensions and margins of the graph
@@ -369,8 +362,6 @@ export class HeatmapComponent implements OnChanges {
       });
     }
   }
-
-
 
   onImageClicked(event: Event) {
     const svg = "";

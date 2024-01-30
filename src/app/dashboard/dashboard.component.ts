@@ -21,11 +21,7 @@ export class DashboardComponent implements OnInit {
   @ViewChild('myTugplot') myRugplot: ElementRef;
 
   searchValue = '';
-  // metadataId = 'SMUBRID';
-  // metadataId = 'SMNTRART';
   metadataId = 'MHARTHTS';
-  // metadataId = 'WGHT';
-  // metadata2Id = 'ENSG00000108405';
   metadata2Id = '';
   geneId = '';
   symbolId = '';

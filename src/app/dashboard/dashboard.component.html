@@ -47,7 +47,6 @@
         <br>
         <h1 class="title" *ngIf="layoutType === 'metadata'">
             {{metadataListReady ? this.metadataLookUp[this.metadataId]['vardescFull'] : ""}}
-            <!-- ({{metadataListReady ? this.metadataLookUp[this.metadataId]['varname'] : ""}}) -->
         </h1>
         <h1 class="title" *ngIf="layoutType === 'gene'">{{geneToSym[this.metadataId]}}</h1>
         <br>

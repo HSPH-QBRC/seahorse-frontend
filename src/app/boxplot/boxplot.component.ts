@@ -60,10 +60,6 @@ export class BoxPlotComponent implements OnChanges {
   tempBPData = [];
 
   getDataM2M(numericId, categoricalId) {
-    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    // let annotationUrl = `sql=select%0D%0A++SAMPID%2C%0D%0A++${numericId}%2C%0D%0A++${categoricalId}%0D%0Afrom%0D%0A++annotations%0D%0Awhere%0D%0A++${numericId}+is+not+""%0D%0A++AND+${categoricalId}+is+not+""%0D%0A`
-    // let queryURL = `${apiUrl}${annotationUrl}`;
-    // let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=SMTS&category_b=SMEXPEFF&comparison=m2m`
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numericId}&category_b=${categoricalId}&comparison=m2m&tissue=${this.tissue}`
 
     this.httpClient.get(queryURL).pipe(
@@ -89,12 +85,6 @@ export class BoxPlotComponent implements OnChanges {
             if (!this.xAxisArr.includes(this.tempBPData[i]["key"].toString())) {
               this.xAxisArr.push(this.tempBPData[i]["key"].toString())
             }
-            // let temp = {
-            //   'name': res['rows'][i][0],
-            //   'key': res['rows'][i][1],
-            //   'value': res['rows'][i][2]
-            // };
-            // this.boxPlotData.push(temp);
           }
           this.createBoxPlot()
         }
@@ -102,10 +92,6 @@ export class BoxPlotComponent implements OnChanges {
   }
   noData = false
   getDataM2G(numericId, categoricalId) {
-    // let apiUrl = "//seahorse-api.tm4.org:8001/gtex.json?";
-    // let annotationUrl = `sql=select%0D%0A++ANN.SAMPID%2C%0D%0A++ANN.${categoricalId}%2C%0D%0A++EXP.GENE_EXPRESSION%0D%0Afrom%0D%0A++annotations+as+ANN%0D%0A++join+expression+as+EXP+on+ANN.SAMPID+%3D+EXP.SAMPID%0D%0Awhere%0D%0A++"ENSG"+like+"${numericId}%"%0D%0A++AND+"${categoricalId}"+is+not+""%0D%0A++AND+"GENE_EXPRESSION"+is+not+""%0D%0Alimit%0D%0A++${this.offset}%2C+${this.limit}`
-    // let queryURL = `${apiUrl}${annotationUrl}`;
-    // let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=SMTS&category_b=ENSG00000180806&comparison=m2g`
     let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${categoricalId}&category_b=${numericId}&comparison=m2g&tissue=${this.tissue}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -310,18 +296,6 @@ export class BoxPlotComponent implements OnChanges {
         .text(this.typeOfLookUp === 'm2g' ? this.metadataNumId : (this.metadataLookUp[this.metadataNumId].vardesc[0].length > 30 ? this.metadataLookUp[this.metadataNumId].vardesc[0].slice(0, 30) + "..." : this.metadataLookUp[this.metadataNumId].vardesc[0]))
 
     }
-
-    // svg.append('text')
-    //   .classed('label', true)
-    //   .attr('transform', 'rotate(-90)')
-    //   .attr("font-weight", "bold")
-    //   .attr('y', -margin.left + 10)
-    //   .attr('x', -height / 2)
-    //   .attr('dy', '.71em')
-    //   .style('fill', 'rgba(0,0,0,.8)')
-    //   .style('text-anchor', 'middle')
-    //   .style('font-size', '12px')
-    //   .text(this.metadataNumId);
 
     if (this.typeOfLookUp === 'm2m' && this.metadataLookUp[this.metadataCatId].vardesc[0].length > 50) {
       svg
