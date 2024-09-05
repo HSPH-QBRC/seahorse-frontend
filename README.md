@@ -12,11 +12,4 @@ Run `npm run build` to build the project. The build artifacts will be stored in 
 
 ## Deploy on AWS S3
 
-Reference: https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html
-
-```shell
-npm run build
-cd dist/seahorse-frontend
-aws s3 rm s3://seahorse.tm4.org --recursive
-aws s3 sync . s3://seahorse.tm4.org
-```
+See: https://github.com/HSPH-QBRC/seahorse-frontend/blob/main/deployment/terraform/README.md
