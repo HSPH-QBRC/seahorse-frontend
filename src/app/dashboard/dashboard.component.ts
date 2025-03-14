@@ -152,6 +152,7 @@ export class DashboardComponent implements OnInit {
     let apiUrl = "https://api.seahorse.tm4.org/";
     let annotationUrl = `g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
+    console.log("g2g: ", queryURL)
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;

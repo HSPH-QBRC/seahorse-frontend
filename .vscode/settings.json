@@ -1,3 +1,6 @@
 {
-    "vscode-pets.petType": "dog"
+    "vscode-pets.petType": "dog",
+    "files.watcherExclude": {
+        "**/target": true
+    }
 }
