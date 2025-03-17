@@ -1,0 +1,44 @@
+<div class="homepage">
+    <div class="text-center logo">
+        <span class="logo-content">
+            <img class="svg-image" src="/assets/images/seahorse.svg" alt="image">
+            <div class="title-seahorse"> SEAHORSE</div>
+        </span>
+    </div>
+    <br>
+    <div class="row container col-sm-12">
+        <div class="col-sm-4">
+            <div class="row buttonRow">
+                <div class="col-sm-12 text-end">
+                    <a routerLink="/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page">
+                        <button mat-raised-button class="homeScreenButtons" color="primary">
+                            <img src="/assets/images/gtex-logo.png" alt="TCGA" class="button-image-gtex" />
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <div class="row buttonRow">
+                <div class="col-sm-12 text-end">
+                    <a routerLink="/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page">
+                        <button mat-raised-button class="homeScreenButtons" color="primary">
+                            <img src="/assets/images/tcga.png" alt="TCGA" class="button-image-tcga" />
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-7">
+            <br>
+            <div class="title-results"> GSEA Results</div>
+            <br>
+            <a href="https://s3.us-east-2.amazonaws.com/seahorse.tm4.org/gsea_data/TCGA_correlation_AGE_GSEA_GO.zip"
+                target="_blank">Age correlation with Tissue by GSEA GO</a>
+            <br>
+            <a href="https://s3.us-east-2.amazonaws.com/seahorse.tm4.org/gsea_data/TCGA_correlation_AGE_GSEA_KEGG.zip"
+                target="_blank">Age correlation with Tissue by GSEA KEGG</a>
+            <br>
+            <a href="https://s3.us-east-2.amazonaws.com/seahorse.tm4.org/gsea_data/AGE_expression_cor_GSEA.zip"
+                target="_blank">Age correlation with gene expression by GSEA GO</a>
+        </div>
+    </div>
+</div>

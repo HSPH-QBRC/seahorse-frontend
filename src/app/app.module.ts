@@ -34,7 +34,8 @@ import { ImageModalComponent } from "./image-modal/image-modal.component";
 import { MatDialogModule } from '@angular/material/dialog';
 import { PathwaysComponent } from './gsea-dialog/gsea.component';
 import { RugPlotComponent } from './rug-plot/rug-plot.component';
-import { TableComponent } from './table/table.component'
+import { TableComponent } from './table/table.component';
+import { GseaResultsComponent } from './gsea-results/gsea-results.component'
 
 
 @NgModule({
@@ -57,7 +58,8 @@ import { TableComponent } from './table/table.component'
     ImageModalComponent,
     PathwaysComponent,
     RugPlotComponent,
-    TableComponent
+    TableComponent,
+    GseaResultsComponent
   ],
   imports: [
     BrowserModule,
