@@ -31,7 +31,7 @@ export class PathwaysComponent implements OnInit {
 
   getTissueList() {
     this.isLoading = true;
-    let apiUrl = "https://api.seahorse.tm4.org/";
+    let apiUrl = "https://api-v1.seahorse.tm4.org/";
     let annotationUrl = `gsea-tissue/?meta=${this.data.meta}&pathway=${this.data.pathway}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(

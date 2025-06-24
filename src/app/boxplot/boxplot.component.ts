@@ -60,7 +60,7 @@ export class BoxPlotComponent implements OnChanges {
   tempBPData = [];
 
   getDataM2M(numericId, categoricalId) {
-    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numericId}&category_b=${categoricalId}&comparison=m2m&tissue=${this.tissue}`
+    let queryURL = `https://api-v1.seahorse.tm4.org/summary-plot/?category_a=${numericId}&category_b=${categoricalId}&comparison=m2m&tissue=${this.tissue}`
 
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -92,7 +92,7 @@ export class BoxPlotComponent implements OnChanges {
   }
   noData = false
   getDataM2G(numericId, categoricalId) {
-    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${categoricalId}&category_b=${numericId}&comparison=m2g&tissue=${this.tissue}`
+    let queryURL = `https://api-v1.seahorse.tm4.org/summary-plot/?category_a=${categoricalId}&category_b=${numericId}&comparison=m2g&tissue=${this.tissue}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;

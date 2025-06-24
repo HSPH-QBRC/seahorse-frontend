@@ -52,7 +52,7 @@ export class BarChartComponent implements OnInit, OnChanges {
 
   getData(categoric) {
     this.hideBarchart = false;
-    let apiUrl = "https://api.seahorse.tm4.org";
+    let apiUrl = "https://api-v1.seahorse.tm4.org";
     let annotationUrl = `/metadata2/metadata-summary-plot?category_a=${categoric}&meta=${this.meta}&tissue=${this.tissue}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(

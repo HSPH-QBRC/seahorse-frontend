@@ -62,7 +62,7 @@ export class HeatmapComponent implements OnChanges {
   }
 
   getData(categorical1, categorical2) {
-    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${categorical1}&category_b=${categorical2}&comparison=m2m&tissue=${this.tissue}`
+    let queryURL = `https://api-v1.seahorse.tm4.org/summary-plot/?category_a=${categorical1}&category_b=${categorical2}&comparison=m2m&tissue=${this.tissue}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;

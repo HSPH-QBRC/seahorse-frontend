@@ -120,7 +120,7 @@ export class DashboardComponent implements OnInit {
     this.pathwaysTableReady = false;
     this.dataSourcePathways = [];
     this.tableSizePathways = 0;
-    let apiUrl = "https://api.seahorse.tm4.org/";
+    let apiUrl = "https://api-v1.seahorse.tm4.org/";
     let annotationUrl = `gsea/?meta=${this.metadataId}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPagePathways * this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -149,7 +149,7 @@ export class DashboardComponent implements OnInit {
   getG2GComparisonStats() {
     this.isLoading = true;
     this.g2gTableReady = false;
-    let apiUrl = "https://api.seahorse.tm4.org/";
+    let apiUrl = "https://api-v1.seahorse.tm4.org/";
     let annotationUrl = `g2g/statistics?geneA=${this.searchValue === '' ? this.geneId : this.searchValue}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
     console.log("g2g: ", queryURL)
@@ -180,7 +180,7 @@ export class DashboardComponent implements OnInit {
   getM2GComparisonStats() {
     this.isLoading = true;
     this.m2gTableReady = false;
-    let apiUrl = "https://api.seahorse.tm4.org/";
+    let apiUrl = "https://api-v1.seahorse.tm4.org/";
     let annotationUrl = `m2g/statistics?category_a=${this.metadataId.split('.')[0]}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -212,7 +212,7 @@ export class DashboardComponent implements OnInit {
     this.isLoading = true;
     this.m2mTableReady = false;
     let metaType = "phenotype"
-    let apiUrl = "https://api.seahorse.tm4.org/";
+    let apiUrl = "https://api-v1.seahorse.tm4.org/";
     let annotationUrl = `m2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -243,7 +243,7 @@ export class DashboardComponent implements OnInit {
     this.isLoading = true;
     this.m2mLibraryTableReady = false;
     let metaType = "library";
-    let apiUrl = "https://api.seahorse.tm4.org/";
+    let apiUrl = "https://api-v1.seahorse.tm4.org/";
     let annotationUrl = `m2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -275,7 +275,7 @@ export class DashboardComponent implements OnInit {
     this.isLoading = true;
     let metaType = "phenotype"
     this.g2mTableReady = false;
-    let apiUrl = "https://api.seahorse.tm4.org/";
+    let apiUrl = "https://api-v1.seahorse.tm4.org/";
     let annotationUrl = `g2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -306,7 +306,7 @@ export class DashboardComponent implements OnInit {
     this.isLoading = true;
     let metaType = "library";
     this.g2mLibraryTableReady = false;
-    let apiUrl = "https://api.seahorse.tm4.org/";
+    let apiUrl = "https://api-v1.seahorse.tm4.org/";
     let annotationUrl = `g2m/statistics?category_a=${this.metadataId}&meta=${metaType}&tissue=${this.selectedTissue}&limit=${this.limit}&offset=${this.currPage * this.limit}`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -336,7 +336,7 @@ export class DashboardComponent implements OnInit {
 
   getListOfMetadata() {
     this.isLoading = true;
-    let apiUrl = "https://api.seahorse.tm4.org/";
+    let apiUrl = "https://api-v1.seahorse.tm4.org/";
     let annotationUrl = `metadata/desc`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -381,7 +381,7 @@ export class DashboardComponent implements OnInit {
   }
 
   getListOfGeneToSymbol() {
-    let apiUrl = "https://api.seahorse.tm4.org";
+    let apiUrl = "https://api-v1.seahorse.tm4.org";
     let annotationUrl = `/e2s/summary`
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -401,7 +401,7 @@ export class DashboardComponent implements OnInit {
   }
 
   getAutoCompleteData() {
-    let apiUrl = "https://api.seahorse.tm4.org/";
+    let apiUrl = "https://api-v1.seahorse.tm4.org/";
     let annotationUrl = `e2s/summary`;
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
@@ -690,7 +690,7 @@ export class DashboardComponent implements OnInit {
     } else if (comparisonType === 'pathways') {
       annotationUrl = `gsea-dl-table/?meta=${this.metadataId}&tissue=${this.selectedTissue}&limit=${limit}&offset=${offset}`
     }
-    let apiUrl = "https://api.seahorse.tm4.org/";
+    let apiUrl = "https://api-v1.seahorse.tm4.org/";
     let queryURL = `${apiUrl}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {

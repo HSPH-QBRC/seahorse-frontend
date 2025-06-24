@@ -62,7 +62,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
   getDataM2M(numerical1, numerical2) {
     this.isLoading = true;
     const headers = new HttpHeaders().set('Accept', 'image/png');
-    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numerical1}&category_b=${numerical2}&comparison=${this.typeOfLookUp}&tissue=${this.tissue}`
+    let queryURL = `https://api-v1.seahorse.tm4.org/summary-plot/?category_a=${numerical1}&category_b=${numerical2}&comparison=${this.typeOfLookUp}&tissue=${this.tissue}`
     this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -78,7 +78,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
 
   getDataM2G(numGene, numMetadata) {
     this.isLoading = true;
-    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numMetadata.split('.')[0]}&category_b=${numGene.split('.')[0]}&comparison=${this.typeOfLookUp}&tissue=${this.tissue}`
+    let queryURL = `https://api-v1.seahorse.tm4.org/summary-plot/?category_a=${numMetadata.split('.')[0]}&category_b=${numGene.split('.')[0]}&comparison=${this.typeOfLookUp}&tissue=${this.tissue}`
     this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -95,7 +95,7 @@ export class ScatterPlotComponent implements OnInit, OnChanges {
 
   getDataG2G(numerical1, numerical2) {
     this.isLoading = true;
-    let queryURL = `https://api.seahorse.tm4.org/summary-plot/?category_a=${numerical1}&category_b=${numerical2}&comparison=${this.typeOfLookUp}&tissue=${this.tissue}`
+    let queryURL = `https://api-v1.seahorse.tm4.org/summary-plot/?category_a=${numerical1}&category_b=${numerical2}&comparison=${this.typeOfLookUp}&tissue=${this.tissue}`
     this.httpClient.get(queryURL, { responseType: 'text' }).pipe(
       catchError(error => {
         this.isLoading = false;
