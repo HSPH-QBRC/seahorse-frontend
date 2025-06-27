@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-barchart',
@@ -15,6 +16,7 @@ export class BarChartComponent implements OnInit, OnChanges {
   @Input() metadataId: string = '';
   @Input() tissue: string = '';
   @Input() meta: string = '';
+  private readonly API_URL = environment.API_URL;
   dataSize = 0;
   isLoading = false;
 
@@ -52,9 +54,8 @@ export class BarChartComponent implements OnInit, OnChanges {
 
   getData(categoric) {
     this.hideBarchart = false;
-    let apiUrl = "https://api-v1.seahorse.tm4.org";
     let annotationUrl = `/metadata2/metadata-summary-plot?category_a=${categoric}&meta=${this.meta}&tissue=${this.tissue}`;
-    let queryURL = `${apiUrl}${annotationUrl}`;
+    let queryURL = `${this.API_URL}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;

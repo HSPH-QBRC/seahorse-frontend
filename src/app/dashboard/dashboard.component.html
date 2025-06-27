@@ -84,7 +84,6 @@
             <p *ngIf="this.dataSourceM2M.length === 0 && showPhenotype" class="hideMessage text-center">
                 There is no data to be displayed.</p>
             <div *ngIf="showPhenotype && m2mTableReady && !isLoading && dataSourceM2M.length > 0">
-                <!-- <div>M2M</div> -->
                 <div class="row justify-content-center" *ngIf="metadataLookUp && dataSourceM2M.length > 0">
                     <div class="testBackground" *ngFor="let i of [0,1,2]">
                         <div *ngIf="dataSourceM2M[i]">

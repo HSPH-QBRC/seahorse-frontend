@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-histogram',
@@ -17,6 +18,8 @@ export class HistogramComponent implements OnChanges {
   @Input() geneId: string = '';
   @Input() comparisonType: string = '';
   @Input() meta: string = '';
+  private readonly API_URL = environment.API_URL;
+
   dataSize = 0;
   isLoading = false;
   histogramData = [];
@@ -46,10 +49,8 @@ export class HistogramComponent implements OnChanges {
   }
 
   getData(numeric) {
-    let apiUrl = "https://api-v1.seahorse.tm4.org";
     let annotationUrl = `/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}&meta=${this.meta}&tissue=${this.tissue}`
-    let queryURL = `${apiUrl}${annotationUrl}`;
-    // let queryURL = `https://api.seahorse.tm4.org/metadata2/metadata-summary-plot?category_a=${numeric}&comparison=${this.comparisonType}&meta=${this.meta}`
+    let queryURL = `${this.API_URL}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -141,9 +142,6 @@ export class HistogramComponent implements OnChanges {
       .attr("transform", function (d) { return "translate(" + x(d.x0) + "," + y(d.count) + ")"; })
       .attr("width", function (d) { return Math.abs(x(d.x1) - x(d.x0) - 1); })
       .attr("height", function (d) { return height - y(d.count); })
-      // .attr("height", function (d) { 
-      //   return d.count === 0 ? 0 : height - y(d.count);
-      // })
       .style("fill", "#69b3a2")
       .on('mouseover', function (mouseEvent: any, d) {
         pointTip.show(mouseEvent, d, this);

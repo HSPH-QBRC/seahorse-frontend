@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-boxplot',
@@ -20,6 +21,8 @@ export class BoxPlotComponent implements OnChanges {
   @Input() size = 'small';
   @Input() tissue = '';
   @Output() svgReady = new EventEmitter();
+  @Output() svgLoaded = new EventEmitter();
+  private readonly API_URL = environment.API_URL;
 
   isLoading = false;
   boxPlotData = [];
@@ -33,6 +36,9 @@ export class BoxPlotComponent implements OnChanges {
   lengthOfResult = 0;
 
   bpSVG
+
+  tempBPData = [];
+  noData = false;
 
   constructor(private httpClient: HttpClient) { }
 
@@ -57,10 +63,9 @@ export class BoxPlotComponent implements OnChanges {
     this.max = -Infinity;
     this.xAxisArr = [];
   }
-  tempBPData = [];
 
   getDataM2M(numericId, categoricalId) {
-    let queryURL = `https://api-v1.seahorse.tm4.org/summary-plot/?category_a=${numericId}&category_b=${categoricalId}&comparison=m2m&tissue=${this.tissue}`
+    let queryURL = `${this.API_URL}/summary-plot/?category_a=${numericId}&category_b=${categoricalId}&comparison=m2m&tissue=${this.tissue}`
 
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
@@ -90,9 +95,9 @@ export class BoxPlotComponent implements OnChanges {
         }
       })
   }
-  noData = false
+  
   getDataM2G(numericId, categoricalId) {
-    let queryURL = `https://api-v1.seahorse.tm4.org/summary-plot/?category_a=${categoricalId}&category_b=${numericId}&comparison=m2g&tissue=${this.tissue}`
+    let queryURL = `${this.API_URL}/summary-plot/?category_a=${categoricalId}&category_b=${numericId}&comparison=m2g&tissue=${this.tissue}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -306,9 +311,7 @@ export class BoxPlotComponent implements OnChanges {
         .attr('y', height + margin.bottom - 10)
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
-        // .style('font-size', '8px')
         .style('font-size', this.size === 'small' ? '6px' : '12px')
-        // .text(this.metadataCatId)
         .text(this.metadataLookUp[this.metadataCatId].vardesc[0].slice(0, 50) + "...")
         .on('mouseover', function (mouseEvent: any) {
           xAxisTip.show(mouseEvent, this);
@@ -328,7 +331,6 @@ export class BoxPlotComponent implements OnChanges {
         .attr('y', height + margin.bottom - 20)
         .style('fill', 'rgba(0,0,0,.8)')
         .style('text-anchor', 'middle')
-        // .style('font-size', '12px')
         .style('font-size', this.size === 'small' ? '6px' : '12px')
         .text(this.getXAxisLabelNames())
     }
@@ -370,14 +372,11 @@ export class BoxPlotComponent implements OnChanges {
       case 'm2m':
         return this.metadataLookUp[this.metadataCatId].vardesc[0]
       case 'm2g':
-        // return "hello"
-        // return this.symbolId === undefined ? this.metadataCatId : this.symbolId
         return this.metadataCatId
       default:
         return "N/A"
     }
   }
-  @Output() svgLoaded = new EventEmitter();
 
   onImageClicked(event: Event) {
     const svg = ''

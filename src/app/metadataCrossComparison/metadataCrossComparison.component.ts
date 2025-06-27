@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-metadataCrossComparison',
@@ -10,6 +11,7 @@ import { catchError } from "rxjs/operators";
 })
 
 export class MetadataCrossComparisonComponent implements OnInit {
+  private readonly API_URL = environment.API_URL;
   metadataId = 'SMEXPEFF';
   metadata2Id = '';
   displayScatterPlot = false;

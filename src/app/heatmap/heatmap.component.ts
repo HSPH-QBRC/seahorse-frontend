@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-heatmap',
@@ -19,6 +20,7 @@ export class HeatmapComponent implements OnChanges {
   @Input() size = 'small';
   @Input() tissue = '';
   @Output() svg2Loaded = new EventEmitter();
+  private readonly API_URL = environment.API_URL;
 
   xAxisArr = [];
   yAxisArr = [];
@@ -62,7 +64,7 @@ export class HeatmapComponent implements OnChanges {
   }
 
   getData(categorical1, categorical2) {
-    let queryURL = `https://api-v1.seahorse.tm4.org/summary-plot/?category_a=${categorical1}&category_b=${categorical2}&comparison=m2m&tissue=${this.tissue}`
+    let queryURL = `${this.API_URL}/summary-plot/?category_a=${categorical1}&category_b=${categorical2}&comparison=m2m&tissue=${this.tissue}`
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
@@ -174,7 +176,9 @@ export class HeatmapComponent implements OnChanges {
     var y = d3.scaleBand()
       .range([height, 0])
       .domain(this.yAxisArr)
+
     let yAxisLabels = (this.yAxisArr.length > 25) ? d3.axisLeft(y).tickFormat((d) => '').tickSize(0) : d3.axisLeft(y);
+    
     svg.append("g")
       .call(yAxisLabels)
 
@@ -281,7 +285,6 @@ export class HeatmapComponent implements OnChanges {
     // //Legend
     var countColorData = [{ "color": "royalblue", "value": 0 }, { "color": "crimson", "value": this.maxCount }];
     var extent = d3.extent(countColorData, d => d.value);
-
     var paddingGradient = 15;
     var widthGradient = 180;
     var innerWidth = widthGradient - (paddingGradient * 2);
@@ -292,7 +295,6 @@ export class HeatmapComponent implements OnChanges {
       .range([0, innerWidth - 100])
       .domain(extent);
 
-    // var xTicks = countColorData.filter(f => f.value === this.min || f.value === this.max).map(d => d.value);
     let xTicksCorr = [0, this.maxCount]
 
     var xAxisGradient = d3.axisBottom(xScaleCorr)
