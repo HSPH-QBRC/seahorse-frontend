@@ -1,15 +1,53 @@
-# SeahorseFrontend
+# Seahorse Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.1.
+## Overview
 
-## Development server
+**SEAHORSE (Serendipity Engine Assaying Heterogeneous Omics Sampling Experiments)** is a web platform designed to enable users to develop new hypotheses from large population-based multi-omic datasets. Nearly all scientific inquiry is based on the paradigm of hypothesis testing, in which associations between pre-identified experimental factors and the final states of a system are explored. However, this approach is limited by our current understanding of the systems we wish to study.
 
-Run `npm run start` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+SEAHORSE was created to help overcome these limitations. Using both phenotypic and genomic variables from the Genotype-Tissue Expression (GTEx) and The Cancer Genome Atlas (TCGA) projects, we have pre-computed all pairwise associations:
+- Between phenotypic variables
+- Between genomic variables (in each tissue)
+- Between phenotypic and expression variables (in each tissue)
 
-## Build
+SEAHORSE not only provides opportunities for users to search for new and unexpected hypotheses that can be tested in future experiments or studies, but it also enables confirmation of findings from other studies within GTEx and TCGA.
 
-Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Key Features
 
-## Deploy on AWS S3
+- Explore all pairwise associations across large, multi-omic datasets
+- Integrated access to GTEx and TCGA data
+- Search for and visualize novel hypotheses
+- Confirm discoveries across multiple studies and tissues
 
-See: https://github.com/HSPH-QBRC/seahorse-frontend/blob/main/deployment/terraform/README.md
+## Getting Started
+### Prerequisite
+For deployment: AWS CLI installed, an AWS account with access to your S3 bucket, and your AWS credentials configured.
+
+
+### Installation and Build
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/HSPH-QBRC/seahorse-frontend.git
+cd seahorse-frontend
+npm install
+npm run build
+cd dist/d3-map-dashboard
+aws s3 rm s3://{s3 bucket name} --recursive
+aws s3 sync . s3://{s3 bucket name}
+```
+
+## Environment Variables
+
+Before running the project, ensure you have the following environment variables set. These can typically be configured in an `environment.ts` (for development) or `environment.prod.ts` (for production) file in your Angular project:
+
+```js
+export const environment = {
+  production: false,
+  API_URL: 'https://api-v1.seahorse.tm4.org'
+};
+```
+
+# Website
+[https://seahorse.tm4.org/](https://seahorse.tm4.org/ )
+
