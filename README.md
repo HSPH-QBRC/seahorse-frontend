@@ -31,8 +31,11 @@ Clone the repository and install dependencies:
 git clone https://github.com/HSPH-QBRC/seahorse-frontend.git
 cd seahorse-frontend
 npm install
+```
+
+```bash
 npm run build
-cd dist/d3-map-dashboard
+cd dist/seahorse-frontend
 aws s3 rm s3://{s3 bucket name} --recursive
 aws s3 sync . s3://{s3 bucket name}
 ```
