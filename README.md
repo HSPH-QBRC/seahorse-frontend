@@ -44,3 +44,6 @@ export const environment = {
 # Website
 [https://seahorse.tm4.org/](https://seahorse.tm4.org/ )
 
+# Backend
+[https://github.com/HSPH-QBRC/seahorse-backend](https://github.com/HSPH-QBRC/seahorse-backend )
+
