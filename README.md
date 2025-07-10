@@ -2,21 +2,7 @@
 
 ## Overview
 
-**SEAHORSE (Serendipity Engine Assaying Heterogeneous Omics Sampling Experiments)** is a web platform designed to enable users to develop new hypotheses from large population-based multi-omic datasets. Nearly all scientific inquiry is based on the paradigm of hypothesis testing, in which associations between pre-identified experimental factors and the final states of a system are explored. However, this approach is limited by our current understanding of the systems we wish to study.
-
-SEAHORSE was created to help overcome these limitations. Using both phenotypic and genomic variables from the Genotype-Tissue Expression (GTEx) and The Cancer Genome Atlas (TCGA) projects, we have pre-computed all pairwise associations:
-- Between phenotypic variables
-- Between genomic variables (in each tissue)
-- Between phenotypic and expression variables (in each tissue)
-
-SEAHORSE not only provides opportunities for users to search for new and unexpected hypotheses that can be tested in future experiments or studies, but it also enables confirmation of findings from other studies within GTEx and TCGA.
-
-## Key Features
-
-- Explore all pairwise associations across large, multi-omic datasets
-- Integrated access to GTEx and TCGA data
-- Search for and visualize novel hypotheses
-- Confirm discoveries across multiple studies and tissues
+**SEAHORSE (Serendipity Engine Assaying Heterogeneous Omics Sampling Experiments)** is a web platform for generating and exploring novel hypotheses from large-scale multi-omic datasets such as GTEx and TCGA. By pre-computing pairwise associations between phenotypic and genomic variables across tissues, SEAHORSE enables users to discover unexpected connections and validate findings in population-level data. The platform facilitates integrated data exploration, hypothesis generation, and cross-study validation within a unified, user-friendly interface.
 
 ## Getting Started
 ### Prerequisite
@@ -32,6 +18,10 @@ git clone https://github.com/HSPH-QBRC/seahorse-frontend.git
 cd seahorse-frontend
 npm install
 ```
+
+### Deployment
+
+Replace`{s3 bucket name}` with your actual S3 bucket name:
 
 ```bash
 npm run build
