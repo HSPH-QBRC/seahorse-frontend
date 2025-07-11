@@ -2,11 +2,11 @@
 
 ## Overview
 
-**SEAHORSE (Serendipity Engine Assaying Heterogeneous Omics Sampling Experiments)** is a web platform for generating and exploring novel hypotheses from large-scale multi-omic datasets such as GTEx and TCGA. By pre-computing pairwise associations between phenotypic and genomic variables across tissues, SEAHORSE enables users to discover unexpected connections and validate findings in population-level data. The platform facilitates integrated data exploration, hypothesis generation, and cross-study validation within a unified, user-friendly interface.
+**SEAHORSE (Serendipity Engine Assaying Heterogeneous Omics Sampling Experiments)** is a platform that enables users to discover and validate novel hypotheses by exploring comprehensive associations among phenotypic and genomic variables in large-scale datasets like GTEx and TCGA.
 
 ## Getting Started
 ### Prerequisite
-For deployment: AWS CLI installed, an AWS account with access to your S3 bucket, and your AWS credentials configured.
+**For deployment**: AWS CLI installed, an AWS account with access to your S3 bucket, and your AWS credentials configured.
 
 
 ### Installation and Build
