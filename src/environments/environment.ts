@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  API_URL: 'https://api-v1.seahorse.tm4.org'
+  API_URL: 'https://api-v1.networkmedicine.tm4.org'
 };
 
 /*

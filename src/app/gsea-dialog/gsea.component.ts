@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from "rxjs/operators";
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'gsea-component',
@@ -12,6 +13,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 export class PathwaysComponent implements OnInit {
   isLoading = false;
   dataSource = [];
+  private readonly API_URL = environment.API_URL;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: {
     meta: string,
@@ -31,9 +33,8 @@ export class PathwaysComponent implements OnInit {
 
   getTissueList() {
     this.isLoading = true;
-    let apiUrl = "https://api-v1.seahorse.tm4.org/";
     let annotationUrl = `gsea-tissue/?meta=${this.data.meta}&pathway=${this.data.pathway}`;
-    let queryURL = `${apiUrl}${annotationUrl}`;
+    let queryURL = `${this.API_URL}${annotationUrl}`;
     this.httpClient.get(queryURL).pipe(
       catchError(error => {
         this.isLoading = false;
